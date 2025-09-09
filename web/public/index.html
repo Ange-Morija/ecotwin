@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EcoTwin – Viewer</title>
+  <link rel="stylesheet" href="../styles/main.css" />
+</head>
+<body>
+  <header class="et-header">
+    <div class="brand"><span class="logo">🌿</span><strong>EcoTwin</strong></div>
+    <div class="actions">
+      <button id="btn-theme" class="btn ghost" title="Thème">🌓</button>
+      <a href="../docs/README.md" class="btn ghost" title="Docs">📄</a>
+    </div>
+  </header>
+
+  <main class="et-layout">
+    <aside class="et-sidebar">
+      <h2>Navigation</h2>
+      <nav class="menu">
+        <button id="btn-fit" class="btn block">Ajuster vue</button>
+        <button id="btn-xray" class="btn block">X-ray</button>
+        <button id="btn-edges" class="btn block">Arêtes</button>
+        <button id="btn-reset" class="btn block">Réinitialiser</button>
+      </nav>
+      <div class="small note"><p>Modèle: <code>assets/model.xkt</code></p></div>
+    </aside>
+
+    <section class="et-viewer">
+      <!-- Canvas principal -->
+      <canvas id="xeokit-canvas"></canvas>
+
+      <!-- Barre de progression -->
+      <div id="loader" class="loader hidden">
+        <div class="bar"><div id="loader-fill" class="fill"></div></div>
+        <div id="loader-text" class="txt">Chargement… 0%</div>
+      </div>
+
+      <!--  NavCube = canvas dédié (pas un div) -->
+      <canvas id="navCube" class="navcube"></canvas>
+
+      <!-- HUD (coords + messages) -->
+      <div class="hud">
+        <div id="coords" class="coords">X —  Y —  Z —</div>
+        <div id="hud-msg" class="msg">Prêt.</div>
+      </div>
+    </section>
+
+    <aside class="et-panel">
+      <div class="panel-section">
+        <h3>Mesures récentes</h3>
+        <div class="charts">
+          <div class="chart placeholder">Température (°C)</div>
+          <div class="chart placeholder">CO₂ (ppm)</div>
+          <div class="chart placeholder">Humidité (%)</div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h3>Propriétés IFC</h3>
+        <pre id="props" class="props">Sélectionnez un objet…</pre>
+      </div>
+    </aside>
+  </main>
+
+  <script type="module" src="../js/app.js"></script>
+</body>
+</html>

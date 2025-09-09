@@ -1,4 +1,5 @@
 env312/
 __pycache__/
 *.pyc
+*.gitignore
 !.gitkeep
