@@ -1,0 +1,67 @@
+/* Reset rapide */
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+
+/* Topbar */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; border-bottom: 1px solid #e5e7eb; background: #ffffff;
+}
+.topbar h1 { font-size: 16px; margin: 0; font-weight: 600; }
+.topbar .actions button { margin-left: 8px; }
+button {
+  padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; cursor: pointer;
+}
+button:hover { background: #f3f4f6; }
+
+/* Layout principal */
+#app {
+  display: grid; grid-template-columns: 300px 1fr; height: calc(100% - 49px);
+}
+
+/* Navigation */
+#navigation {
+  border-right: 1px solid #e5e7eb; background: #fafafa; display: flex; flex-direction: column; min-width: 240px;
+}
+.nav-header { padding: 8px; border-bottom: 1px solid #e5e7eb; }
+#filterInput { width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px; }
+
+.models-list {
+  list-style: none; margin: 0; padding: 6px; overflow-y: auto; flex: 1;
+}
+.models-list li {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 8px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; margin-bottom: 6px;
+}
+.models-list label { display: flex; align-items: center; gap: 8px; cursor: pointer; flex: 1; }
+.badge { font-size: 11px; padding: 2px 6px; border-radius: 999px; border: 1px solid #d1d5db; background: #f9fafb; }
+.loading { opacity: 0.6; }
+.hint { padding: 8px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; }
+
+/* Viewer */
+#viewer { position: relative; background: #111827; }
+#viewer-canvas { width: 100%; height: 100%; display: block; }
+
+/* Overlays */
+.overlay-corner {
+  position: absolute; top: 8px; right: 8px; width: 140px; height: 140px; pointer-events: auto;
+  background: rgba(255,255,255,0.05); border-radius: 8px; backdrop-filter: blur(2px);
+}
+.overlay-bottom-left {
+  position: absolute; left: 8px; bottom: 8px; color: #e5e7eb; font-size: 12px; padding: 4px 6px;
+  background: rgba(0,0,0,0.35); border-radius: 6px;
+}
+
+/* Status bar */
+.status-bar {
+  position: absolute; left: 0; right: 0; top: 0;
+  background: rgba(17, 24, 39, 0.8); color: #e5e7eb; font-size: 12px; padding: 6px 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.progress {
+  height: 6px; background: #e5e7eb; border-radius: 999px; overflow: hidden; flex: 1;
+}
+.progress > span {
+  display: block; height: 100%; background: #60a5fa; width: 0%;
+  transition: width 120ms ease;
+}

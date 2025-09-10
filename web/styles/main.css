@@ -1,4 +1,4 @@
-/* === Thème (contrastes) === */
+/* ===== Thème ===== */
 :root{
   --bg:#0f172a;--surface:#111827;--panel:#0b1220;--text:#e5e7eb;--muted:#9aa4b2;
   --primary:#14b8a6;--primary-600:#0d9488;--secondary:#6366f1;--border:#1f2937;
@@ -10,12 +10,14 @@ body{margin:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-ser
   background:radial-gradient(1200px 800px at 20% -10%, rgba(34,211,238,.08), transparent 50%),
              radial-gradient(900px 600px at 120% 10%, rgba(99,102,241,.08), transparent 50%),var(--bg)}
 
-/* Header */
+/* ===== Header ===== */
 .et-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
 .brand{display:flex;align-items:center;gap:10px}.brand .logo{font-size:20px}.actions{display:flex;gap:8px}
 
-/* Layout */
+/* ===== Layout ===== */
 .et-layout{display:grid;grid-template-columns:260px 1fr 380px;gap:12px;padding:12px;height:calc(100vh - 56px)}
+
+/* Sidebar */
 .et-sidebar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
 .et-sidebar h2{font-size:14px;margin:0 0 10px;color:var(--muted)}
 .menu{display:grid;gap:8px}
@@ -25,32 +27,62 @@ body{margin:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-ser
 .et-viewer{position:relative;background:linear-gradient(180deg,#020617,#0b1220);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
 #xeokit-canvas{width:100%;height:100%;display:block}
 
-/* Overlay: loader (progress bar) */
+/* Loader */
 .loader{position:absolute;left:50%;top:20px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:5}
 .loader.hidden{display:none}
 .loader .bar{width:380px;max-width:70vw;height:8px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.06);overflow:hidden}
 .loader .fill{height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--secondary))}
 .loader .txt{font-size:12px;color:var(--muted)}
 
-/* HUD + coords */
+/* HUD + Cube */
 .hud{position:absolute;left:12px;bottom:12px;display:grid;gap:6px}
 .coords{background:rgba(0,0,0,.35);backdrop-filter:blur(6px);padding:4px 8px;border-radius:8px;font-size:12px}
 .msg{font-size:12px;color:var(--muted)}
-
-/* NavCube */
 .navcube{position:absolute;right:12px;bottom:12px;width:110px;height:110px;border-radius:12px;overflow:hidden;border:1px solid var(--border);z-index:4}
 
-/* Panneau */
-.et-panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px;display:grid;gap:16px;box-shadow:var(--shadow)}
-.panel-section h3{margin:0 0 10px;font-size:14px;color:var(--muted)}
-.charts{display:grid;gap:8px}
-.chart.placeholder{height:120px;border-radius:12px;border:1px dashed var(--border);background:linear-gradient(90deg,rgba(20,184,166,.06),rgba(99,102,241,.06));display:grid;place-items:center;font-size:13px;color:var(--muted)}
+/* ===== Panneau droit ===== */
+/* Grille 2 rangées: [mesures] = 1fr (prend le reste, scroll) | [props] = auto */
+.et-panel{
+  background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px;
+  display:grid;grid-template-rows:1fr auto;gap:16px;box-shadow:var(--shadow);min-height:0; /* min-height:0 -> autorise l'enfant à scroller */ 
+}
+/* Chaque section devient une colonne flex pour que son contenu puisse scroller proprement */
+.panel-section{display:flex;flex-direction:column;gap:10px;min-height:0}
+
+/* Titre de section */
+.panel-section h3{margin:0;font-size:14px;color:var(--muted)}
+
+/* Grille des iframes */
+.charts{display:grid;gap:12px}
+.charts-2col{grid-template-columns:1fr 1fr}
+@media (max-width:1400px){ .charts-2col{ grid-template-columns:1fr; } }
+
+/* === Scroll vertical pour la zone des graphes === */
+.scroll-v{
+  /* Laisse cette zone prendre l'espace et scroller */
+  flex:1 1 auto;              /* occupe l'espace disponible */
+  overflow-y:auto;            /* scroll vertical uniquement */
+  overscroll-behavior:contain;/* évite de scroller le parent à la fin */       /* MDN overscroll-behavior */
+  scrollbar-width:thin;       /* barre fine (Firefox) */                        /* MDN scrollbar-width */
+  scrollbar-color:var(--muted) transparent;                                     /* MDN CSS scrollbars styling */
+  min-height:0;               /* clé pour autoriser le scroll en flex/grid */   /* MDN min-height */
+  scroll-behavior:smooth;     /* scroll fluide (optionnel) */
+}
+/* WebKit (optionnel) */
+.scroll-v::-webkit-scrollbar{width:8px}
+.scroll-v::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:8px}
+.scroll-v::-webkit-scrollbar-track{background:transparent}
+
+/* Panneau propriétés */
 .props{margin:0;background:var(--surface);border:1px solid var(--border);padding:10px;border-radius:12px;max-height:180px;overflow:auto}
 
 /* Boutons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);color:var(--text);cursor:pointer;font-weight:600}
 .btn:hover{border-color:var(--primary);box-shadow:0 0 0 3px rgba(20,184,166,.18)}
 .btn.ghost{background:transparent}.btn.block{width:100%}
+
+/* Iframes Grafana */
+.gpanel{width:100%;height:220px;border:0;border-radius:12px;background:rgba(255,255,255,.02)}
 
 /* Responsive */
 @media (max-width:1200px){.et-layout{grid-template-columns:220px 1fr}.et-panel{display:none}}

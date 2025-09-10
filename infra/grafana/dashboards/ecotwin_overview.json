@@ -1,0 +1,96 @@
+{
+  "uid": "ecotwin-overview",
+  "title": "EcoTwin – Capteurs air",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "3min",
+  "time": { "from": "now-2h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "sensor",
+        "type": "query",
+        "label": "Capteur",
+        "datasource": "InfluxDB",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"air_quality\", tag: \"sensor\")",
+        "refresh": 2,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1, "type": "timeseries", "title": "Humidité (%)",
+      "fieldConfig": { "defaults": { "unit": "percent" } },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        { "datasource": "InfluxDB",
+          "query": "from(bucket:\"air_quality\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn:(r)=> r._measurement == \"air_quality\" and r._field == \"humidity\")\n|> filter(fn:(r)=> if v.sensor == \".*\" then true else r.sensor =~ regexp.compile(v.sensor))\n|> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n|> yield(name:\"mean\")"
+        }
+      ]
+    },
+    {
+      "id": 2, "type": "timeseries", "title": "Température (°C)",
+      "fieldConfig": { "defaults": { "unit": "celsius" } },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        { "datasource": "InfluxDB",
+          "query": "from(bucket:\"air_quality\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn:(r)=> r._measurement == \"air_quality\" and r._field == \"temperature\")\n|> filter(fn:(r)=> if v.sensor == \".*\" then true else r.sensor =~ regexp.compile(v.sensor))\n|> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n|> yield(name:\"mean\")"
+        }
+      ]
+    },
+    {
+      "id": 3, "type": "timeseries", "title": "PM2.5 (µg/m³)",
+      "fieldConfig": { "defaults": { "unit": "µg/m³" } },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        { "datasource": "InfluxDB",
+          "query": "from(bucket:\"air_quality\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn:(r)=> r._measurement == \"air_quality\" and r._field == \"pm25\")\n|> filter(fn:(r)=> if v.sensor == \".*\" then true else r.sensor =~ regexp.compile(v.sensor))\n|> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n|> yield(name:\"mean\")"
+        }
+      ]
+    },
+    {
+      "id": 4, "type": "timeseries", "title": "PM10 (µg/m³)",
+      "fieldConfig": { "defaults": { "unit": "µg/m³" } },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        { "datasource": "InfluxDB",
+          "query": "from(bucket:\"air_quality\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn:(r)=> r._measurement == \"air_quality\" and r._field == \"pm10\")\n|> filter(fn:(r)=> if v.sensor == \".*\" then true else r.sensor =~ regexp.compile(v.sensor))\n|> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n|> yield(name:\"mean\")"
+        }
+      ]
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "SO₂ (ppb)",
+      "fieldConfig": { "defaults": { "unit": "ppb" } },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        { "datasource": "InfluxDB",
+          "query": "from(bucket:\"air_quality\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn:(r)=> r._measurement == \"air_quality\" and r._field == \"so2\")\n|> filter(fn:(r)=> if v.sensor == \".*\" then true else r.sensor =~ regexp.compile(v.sensor))\n|> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n|> yield(name:\"mean\")"
+        }
+      ]
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "CO (ppm)",
+      "fieldConfig": { "defaults": { "unit": "ppm" } },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        { "datasource": "InfluxDB",
+          "query": "from(bucket:\"air_quality\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn:(r)=> r._measurement == \"air_quality\" and r._field == \"co\")\n|> filter(fn:(r)=> if v.sensor == \".*\" then true else r.sensor =~ regexp.compile(v.sensor))\n|> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n|> yield(name:\"mean\")"
+        }
+      ]
+    },
+    {
+      "id": 7, "type": "timeseries", "title": "O₃ (ppb)",
+      "fieldConfig": { "defaults": { "unit": "ppb" } },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        { "datasource": "InfluxDB",
+          "query": "from(bucket:\"air_quality\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn:(r)=> r._measurement == \"air_quality\" and r._field == \"o3\")\n|> filter(fn:(r)=> if v.sensor == \".*\" then true else r.sensor =~ regexp.compile(v.sensor))\n|> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n|> yield(name:\"mean\")"
+        }
+      ]
+    }
+  ]
+}
