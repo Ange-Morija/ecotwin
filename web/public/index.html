@@ -5,40 +5,88 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>EcoTwin – Viewer</title>
   <link rel="stylesheet" href="../styles/main.css" />
-  <!-- Aucun meta refresh. Le refresh est géré par Grafana via ?refresh=5s -->
 </head>
 <body>
+  <!-- En-tête -->
   <header class="et-header">
     <div class="brand"><span class="logo">🌿</span><strong>EcoTwin</strong></div>
     <div class="actions">
-      <button id="btn-theme" class="btn ghost" title="Thème">🌓</button>
+      <button id="btn-theme" type="button" class="btn ghost" title="Thème">🌓</button>
       <a href="../docs/README.md" class="btn ghost" title="Docs">📄</a>
     </div>
   </header>
 
   <main class="et-layout">
+    <!-- Panneau gauche -->
     <aside class="et-sidebar">
       <h2>Navigation</h2>
       <nav class="menu">
-        <button id="btn-fit" class="btn block">Ajuster vue</button>
-        <button id="btn-xray" class="btn block">X-ray</button>
-        <button id="btn-edges" class="btn block">Arêtes</button>
-        <button id="btn-reset" class="btn block">Réinitialiser</button>
+        <div class="note small">Outils de navigation disponibles dans la scène (coin supérieur droit).</div>
       </nav>
-      <div class="small note"><p>Modèle: <code>assets/model.xkt</code></p></div>
+
+      <!-- Arborescence -->
+      <div class="panel-section">
+        <h3>Arborescence</h3>
+        <div class="tree-toolbar">
+          <input id="tree-search" class="input" type="search" placeholder="Rechercher…" />
+          <div class="tree-actions">
+            <button id="btn-tree-expand"  type="button" class="btn ghost" title="Tout ouvrir">▾</button>
+            <button id="btn-tree-collapse" type="button" class="btn ghost" title="Tout fermer">▸</button>
+          </div>
+        </div>
+        <div id="tree" class="tree scroll-v">Chargement…</div>
+      </div>
+
+      <!-- Propriétés IFC -->
+      <div class="panel-section">
+        <h3>Propriétés IFC</h3>
+        <pre id="props" class="props">Sélectionnez un objet…</pre>
+      </div>
+
+      <!-- Liste des mesures -->
+      <div class="panel-section">
+        <h3>Mesures 3D</h3>
+        <div id="measure-list" class="measure-list scroll-v empty">Aucune mesure.</div>
+        <div class="small note"><p><strong>Astuce :</strong> <kbd>Échap</kbd> annule le point en cours.</p></div>
+      </div>
     </aside>
 
+    <!-- Viewer -->
     <section class="et-viewer">
-      <!-- Canvas xeokit -->
       <canvas id="xeokit-canvas"></canvas>
+
+      <!-- Overlay SVG (cordes + points) -->
+      <svg id="measure-overlay" class="measure-overlay" preserveAspectRatio="none"></svg>
+
+      <!-- Boutons flottants dans la scène (FAB) -->
+      <div class="viewer-tools" aria-label="Outils de mesure et navigation">
+        <!-- Ajuster vue en fab (taille identique aux autres) -->
+        <button id="btn-fit" type="button" class="fab" title="Ajuster vue">🧭</button>
+
+        <div class="tools-row">
+          <button id="vt-meas-distance" type="button" class="fab" title="Mesurer une distance">📏</button>
+          <button id="vt-meas-point"    type="button" class="fab" title="Mesurer un point XYZ">📍</button>
+          <button id="vt-meas-clear"    type="button" class="fab ghost" title="Effacer les mesures">🗑️</button>
+        </div>
+
+        <div class="tools-row small-gap">
+          <button id="btn-xray"  type="button" class="fab outline" data-toggle="xray" title="X-ray">🩻</button>
+          <button id="btn-edges" type="button" class="fab outline" data-toggle="edges" title="Arêtes">⬚</button>
+          <button id="btn-reset" type="button" class="fab ghost" title="Réinitialiser">↺</button>
+        </div>
+
+        <div class="tools-row">
+          <button id="btn-export-assets" type="button" class="fab outline" title="Exporter hiérarchie CSV">📦</button>
+        </div>
+      </div>
 
       <!-- Loader -->
       <div id="loader" class="loader hidden">
         <div class="bar"><div id="loader-fill" class="fill"></div></div>
-        <div id="loader-text" class="txt">Chargement… 0%</div>
+        <div id="loader-text" class="txt">Chargement…</div>
       </div>
 
-      <!-- Cube nav -->
+      <!-- Cube navigation -->
       <canvas id="navCube" class="navcube"></canvas>
 
       <!-- HUD -->
@@ -48,40 +96,163 @@
       </div>
     </section>
 
+    <!-- Panneau droit -->
     <aside class="et-panel">
-      <div class="panel-section">
-        <h3>Mesures récentes</h3>
+      <div class="tabs">
+        <button class="tab-btn active" type="button" data-tab="latest">Mesures</button>
+        <button class="tab-btn" type="button" data-tab="history">Historique</button>
+        <button class="tab-btn" type="button" data-tab="predictions">Prévisions</button>
+        <button class="tab-btn" type="button" data-tab="sensors">Capteurs</button>
+        <button class="tab-btn" type="button" data-tab="actions">Actions IA</button>
+      </div>
 
-        <!-- Conteneur scrollable -->
-        <div id="graphs" style="max-height:80vh; overflow-y:auto; border:1px solid #eee; padding:8px; display:grid; gap:8px;">
+      <div class="tab-content active" id="tab-latest">
+        <h3>Dernières mesures</h3>
+        <div id="latest-cards" class="charts charts-3col scroll-v"></div>
+        <div class="aqi-pair">
+          <div id="aqi-current" class="aqi-box"><div class="aqi-label">Qualité de l'air (calculée) :</div><div class="aqi-value">—</div></div>
+          <div id="aqi-pred"    class="aqi-box"><div class="aqi-label">Qualité de l'air (prédite) :</div><div class="aqi-value">—</div></div>
+        </div>
+      </div>
 
-          <!-- Iframes Grafana : fenêtre 1h, auto-refresh 5s -->
-          <iframe src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=1" width="100%" height="260" frameborder="0"></iframe>
-
-          <iframe src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=2" width="100%" height="260" frameborder="0"></iframe>
-
-          <iframe src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=3" width="100%" height="260" frameborder="0"></iframe>
-
-          <iframe src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=4" width="100%" height="260" frameborder="0"></iframe>
-
-          <iframe src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=5" width="100%" height="260" frameborder="0"></iframe>
-
-          <iframe src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=6" width="100%" height="260" frameborder="0"></iframe>
-
-          <iframe src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=7" width="100%" height="260" frameborder="0"></iframe>
+      <div class="tab-content" id="tab-history">
+        <h3>Historique (1h)</h3>
+        <div class="charts scroll-v">
+          <iframe class="gpanel" src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=1"></iframe>
+          <iframe class="gpanel" src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=2"></iframe>
+          <iframe class="gpanel" src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=3"></iframe>
+          <iframe class="gpanel" src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=4"></iframe>
+          <iframe class="gpanel" src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=5"></iframe>
+          <iframe class="gpanel" src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=6"></iframe>
+          <iframe class="gpanel" src="http://localhost:3005/d-solo/cexn7ihyljldsf/mvp?orgId=1&from=now-1h&to=now&refresh=5s&kiosk&panelId=7"></iframe>
 
         </div>
       </div>
 
-      <div class="panel-section">
-        <h3>Propriétés IFC</h3>
-        <pre id="props" class="props">Sélectionnez un objet…</pre>
+      <div class="tab-content" id="tab-predictions">
+        <h3>Prévisions & Qualité de l'air</h3>
+        <div id="predictions" class="charts charts-3col scroll-v"></div>
+
+        <!-- MLOps / Drift -->
+        <div id="mlops-section" class="mlops-section">
+          <h4>Drift & MLOps</h4>
+          <div id="mlops-cards" class="mlops-grid">
+            <div class="mlops-card" id="mlops-drift">
+              <div class="mlops-title">Dérive (score)</div>
+              <div class="mlops-value" id="mlops-drift-score">—</div>
+              <div class="mlops-meta" id="mlops-last-check">Dernier contrôle: —</div>
+            </div>
+            <div class="mlops-card" id="mlops-retrain">
+              <div class="mlops-title">Ré-entraînement</div>
+              <div class="mlops-value" id="mlops-retrain-status">—</div>
+              <div class="mlops-meta" id="mlops-next-retrain">Planifié: —</div>
+            </div>
+            <div class="mlops-card" id="mlops-featurestore">
+              <div class="mlops-title">Feature store</div>
+              <div class="mlops-value" id="mlops-feature-count">— features</div>
+              <div class="mlops-meta" id="mlops-feature-summary">Résumé: —</div>
+            </div>
+            <div class="mlops-card" id="mlops-alerts">
+              <div class="mlops-title">Alertes</div>
+              <div class="mlops-value" id="mlops-alert-count">0</div>
+              <div class="mlops-meta" id="mlops-alert-list">—</div>
+            </div>
+          </div>
+          <div class="mlops-actions">
+            <button id="btn-trigger-retrain" class="btn primary">Lancer ré-entraînement</button>
+            <button id="btn-view-featurestore" class="btn ghost">Voir feature store</button>
+          </div>
+        </div>
+
+        <div id="ai-info" class="ai-info">
+          <div class="ai-item"><span>Modèle :</span><strong id="ai-model">—</strong></div>
+          <div class="ai-item"><span>Version :</span><strong id="ai-version">—</strong></div>
+          <div class="ai-item"><span>Fenêtre d'entraînement :</span><strong id="ai-window">—</strong></div>
+          <div class="ai-item"><span>Dernier entraînement :</span><strong id="ai-trained">—</strong></div>
+        </div>
+        <div id="pred-metrics" class="metrics"></div>
+        <div id="sensor-metrics" class="sensor-metrics"></div>
+        <div id="air-quality" class="aqi-box"><div class="aqi-label">Qualité de l'air (prédite) :</div><div class="aqi-value">—</div></div>
+      </div>
+
+      <div class="tab-content" id="tab-sensors">
+        <h3>Capteurs & Données</h3>
+        <div class="sensor-filter-row">
+          <input id="sensor-filter" class="input" type="search" placeholder="Filtrer par nom ou id…" />
+          <select id="sensor-unit-filter" class="input">
+            <option value="">Tous les units</option>
+          </select>
+          <button id="btn-export-sensors" class="btn ghost" title="Exporter capteurs filtrés">Export CSV</button>
+        </div>
+        <div id="sensor-list" class="sensor-list charts scroll-v"></div>
+      </div>
+
+      <!-- Nouvel onglet Actions IA -->
+      <div class="tab-content" id="tab-actions">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <h3>Actions suggérées par l'IA</h3>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="action-filter" class="input" type="search" placeholder="Filtrer action / statut…" />
+            <button id="btn-new-action" class="btn primary">Nouvelle action</button>
+            <button id="btn-export-actions" class="btn ghost">Export CSV</button>
+          </div>
+        </div>
+        <div id="actions-list" class="actions-list scroll-v"></div>
       </div>
     </aside>
   </main>
 
-  <!-- App (ne recharge pas la page) -->
+  <!-- Modal édition maintenance (avec IA) -->
+  <div id="maint-modal" class="modal hidden" role="dialog" aria-hidden="true">
+    <div class="modal-panel">
+      <h3>Éditer maintenance</h3>
+      <form id="maint-form">
+        <div class="form-row"><label>Capteur:</label><div id="maint-sensor-id">—</div></div>
+        <div class="form-row"><label for="maint-last">Dernière maintenance</label><input id="maint-last" type="datetime-local" /></div>
+        <div class="form-row"><label for="maint-interval">Intervalle (jours)</label><input id="maint-interval" type="number" min="0" /></div>
+        <div class="form-row"><label for="maint-next">Maintenance opportune</label><input id="maint-next" type="datetime-local" /></div>
+
+        <!-- Section IA: prédiction + bouton -->
+        <div class="form-row ia-row">
+          <label>Date maintenance (IA)</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="maint-ia-date" type="datetime-local" readonly />
+            <button id="btn-ia-compute" type="button" class="btn outline">Calculer (IA)</button>
+          </div>
+          <div class="small" id="maint-ia-meta">Dernier calcul: — • Confiance: —</div>
+        </div>
+
+        <div class="form-row"><label for="maint-notes">Notes</label><textarea id="maint-notes" rows="3"></textarea></div>
+        <div class="form-actions">
+          <button id="maint-save" type="button" class="btn primary">Enregistrer</button>
+          <button id="maint-cancel" type="button" class="btn ghost">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Action (création / édition) -->
+  <div id="action-modal" class="modal hidden" role="dialog" aria-hidden="true">
+    <div class="modal-panel">
+      <h3 id="action-modal-title">Éditer action</h3>
+      <form id="action-form">
+        <input type="hidden" id="action-id" />
+        <div class="form-row"><label for="action-created">Créée le</label><input id="action-created" type="datetime-local" /></div>
+        <div class="form-row"><label for="action-due">À faire avant</label><input id="action-due" type="datetime-local" /></div>
+        <div class="form-row"><label for="action-text">Action</label><textarea id="action-text" rows="3"></textarea></div>
+        <div class="form-row" style="display:flex;gap:8px;align-items:center;">
+          <label><input id="action-done" type="checkbox" /> Corrigée</label>
+          <input id="action-done-date" type="datetime-local" placeholder="Date exécution" />
+          <input id="action-done-by" type="text" placeholder="Par qui" />
+        </div>
+        <div class="form-actions">
+          <button id="action-save" type="button" class="btn primary">Sauvegarder</button>
+          <button id="action-cancel" type="button" class="btn ghost">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script type="module" src="../js/app.js"></script>
-  <!-- ✅ Pas de script de refresh : Grafana gère le rafraîchissement interne des panels -->
 </body>
 </html>
