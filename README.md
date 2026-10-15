@@ -1,229 +1,98 @@
 # EcoTwin
+Une plateforme de jumeaux numériques pour relier le contexte BIM aux observations du bâtiment et aux décisions d'exploitation.
 
-EcoTwin — application de visualisation 3D et dashboard de télémétrie. Ce dépôt contient :
-- API Python (FastAPI) : api/
-- Frontend statique (HTML/CSS/JS) : web/
-- Infra pour tests locaux : infra/ (docker-compose, .env.example)
-- Documentation d'architecture : docs/
-
-Résumé : viewer 3D + panneau de télémétrie, assets servis soit par l'API soit statiquement.
-
----
-
-## Table des matières
-- Aperçu
-- Structure du dépôt
-- Prérequis
-- Lancement local (Windows)
-- Déploiement local (docker-compose)
-- Pipeline CI/CD — diagramme simple + étapes
-- Exemple GitHub Actions (minimal)
-- Bonnes pratiques
-- Contribuer
-- Fichiers importants
-- Licence
-
----
+Le pilote propose une présentation produit, une connexion réelle et un dashboard responsive avec modèle XKT, huit métriques environnementales, historique, export CSV et insights par règles. Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
 
 ## Aperçu
-- Backend : FastAPI pour endpoints REST/WebSocket (télémétrie, métadonnées, santé).
-- Frontend : viewer 3D + dashboard (web/public, web/js, web/styles).
-- Optionnel : InfluxDB/Grafana via infra/docker-compose.yml pour séries temporelles.
+![Dashboard EcoTwin — démonstration BIM et données](docs/images/dashboard-desktop.png)
 
----
+[Présentation, connexion et captures mobiles](docs/product.md) · [Documentation complète](docs/README.md) · [Architecture](docs/architecture.md) · [Déploiement](docs/deployment.md)
 
-## Structure du dépôt
-- api/ — code source API, Dockerfile
-- web/ — public/, js/, styles/, Dockerfile
-- infra/ — docker-compose.yml, .env.example
-- docs/ — architecture, notes
+Le pilote livre 27 tâches; 7 lots restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le moteur IA n’est pas connecté. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
 
----
-
-## Prérequis
-- Windows 10/11 (instructions ci‑dessous en PowerShell)
-- Python 3.10+
-- Node.js/npm (optionnel pour frontend tooling)
-- Docker & Docker Compose
-
----
-
-## Lancement local (Windows - PowerShell)
-
-API
-```powershell
-cd api
-python -m venv .venv
-. .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
-# API disponible sur http://localhost:8000 (vérifier /health)
+## Démarrage
+Python 3.11+ (3.12 testé), Node.js 22+ et uv.
+Depuis la racine du dépôt:
+```bash
+uv venv .venv --python python3
+uv pip sync --python .venv/bin/python --require-hashes api/requirements-dev.lock
+npm ci
+npm run build
+.venv/bin/python -m uvicorn api.src.main:app --host 0.0.0.0 --port 8000
 ```
+Routes: `/` présentation, `/login` connexion, `/register` création de compte local, `/dashboard` espace connecté, `/dashboard?mode=demo` découverte publique. Le serveur fournit frontend et API sur la même origine. Aucun compte par défaut: créez explicitement votre compte local.
 
-Frontend (serveur statique)
-```powershell
-cd web/public
-npx http-server -p 8080
-# Ouvrir http://localhost:8080
+La démonstration est étiquetée et contient des données illustratives. Le viewer charge le véritable modèle `web/assets/model.xkt` avec un SDK Xeokit figé, servi localement. Le lien entre objets BIM et capteurs n'est pas encore configuré.
+
+## Données réelles et configuration
+La page connectée ne bascule jamais silencieusement en démo si InfluxDB est absent.
+- `INFLUX_URL`, `INFLUX_TOKEN`, `INFLUX_ORG`, `INFLUX_BUCKET`: accès à votre source.
+- `API_KEY`: clé pour les producteurs machine, transmise par `X-API-Key`.
+- `ECOTWIN_DATA_DIR`: stockage local des comptes, sessions, maintenances et actions; défaut `.runtime/`, ignoré.
+- `ALLOW_REGISTRATION`: true pour le développement local; désactiver avant exposition publique.
+- `COOKIE_SECURE=true`: requis lorsque servi en HTTPS.
+- `CORS_ORIGINS`: origines explicitement autorisées, séparées par virgules, si vous utilisez un frontend séparé.
+
+Le pilote est **mono-site partagé**; les actions sont personnelles, les données de site et la maintenance sont partagées entre comptes autorisés du pilote. Pas d'isolation multi-client ni de SSO pour le moment. Voir [sécurité](docs/security.md).
+
+Télémétrie: `POST /api/telemetry/ingest`, `GET /api/telemetry/latest?sensor=CAP_TEMP`. Les alias `/ingest` et `/latest` restent disponibles avec les mêmes contrôles d'accès. Les écritures sont synchrones et les requêtes Flux paramétrées. Contrat interactif à `/docs`.
+
+Le script `scripts/replay_csv_every_3min_per_metric_no_time.py` utilise uniquement la bibliothèque standard Python. Définissez `CSV_PATH`, `API_KEY`, éventuellement `API_BASE_URL`, `SLEEP_SEC`, `START_INDEX` et `LOOP`. Les identifiants ne sont jamais codés en dur. Sans LOOP, il s'arrête à la dernière ligne.
+
+## Docker
+Les deux images se construisent depuis la **racine**:
+```bash
+docker build -f api/Dockerfile -t ecotwin-api .
+docker build -f web/Dockerfile -t ecotwin-web .
+docker compose --env-file infra/.env -f infra/docker-compose.yml up -d --build
 ```
+Le frontend Nginx transmet `/api/` à FastAPI. SDK, modèle et routes frontend sont inclus dans les images.
+Compose démarre API et web; les profils `telemetry` et `monitoring` ajoutent respectivement InfluxDB et Grafana. Préparer un fichier local à partir de `infra/.env.example` sans écraser un fichier existant; renseigner des identifiants uniques avant l'initialisation des services optionnels.
+Les nouveaux volumes Docker remplacent les anciennes données de base versionnées. L'inscription est désactivée par défaut dans Compose et dans l'image API; l'activer uniquement pour un pilote local contrôlé.
 
-Tests API
-```powershell
-cd api
-. .venv\Scripts\activate
-pytest -q
+Dans un cloud avec proxy TLS géré, conserver la vérification et transmettre le bundle CA au build:
+```bash
+docker build --secret id=proxy_ca,src=/etc/ssl/certs/ca-certificates.crt -f api/Dockerfile -t ecotwin-api .
 ```
+Le certificat est monté pendant l'installation et n'est pas embarqué dans l'image.
 
----
-
-## Déploiement local (docker-compose)
-```powershell
-cd infra
-copy .env.example .env
-docker compose up -d --build
-docker compose logs -f
+## Tests
+```bash
+.venv/bin/python -m pytest api/tests -q
+.venv/bin/python -m ruff check api/src api/tests
+.venv/bin/python -m ruff format --check api/src api/tests
+npm run check
+npm run format:check
+npx playwright install chromium
+npm run test:e2e
 ```
-Vérifier : endpoint santé de l'API et page frontend.
+Playwright lance un serveur isolé sur le port 8010 et stocke ses comptes dans `test-results/runtime`; aucun compte de test n'est créé dans le stockage normal. `CHROMIUM_PATH` permet de choisir un navigateur système, `ECOTWIN_PYTHON` l'interpréteur. `ECOTWIN_E2E_URL` cible un serveur de test existant (par exemple les images Docker), jamais une instance de production.
+Le test InfluxDB réel exige `ECOTWIN_TEST_INFLUX_URL` pointant vers une instance **neuve et jetable** d'InfluxDB 2. Il initialise cette instance avec des identifiants de test éphémères et vérifie ingestion/lecture/dashboard. Sans ce paramètre, ce seul test est explicitement ignoré.
+CI: [.github/workflows/ci.yml](.github/workflows/ci.yml), avec un service InfluxDB jetable et vérifications navigateur. Voir [preuves de vérification](docs/verification.md).
 
----
+## Spec Kit et prochaines tâches
+Le dépôt est initialisé avec la CLI officielle GitHub Spec Kit et l'intégration Codex.
+- [Constitution](.specify/memory/constitution.md): principes de données, sécurité, accessibilité et livraison.
+- [Spécification](specs/001-digital-twin-platform/spec.md): parcours et critères d'acceptation.
+- [Plan](specs/001-digital-twin-platform/plan.md): architecture et frontières du pilote.
+- [Tâches](specs/001-digital-twin-platform/tasks.md): état livré et lots futurs.
+- [Design](DESIGN.md) et [contrat UX](UX-CONTRACT.md): identité et comportements partagés.
 
-## Pipeline CI/CD — diagramme simple (Markdown)
-Diagramme simple en ASCII (lisible n'importe où) :
-
-```text
-[PR / Push]
-     |
-     v
-+-----------------+
-| Checkout        |
-+-----------------+
-     |
-     v
-+-----------------+
-| Lint & Format   |
-+-----------------+
-     |
-     v
-+-----------------+
-| Unit Tests      |
-+-----------------+
-     |
-     v
-+-----------------+
-| Build Artifacts |
-| (frontend build)|
-+-----------------+
-     |
-     v
-+-----------------+
-| Build Docker    |
-| Images (api,web)|
-+-----------------+
-     |
-     v
-+-----------------+
-| Push to Registry|
-+-----------------+
-     |
-     v
-+---------------------------+
-| Deploy (compose / k8s)    |
-+---------------------------+
-     |
-     v
-+-----------------+
-| Smoke Tests     |
-+-----------------+
+Dans Codex, les compétences locales `$speckit-specify`, `$speckit-plan`, `$speckit-tasks`, `$speckit-implement` et `$speckit-analyze` permettent de poursuivre le travail. La sélection actuelle est dans `.specify/feature.json`.
+```bash
+.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
 ```
+Les prochains lots couvrent multi-sites/RBAC/SSO, import et mapping IFC-capteur, connecteurs IoT, IA avec preuves et validation humaine, puis notifications et exploitation. Aucun moteur IA n'est connecté: les insights actuels expliquent des règles de seuil, pas des prédictions.
 
-Étapes rapides
-1. Checkout (PR/branch).
-2. Lint & format (Python : ruff/black, JS : eslint/prettier).
-3. Static analysis (mypy / npm audit).
-4. Unit tests (pytest, jest/playwright si présents).
-5. Frontend build / empaquetage des assets.
-6. Build image Docker (multi-stage recommandé).
-7. Scanner images (Trivy).
-8. Push images (registry privée / GHCR).
-9. Déploiement (staging automatique, prod manuel/gated).
-10. Smoke tests (endpoint /health, UI load).
+## Structure
+- `api/src/`: FastAPI, sécurité, stockage et données.
+- `web/`: produit, connexion, dashboard et viewer avancé historique sous `/public/index.html`.
+- `infra/`: Compose et reverse proxy.
+- `api/tests/`, `tests/e2e/`: tests API et navigateur.
+- `specs/`, `.specify/`, `.agents/skills/`: workflow Spec Kit.
+- `docs/`: sécurité, intégration IA et validation.
 
----
+Les fichiers secrets et les anciens fichiers internes InfluxDB sont retirés du suivi Git en préservant les copies locales. L'historique Git n'est pas purgé: la vérification et la rotation des anciens identifiants restent nécessaires avant production.
 
-## Exemple GitHub Actions (minimal)
-Extrait à adapter / sécuriser (se placer dans .github/workflows/ci.yml) :
-
-```yaml
-# filepath: .github/workflows/ci.yml
-# ...existing code...
-name: CI
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with: python-version: '3.10'
-      - name: Install deps & test
-        run: |
-          python -m venv .venv
-          . .venv\Scripts\activate
-          pip install -r api/requirements.txt
-          pip install ruff pytest
-          ruff check api
-          pytest api -q
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build images
-        run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/ecotwin-api:latest ./api
-          docker build -t ghcr.io/${{ github.repository_owner }}/ecotwin-web:latest ./web
-# ...existing code...
-```
-
-Notes : sécuriser secrets (REGISTRY auth), activer scans d'images, tag par SHA.
-
----
-
-## Bonnes pratiques
-- Ne versionnez pas de secrets (.env). Utilisez variables CI / vault.
-- Docker : multi-stage pour réduire taille et surface d'attaque.
-- Linter/tests avant build d'images.
-- Tag images avec semver + commit SHA.
-- Monitoring & alerting sur métriques/erreurs.
-
----
-
-## Contribuer
-- Ouvrir une issue pour discuter d'une feature.
-- Créer branche feature/xxx ou fix/xxx.
-- Ajouter tests et documentation pour changements significatifs.
-- Ouvrir PR et attendre checks CI verts.
-
----
-
-## Fichiers importants
-- api/src/main.py
-- api/Dockerfile
-- web/public/index.html
-- web/js/app.js
-- web/js/pages/dashboard.js
-- web/js/components/card-latest.js
-- web/styles/main.css
-- web/Dockerfile
-- infra/docker-compose.yml
-- infra/.env.example
-- docs/architecture.md
-
----s
-
-Licence
-- MIT
+## Contribuer et suivre les évolutions
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) et [CHANGELOG.md](CHANGELOG.md). Les changements de ce pilote sont publiés via Git; aucune mise en production automatique n’est configurée.

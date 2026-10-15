@@ -1,64 +1,100 @@
-# Envoie 7 mesures (une par métrique) toutes les 3 min. Pas de 'time'.
-import os, time, signal, pandas as pd, requests
+"""Replay an explicitly selected CSV into the EcoTwin ingestion API.
 
-API_BASE = os.getenv("API_BASE_URL", "http://localhost:8000")
-API_KEY  = os.getenv("API_KEY", "change-me")
-CSV_PATH = os.getenv("CSV_PATH", "web/assets/data.csv")
-SLEEP_SEC = int(os.getenv("SLEEP_SEC", "180"))
-START_INDEX = int(os.getenv("START_INDEX", "0"))
-LOOP = os.getenv("LOOP", "false").lower() == "true"
+Credentials come from API_KEY; the CSV must be supplied through CSV_PATH.
+Uses only the Python standard library and stops cleanly at end-of-file.
+"""
+
+import csv
+import json
+import math
+import os
+import signal
+import threading
+from pathlib import Path
+from urllib.request import Request, urlopen
 
 SENSOR_ID = {
-    "temperature":"CAP_TEMP","humidity":"CAP_HUM","pm25":"CAP_PM25","pm10":"CAP_PM10",
-    "so2":"CAP_SO2","co":"CAP_CO","o3":"CAP_O3","no2":"CAP_NO2",
+    "temperature": "CAP_TEMP",
+    "humidity": "CAP_HUM",
+    "pm25": "CAP_PM25",
+    "pm10": "CAP_PM10",
+    "so2": "CAP_SO2",
+    "co": "CAP_CO",
+    "o3": "CAP_O3",
+    "no2": "CAP_NO2",
 }
-COLMAP = {"36_temperature":"temperature","37_humidity":"humidity","38_pm25":"pm25","39_pm10":"pm10",
-          "41_so2":"so2","42_co":"co","43_o3":"o3","40_no2":"no2"}
+COLMAP = {
+    "36_temperature": "temperature",
+    "37_humidity": "humidity",
+    "38_pm25": "pm25",
+    "39_pm10": "pm10",
+    "41_so2": "so2",
+    "42_co": "co",
+    "43_o3": "o3",
+    "40_no2": "no2",
+}
 
-stop=False
-def _stop(*_): 
-    global stop; stop=True
-for s in (signal.SIGINT, signal.SIGTERM): 
-    signal.signal(s,_stop)
 
 def build_items(row):
-    out=[]
-    for raw, field in COLMAP.items():
-        if raw not in row.index: continue
-        v = pd.to_numeric(row[raw], errors="coerce")
-        if pd.isna(v): continue
-        sid = SENSOR_ID.get(field)
-        if not sid: continue
-        out.append({"sensor": sid, field: float(v)})
-    return out
+    items = []
+    for column, field in COLMAP.items():
+        raw = row.get(column, row.get(field))
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            items.append({"sensor": SENSOR_ID[field], field: value})
+    return items
 
-def send(items):
-    if not items: return 0
-    r = requests.post(f"{API_BASE}/telemetry/ingest",
-                      headers={"Content-Type":"application/json","X-API-Key":API_KEY},
-                      json={"items":items}, timeout=30)
-    r.raise_for_status()
-    return r.json().get("written",0)
+
+def send(items, api_base, api_key):
+    if not items:
+        return 0
+    request = Request(
+        f"{api_base.rstrip('/')}/api/telemetry/ingest",
+        data=json.dumps({"items": items}).encode(),
+        headers={"Content-Type": "application/json", "X-API-Key": api_key},
+        method="POST",
+    )
+    with urlopen(request, timeout=30) as response:
+        return json.load(response)["written"]
+
 
 def main():
-    df = pd.read_csv(CSV_PATH, engine="python")
-    #print(f"[per-metric] lignes={len(df)} start={START_INDEX} interval={SLEEP_SEC}s")
-    i=START_INDEX
-    while not stop:
-        if i>=len(df):
-            if LOOP: i=0
-            else: 
-                a = 0 
-                #print("[per-metric] terminé."); break
-        items = build_items(df.iloc[i])
-        try:
-            n = send(items)
-            #print(f"[per-metric] i={i} -> {n} points")
-        except Exception as e:
-            #print(f"[per-metric] i={i} ERREUR: {e}")
-            a = 0
-        i+=1
-        for _ in range(SLEEP_SEC):
-            if stop: break
-            time.sleep(1)
-if __name__=="__main__": main()
+    csv_path = os.getenv("CSV_PATH")
+    api_key = os.getenv("API_KEY")
+    if not csv_path or not api_key:
+        raise SystemExit("Définissez CSV_PATH et API_KEY avant de lancer la reprise.")
+    interval = int(os.getenv("SLEEP_SEC", "180"))
+    start = int(os.getenv("START_INDEX", "0"))
+    if interval < 1 or start < 0:
+        raise SystemExit(
+            "SLEEP_SEC doit être positif et START_INDEX doit être positif ou nul."
+        )
+    looping = os.getenv("LOOP", "false").lower() == "true"
+    stop = threading.Event()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        signal.signal(sig, lambda *_: stop.set())
+    with Path(csv_path).open(newline="", encoding="utf-8-sig") as handle:
+        rows = list(csv.DictReader(handle))
+    if start >= len(rows):
+        raise SystemExit("Le CSV est vide ou START_INDEX dépasse la dernière ligne.")
+    index = start
+    while not stop.is_set():
+        count = send(
+            build_items(rows[index]),
+            os.getenv("API_BASE_URL", "http://localhost:8000"),
+            api_key,
+        )
+        print(f"Ligne {index + 1}: {count} mesure(s) enregistrée(s).")
+        index += 1
+        if index == len(rows):
+            if not looping:
+                break
+            index = 0
+        stop.wait(interval)
+
+
+if __name__ == "__main__":
+    main()

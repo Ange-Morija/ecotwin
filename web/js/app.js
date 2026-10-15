@@ -2,7 +2,28 @@
 // Viewer + Arborescence + Mesures 3D + Capteurs + Maintenance + Actions IA
 // Commentaires courts, propres et concis.
 
-import { Viewer, NavCubePlugin, XKTLoaderPlugin } from "https://cdn.jsdelivr.net/npm/@xeokit/xeokit-sdk/dist/xeokit-sdk.es.js";
+import { Viewer, NavCubePlugin, XKTLoaderPlugin } from "/vendor/xeokit-sdk.es.js";
+
+
+function apiFetch(url, options={}) {
+  return window.fetch(url, {...options, credentials:'same-origin', headers:{'X-EcoTwin-Request':'1', ...options.headers}});
+}
+function legacyCard(text) { const element=document.createElement('div'); element.className='card'; element.textContent=text; return element; }
+function messageDialog(text, destructive=false) {
+  return new Promise(resolve=>{
+    const previous=document.activeElement;
+    const dialog=document.createElement('dialog');
+    dialog.setAttribute('aria-labelledby','legacy-dialog-title');
+    dialog.style.cssText='max-width:min(600px,90vw);max-height:80vh;overflow:auto;border:1px solid #9fb2bf;border-radius:12px;padding:24px;background:#fff;color:#172c3d';
+    const title=document.createElement('h2'); title.id='legacy-dialog-title';title.textContent=destructive?'Supprimer l’action':'Informations';
+    const body=document.createElement('pre');body.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere';body.textContent=text;
+    const cancel=document.createElement('button');cancel.textContent=destructive?'Annuler':'Fermer';cancel.className='btn';cancel.addEventListener('click',()=>dialog.close('cancel'));
+    dialog.append(title,body,cancel);
+    if(destructive){const remove=document.createElement('button');remove.textContent='Supprimer';remove.className='btn';remove.addEventListener('click',()=>dialog.close('delete'));dialog.append(remove);}
+    dialog.addEventListener('close',()=>{const accepted=dialog.returnValue==='delete';dialog.remove();previous?.focus();resolve(accepted);},{once:true});
+    document.body.append(dialog);dialog.showModal();cancel.focus();
+  });
+}
 
 /* ---------- DOM ---------- */
 const canvas      = document.getElementById("xeokit-canvas");
@@ -30,6 +51,7 @@ const btnIaCompute  = document.getElementById('btn-ia-compute');
 const maintIaMeta   = document.getElementById('maint-ia-meta');
 
 /* Actions modal DOM */
+maintForm?.addEventListener('submit',event=>event.preventDefault());
 const actionsListRoot = document.getElementById('actions-list');
 const actionFilterInput = document.getElementById('action-filter');
 const btnNewAction = document.getElementById('btn-new-action');
@@ -47,17 +69,18 @@ const actionSaveBtn = document.getElementById('action-save');
 const actionCancelBtn = document.getElementById('action-cancel');
 
 /* Sensors tab DOM */
+actionForm?.addEventListener('submit',event=>event.preventDefault());
 const sensorFilterInput = document.getElementById('sensor-filter');
 const sensorUnitSelect  = document.getElementById('sensor-unit-filter');
 const sensorListRoot    = document.getElementById('sensor-list');
 const btnExportSensors  = document.getElementById('btn-export-sensors');
 
 /* ---------- Config ---------- */
-const API_BASE=(window.ECOTWIN_API_URL??"http://localhost:8000/api").replace(/\/$/,"");
+const API_BASE=(window.ECOTWIN_API_URL??"/api").replace(/\/$/,"");
 
 /* ---------- Small helpers (unique definitions) ---------- */
 const csvQ=(v)=> `"${(v??"").toString().replace(/"/g,'""')}"`;
-function downloadFile(name, text){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:"text/csv"})); a.download=name; document.body.appendChild(a); a.click(); a.remove(); }
+function downloadFile(name, text){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:"text/csv"})); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
 function hud(t){ if(hudMsg) hudMsg.textContent = t; }
 function showLoader(show, txt){ if(loader) loader.classList.toggle("hidden", !show); if(txt && loaderText) loaderText.textContent = txt; }
 
@@ -78,7 +101,7 @@ const viewer = new Viewer({ canvasId:"xeokit-canvas", transparent:true, readable
 viewer.camera.eye = [-20,20,20]; viewer.camera.look = [0,5,0]; viewer.camera.up = [0,1,0];
 new NavCubePlugin(viewer, { canvasElement: navCube, size: 100 });
 
-class ProgressDataSource{ async getXKT(src, ok, error){ try{ showLoader(true,"Chargement…"); const r=await fetch(src); ok(await r.arrayBuffer()); }catch(e){ showLoader(false); hud("Erreur XKT"); error(e.toString()); } } }
+class ProgressDataSource{ async getXKT(src, ok, error){ try{ showLoader(true,"Chargement…"); const r=await apiFetch(src); ok(await r.arrayBuffer()); }catch(e){ showLoader(false); hud("Erreur XKT"); error(e.toString()); } } }
 const xktLoader = new XKTLoaderPlugin(viewer, { dataSource:new ProgressDataSource() });
 hud("Chargement XKT…");
 const model = xktLoader.load({ id:"ecotwinModel", src:"../assets/model.xkt", edges:true });
@@ -145,7 +168,7 @@ const className=(t)=> (t||"").replace(/^Ifc/,"").toLowerCase();
 function findZoneName(mo){ let cur=mo; while(cur){ if(/Ifc(Zone|BuildingStorey|Space)/i.test(cur.type||"")) return cur.name||cur.id||""; cur=cur.parent||null; } return ""; }
 function exportHierarchyCsv(){
   const mos=viewer.metaScene?.metaObjects||{}; const list=Object.values(mos);
-  if (!list.length){ alert("Aucune métadonnée trouvée."); return; }
+  if (!list.length){ messageDialog("Aucune métadonnée trouvée."); return; }
   const rows=[["asset_id","parent_id","asset_name","asset_class","ifc_guid","zone"].join(",")];
   for (const mo of list){
     if (!TYPE_KEEP.test(mo.type||"")) continue;
@@ -169,7 +192,7 @@ function buildModelTree(){
   all.forEach(m=>{ const pid=m.parent?.id||null; parentOf.set(m.id,pid); if(!children.has(pid)) children.set(pid,[]); children.get(pid).push(m); });
   const roots=(children.get(null)||[]).concat((children.get(undefined)||[]));
   const sortByName=arr=>arr.sort((a,b)=>(a.name||a.id).localeCompare(b.name||b.id));
-  treeRoot.innerHTML=""; TREE_INDEX.clear();
+  treeRoot.replaceChildren(); TREE_INDEX.clear();
   function renderNode(mo){
     const hasKids=!!children.get(mo.id);
     const node=document.createElement("div"); node.className="node collapsed"; node.dataset.id=mo.id;
@@ -369,13 +392,21 @@ const SENSORS=[
   {id:"CAP_NO2", name:"NO₂",unit:"ppb",field:"no2"}
 ];
 
-const _LOCAL_MAINT_CACHE = {};
-const _LOCAL_ACTIONS_CACHE = {};
+
+
 
 /* Raw fetch latest */
 async function getLatestRaw(sensorId){
-  if(_LOCAL_MAINT_CACHE[sensorId]) return _LOCAL_MAINT_CACHE[sensorId];
-  try{ const r=await fetch(`${API_BASE}/telemetry/latest?sensor=${encodeURIComponent(sensorId)}`); if(!r.ok) return null; return await r.json(); }catch{return null;}
+  let raw = {};
+  try {
+    const response = await apiFetch(`${API_BASE}/telemetry/latest?sensor=${encodeURIComponent(sensorId)}`);
+    if(response.ok) raw = await response.json();
+  } catch { /* Maintenance remains available if Influx is offline. */ }
+  try {
+    const response = await apiFetch(`${API_BASE}/telemetry/maintenance?sensor=${encodeURIComponent(sensorId)}`);
+    if(response.ok) Object.assign(raw, await response.json());
+  } catch { /* Report source absence through the existing empty measure state. */ }
+  return Object.keys(raw).length ? raw : null;
 }
 
 /* parse timestamp and quality */
@@ -423,28 +454,18 @@ function extractMaintenance(obj){
 
 /* IA prediction endpoint helper */
 async function fetchIaPredictionForSensor(sensorId){
-  const urls=[
-    `${API_BASE}/mlops/maintenance/predict?sensor=${encodeURIComponent(sensorId)}`,
-    `${API_BASE}/telemetry/maintenance/predict?sensor=${encodeURIComponent(sensorId)}`,
-    `${API_BASE}/mlops/predict_maintenance?sensor=${encodeURIComponent(sensorId)}`
-  ];
-  for(const u of urls){
-    try{
-      const r = await fetch(u);
-      if(!r.ok) continue;
-      const j = await r.json();
-      if(j && (j.predicted_next || j.next)) return { predicted_next: j.predicted_next||j.next, confidence: j.confidence??j.confidence_score??null, computed_at: j.computed_at||j.computedAt||new Date().toISOString() };
-    }catch(e){ /* ignore */ }
-  }
-  return null;
+  return null; // No provider is connected; do not manufacture a prediction.
 }
+if(btnIaCompute) { btnIaCompute.disabled=true; btnIaCompute.title='Aucun moteur IA connecté'; }
 
 /* ---------- Render sensors (affiche maintenance + IA) ---------- */
 (function populateUnitFilter(){ if(!sensorUnitSelect) return; const units = Array.from(new Set(SENSORS.map(s=>s.unit).filter(Boolean))); for(const u of units){ const o=document.createElement('option'); o.value=u; o.textContent=u; sensorUnitSelect.appendChild(o); } })();
 
+let sensorRenderGeneration=0;
 async function renderSensors(filterText=''){
+  const generation=++sensorRenderGeneration;
   if(!sensorListRoot) return;
-  sensorListRoot.innerHTML = '<div class="card">Chargement…</div>';
+  sensorListRoot.replaceChildren(legacyCard('Chargement…'));
   const q = (filterText||'').trim().toLowerCase();
   const unitFilter = sensorUnitSelect ? sensorUnitSelect.value : '';
 
@@ -460,7 +481,8 @@ async function renderSensors(filterText=''){
   });
 
   const results = await Promise.all(jobs);
-  sensorListRoot.innerHTML = '';
+  if(generation!==sensorRenderGeneration)return;
+  sensorListRoot.replaceChildren();
   const now = Date.now();
   const STALE_THRESHOLD_SEC = 300;
   const csvRows = [["id","name","value","unit","last_seen","age_s","quality","last_maintenance","next_maintenance","ia_predicted","notes"].join(",")];
@@ -493,7 +515,7 @@ async function renderSensors(filterText=''){
     const card = document.createElement('div'); card.className='sensor-card';
     const title = document.createElement('div'); title.className='title'; title.textContent = `${name} (${id})`;
     const meta = document.createElement('div'); meta.className='sensor-meta';
-    meta.innerHTML = `Unité: ${s.unit||'—'} • Dernière valeur: <strong>${fmt(val)}</strong> • Horodatage: <span class="ts">${tsText}</span>`;
+    meta.textContent = `Unité: ${s.unit||'—'} • Dernière valeur: ${fmt(val)} • Horodatage: ${tsText}`;
 
     const valueRow = document.createElement('div'); valueRow.style.display='flex'; valueRow.style.alignItems='center'; valueRow.style.justifyContent='space-between';
     const valEl = document.createElement('div'); valEl.className='sensor-value'; valEl.textContent = (val===null||val===undefined) ? '—' : `${fmt(val)} ${s.unit||''}`;
@@ -504,9 +526,7 @@ async function renderSensors(filterText=''){
     else if(isStale) qPill.classList.add('stale'); else qPill.classList.add('good');
 
     const maintenanceRow = document.createElement('div'); maintenanceRow.className='maintenance-row';
-    maintenanceRow.innerHTML = `<div class="maintenance-date">Dernière maintenance: <strong>${lastMaintText}</strong></div>
-                                <div class="maintenance-date">Maintenance opportune: <strong>${nextMaintText}</strong></div>
-                                <div class="maintenance-date">Maintenance (IA): <strong id="ia-${id.replace(/[^a-zA-Z0-9_-]/g,'_')}">${iaText}</strong></div>`;
+    maintenanceRow.textContent = `Dernière maintenance: ${lastMaintText} · Prochaine maintenance: ${nextMaintText} · IA: ${iaText}`;
 
     const notesRow = document.createElement('div'); notesRow.className='sensor-meta'; notesRow.style.marginTop='6px';
     notesRow.textContent = `Notes maintenance: ${m.notes||'—'}`;
@@ -518,7 +538,7 @@ async function renderSensors(filterText=''){
     const bCopy = document.createElement('button'); bCopy.className='ms-btn'; bCopy.textContent='📋'; bCopy.title='Copier valeur';
     bCopy.addEventListener('click', ()=>{ navigator.clipboard.writeText(`${name} ${fmt(val)} ${s.unit||''} — ${tsText} — ${qualText}`).catch(()=>{}); });
     const bShowRaw = document.createElement('button'); bShowRaw.className='ms-btn'; bShowRaw.textContent='🔎'; bShowRaw.title='Voir RAW';
-    bShowRaw.addEventListener('click', ()=>{ alert(JSON.stringify(raw||{value:val}, null, 2)); });
+    bShowRaw.addEventListener('click', ()=>{ messageDialog(JSON.stringify(raw||{value:val}, null, 2)); });
     const bEditM = document.createElement('button'); bEditM.className='ms-btn'; bEditM.textContent='🛠️'; bEditM.title='Éditer maintenance';
     bEditM.addEventListener('click', ()=> openMaintenanceEditor(id, raw));
 
@@ -538,26 +558,26 @@ async function renderSensors(filterText=''){
             if(el) el.textContent = new Date(res.predicted_next).toLocaleString();
             raw.meta = raw.meta || {};
             raw.meta.maintenance_ia_predicted_next = res.predicted_next;
-            _LOCAL_MAINT_CACHE[id] = raw;
+
           }
         }catch(e){ /* ignore */ }
       })();
     }
   }
 
-  if(sensorListRoot.children.length===0) sensorListRoot.innerHTML = '<div class="card">Aucun capteur trouvé pour ce filtre.</div>';
+  if(sensorListRoot.children.length===0) sensorListRoot.replaceChildren(legacyCard('Aucun capteur trouvé pour ce filtre.'));
   if(btnExportSensors) btnExportSensors.onclick = ()=> downloadFile(`sensors_filtered_${Date.now()}.csv`, csvRows.join("\n"));
 }
 
 /* Hook filters / initial render */
-if(sensorFilterInput) sensorFilterInput.addEventListener('input', ()=> renderSensors(sensorFilterInput.value));
+if(sensorFilterInput){let pending; sensorFilterInput.addEventListener('input',event=>{clearTimeout(pending);if(!event.isComposing)pending=setTimeout(()=>renderSensors(sensorFilterInput.value),300);});sensorFilterInput.addEventListener('compositionend',()=>{clearTimeout(pending);pending=setTimeout(()=>renderSensors(sensorFilterInput.value),300);});}
 if(sensorUnitSelect) sensorUnitSelect.addEventListener('change', ()=> renderSensors(sensorFilterInput?sensorFilterInput.value:'') );
-setTimeout(()=>renderSensors(),80);
-setInterval(()=>{ renderSensors(sensorFilterInput?sensorFilterInput.value:''); }, 30000);
+
+setInterval(()=>{ if(!document.hidden) renderSensors(sensorFilterInput?sensorFilterInput.value:''); }, 30000);
 
 /* ---------- Maintenance modal helpers ---------- */
 function openMaintenanceEditor(sensorId, raw){
-  if(!maintModal) return alert("Modal indisponible");
+  if(!maintModal) return messageDialog("Modal indisponible");
   maintSensorId.textContent = sensorId;
   const m = extractMaintenance(raw||{});
   maintLast.value = m.lastMaintenance ? dateToLocalInput(m.lastMaintenance) : '';
@@ -612,37 +632,20 @@ async function saveMaintenanceForSensor(sensorId){
 
   hud("Enregistrement maintenance…");
   try{
-    const r = await fetch(`${API_BASE}/telemetry/maintenance?sensor=${encodeURIComponent(sensorId)}`, {
+    const r = await apiFetch(`${API_BASE}/telemetry/maintenance?sensor=${encodeURIComponent(sensorId)}`, {
       method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
     });
     if(r.ok){ hud("Maintenance enregistrée (serveur)."); closeMaintenanceEditor(); setTimeout(()=> renderSensors(sensorFilterInput?.value||''),200); return; }
   }catch(e){ /* ignore */ }
 
   try{
-    const r2 = await fetch(`${API_BASE}/sensors/${encodeURIComponent(sensorId)}/maintenance`, {
+    const r2 = await apiFetch(`${API_BASE}/sensors/${encodeURIComponent(sensorId)}/maintenance`, {
       method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
     });
     if(r2.ok){ hud("Maintenance enregistrée (endpoint alternative)."); closeMaintenanceEditor(); setTimeout(()=> renderSensors(sensorFilterInput?.value||''),200); return; }
   }catch(e){ /* ignore */ }
 
-  // fallback local
-  hud("Impossible d'enregistrer sur le serveur — mise à jour locale appliquée.");
-  try{
-    const raw = await getLatestRaw(sensorId) || {};
-    raw.meta = raw.meta || {};
-    if(payload.maintenance){
-      raw.meta.last_maintenance = payload.maintenance.last;
-      raw.meta.next_maintenance = payload.maintenance.next;
-      raw.meta.maintenance_interval_days = payload.maintenance.interval_days;
-      raw.meta.maintenance_notes = payload.maintenance.notes;
-    }
-    if(payload.maintenance_ia){
-      raw.meta.maintenance_ia_predicted_next = payload.maintenance_ia.predicted_next;
-    }
-    _LOCAL_MAINT_CACHE[sensorId] = raw;
-    closeMaintenanceEditor();
-    setTimeout(()=> renderSensors(sensorFilterInput?.value||''),200);
-  }catch(e){ closeMaintenanceEditor(); }
+  hud("Maintenance non enregistrée. Vérifiez votre connexion et votre session, puis réessayez.");
 }
 
 if(btnIaCompute){
@@ -678,41 +681,41 @@ if(maintSaveBtn) maintSaveBtn.addEventListener('click', async ()=>{
 async function fetchActions(force=false){
   if(!force && fetchActions._cache) return fetchActions._cache;
   try{
-    const r = await fetch(`${API_BASE}/mlops/actions`);
+    const r = await apiFetch(`${API_BASE}/mlops/actions`);
     if(!r.ok) throw new Error('nok');
     const j = await r.json();
     fetchActions._cache = Array.isArray(j) ? j : (j.actions||[]);
     return fetchActions._cache;
   }catch(e){
-    return Object.values(_LOCAL_ACTIONS_CACHE);
+    hud('Actions indisponibles. Vérifiez votre session et réessayez.'); return [];
   }
 }
 async function postActionToApi(action){
-  const r = await fetch(`${API_BASE}/mlops/actions`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(action) });
+  const r = await apiFetch(`${API_BASE}/mlops/actions`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(action) });
   if(!r.ok) throw new Error('post failed');
   return await r.json();
 }
 async function putActionToApi(id, action){
-  const r = await fetch(`${API_BASE}/mlops/actions/${encodeURIComponent(id)}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(action) });
+  const r = await apiFetch(`${API_BASE}/mlops/actions/${encodeURIComponent(id)}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(action) });
   if(!r.ok) throw new Error('put failed');
   return await r.json();
 }
 async function deleteActionApi(id){
-  const r = await fetch(`${API_BASE}/mlops/actions/${encodeURIComponent(id)}`, { method:'DELETE' });
+  const r = await apiFetch(`${API_BASE}/mlops/actions/${encodeURIComponent(id)}`, { method:'DELETE' });
   if(!r.ok) throw new Error('delete failed');
   return true;
 }
 
 async function renderActions(filter=''){
   if(!actionsListRoot) return;
-  actionsListRoot.innerHTML = '<div class="card">Chargement…</div>';
+  actionsListRoot.replaceChildren(legacyCard('Chargement…'));
   const items = await fetchActions(true).catch(()=>[]);
   const q = (filter||'').trim().toLowerCase();
-  actionsListRoot.innerHTML = '';
+  actionsListRoot.replaceChildren();
 
   const rows = [["id","created_at","due_at","action","done","done_at","done_by","source"].join(",")];
 
-  if(!items.length) actionsListRoot.innerHTML = '<div class="card">Aucune action.</div>';
+  if(!items.length) actionsListRoot.replaceChildren(legacyCard('Aucune action.'));
   for(const a of items){
     const id = a.id || a._id || ('local-'+(Math.random()*1e9|0));
     const created = a.created_at || a.created || a.ts || null;
@@ -727,24 +730,27 @@ async function renderActions(filter=''){
     const card = document.createElement('div'); card.className='action-card';
     card.dataset.id = id;
     const hdr = document.createElement('div'); hdr.className='action-hdr';
-    hdr.innerHTML = `<div class="action-id">${id}</div><div class="action-meta">Créée: ${fmtDateShort(created)} • À faire: ${fmtDateShort(due)}</div>`;
+    hdr.textContent = `${id} · Créée: ${fmtDateShort(created)} · À faire: ${fmtDateShort(due)}`;
     const body = document.createElement('div'); body.className='action-body'; body.textContent = text;
     const foot = document.createElement('div'); foot.className='action-foot';
-    foot.innerHTML = `<label class="chk"><input type="checkbox" ${done?'checked':''} data-id="${id}" class="action-toggle" /> Corrigée</label>
-                      <div class="action-right">Fait: <strong>${fmtDateShort(done_at)}</strong> • Par: <strong>${done_by||'—'}</strong></div>`;
+    const checkLabel = document.createElement('label'); checkLabel.className='chk';
+    const actionCheckbox = document.createElement('input'); actionCheckbox.type='checkbox'; actionCheckbox.className='action-toggle'; actionCheckbox.checked=done; actionCheckbox.dataset.id=id;
+    checkLabel.append(actionCheckbox, document.createTextNode(' Corrigée'));
+    const actionMeta = document.createElement('div'); actionMeta.className='action-right';
+    actionMeta.textContent = `Fait: ${fmtDateShort(done_at)} · Par: ${done_by||'—'}`;
+    foot.append(checkLabel, actionMeta);
 
     const acts = document.createElement('div'); acts.className='action-actions';
     const bEdit = document.createElement('button'); bEdit.className='btn ghost small'; bEdit.textContent='✎'; bEdit.title='Éditer';
     const bDel  = document.createElement('button'); bDel.className='btn ghost small'; bDel.textContent='🗑'; bDel.title='Supprimer';
     bEdit.addEventListener('click', ()=> openActionEditor({ id, created_at:created, due_at:due, text, done, done_at, done_by }));
     bDel.addEventListener('click', async ()=>{
-      if(!confirm("Supprimer cette action ?")) return;
+      if(!await messageDialog("Supprimer cette action ? Cette suppression est définitive.", true)) return;
       try{
         await deleteActionApi(id);
         hud("Action supprimée (serveur).");
       }catch(e){
-        delete _LOCAL_ACTIONS_CACHE[id];
-        hud("Suppression locale.");
+        hud("Suppression non enregistrée. Vérifiez votre session puis réessayez.");
       }
       renderActions(actionFilterInput?.value||'');
     });
@@ -781,39 +787,28 @@ function closeActionEditor(){ if(actionModal){ actionModal.classList.add('hidden
 if(btnNewAction) btnNewAction.addEventListener('click', ()=> openActionEditor({}));
 
 async function saveActionFromModal(){
+  if(actionSaveBtn.disabled) return;
   const id = actionIdInput.value || null;
   const payload = {
-    created_at: localInputToIso(actionCreated.value) || new Date().toISOString(),
-    due_at: localInputToIso(actionDue.value) || null,
+    due_at: localInputToIso(actionDue.value),
     text: (actionText.value||'').trim(),
     done: actionDone.checked,
-    done_at: localInputToIso(actionDoneDate.value) || null,
-    done_by: (actionDoneBy.value||'').trim(),
-    source: 'ai'
+    done_at: localInputToIso(actionDoneDate.value),
+    done_by: (actionDoneBy.value||'').trim()
   };
-  try{
-    if(!id){
-      await postActionToApi(payload);
-      hud("Action créée (serveur).");
-      fetchActions._cache = null;
-    } else {
-      try{
-        await putActionToApi(id, payload);
-        hud("Action mise à jour (serveur)."); fetchActions._cache = null;
-      }catch(e){
-        _LOCAL_ACTIONS_CACHE[id] = Object.assign({ id }, payload);
-        hud("Mise à jour locale.");
-      }
-    }
-  }catch(e){
-    const nid = id || ('local-'+(Math.random()*1e9|0));
-    _LOCAL_ACTIONS_CACHE[nid] = Object.assign({ id:nid }, payload);
-    hud("Action sauvegardée localement.");
-  } finally {
+  if(!payload.text) { hud('Renseignez le texte de l’action.'); actionText.focus(); return; }
+  actionSaveBtn.disabled=true;
+  try {
+    if(id) await putActionToApi(id,payload); else await postActionToApi(payload);
+    hud('Action enregistrée sur le serveur.');
+    fetchActions._cache=null;
     closeActionEditor();
-    setTimeout(()=> renderActions(actionFilterInput?.value||''), 150);
-  }
+    renderActions(actionFilterInput?.value||'');
+  } catch {
+    hud('Action non enregistrée. Vérifiez votre session et réessayez.');
+  } finally { actionSaveBtn.disabled=false; }
 }
+
 if(actionSaveBtn) actionSaveBtn.addEventListener('click', ()=> saveActionFromModal());
 if(actionCancelBtn) actionCancelBtn.addEventListener('click', ()=> closeActionEditor());
 if(actionFilterInput) actionFilterInput.addEventListener('input', ()=> renderActions(actionFilterInput.value));
@@ -822,3 +817,36 @@ if(actionFilterInput) actionFilterInput.addEventListener('input', ()=> renderAct
 setTimeout(()=>{ renderActions(); renderSensors(); }, 200);
 
 /* End of file */
+
+// Legacy editors share modal focus containment and preserve the prior inert state.
+function bindLegacyModal(modal, close) {
+  if(!modal)return;
+  let previous, inertBefore=new Map();
+  const focusable=()=>Array.from(modal.querySelectorAll('button:not(:disabled),input:not(:disabled):not([type=hidden]),textarea,select,a[href],[tabindex="0"]')).filter(node=>node.getClientRects().length);
+  new MutationObserver(()=>{
+    if(!modal.classList.contains('hidden')) {
+      previous=document.activeElement;
+      for(const node of document.body.children)if(node!==modal){inertBefore.set(node,node.inert);node.inert=true;}
+      focusable()[0]?.focus();
+    } else {
+      for(const [node,wasInert]of inertBefore)node.inert=wasInert;
+      inertBefore.clear();previous?.focus();
+    }
+  }).observe(modal,{attributes:true,attributeFilter:['class']});
+  modal.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){event.preventDefault();close();return;}
+    if(event.key!=='Tab')return;
+    const nodes=focusable(),first=nodes[0],last=nodes.at(-1);
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+  });
+}
+bindLegacyModal(maintModal,closeMaintenanceEditor);
+bindLegacyModal(actionModal,closeActionEditor);
+for(const input of [treeSearch,sensorFilterInput,actionFilterInput]) {
+  if(!input)continue;
+  const clear=document.createElement('button');clear.type='button';clear.className='btn ghost';clear.textContent='×';clear.setAttribute('aria-label','Effacer la recherche');clear.hidden=!input.value;
+  input.insertAdjacentElement('afterend',clear);
+  input.addEventListener('input',()=>{clear.hidden=!input.value;});
+  clear.addEventListener('click',()=>{input.value='';clear.hidden=true;input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();});
+}

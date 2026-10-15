@@ -1,0 +1,43 @@
+name: EcoTwin checks
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  platform:
+    runs-on: ubuntu-latest
+    services:
+      influxdb:
+        image: influxdb:2.7
+        ports: [8086:8086]
+        options: >-
+          --health-cmd "curl -fsS http://localhost:8086/health"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: python -m pip install --require-hashes -r api/requirements-dev.lock
+      - run: npm ci
+      - run: npm run build
+      - run: python -m ruff check api/src api/tests
+      - run: python -m ruff format --check api/src api/tests
+      - run: python -m pytest api/tests -q
+        env:
+          ECOTWIN_TEST_INFLUX_URL: http://127.0.0.1:8086
+      - run: npm run check && npm run format:check
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-evidence
+          path: test-results/

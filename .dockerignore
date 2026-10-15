@@ -1,0 +1,10 @@
+.git
+.agents
+.specify
+node_modules
+.runtime
+.venv
+test-results
+**/__pycache__
+**/.env
+infra/influxdb

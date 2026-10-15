@@ -203,13 +203,13 @@
   </main>
 
   <!-- Modal édition maintenance (avec IA) -->
-  <div id="maint-modal" class="modal hidden" role="dialog" aria-hidden="true">
+  <div id="maint-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="maint-modal-title" aria-hidden="true">
     <div class="modal-panel">
-      <h3>Éditer maintenance</h3>
-      <form id="maint-form">
+      <h3 id="maint-modal-title">Éditer maintenance</h3>
+      <form id="maint-form" novalidate>
         <div class="form-row"><label>Capteur:</label><div id="maint-sensor-id">—</div></div>
         <div class="form-row"><label for="maint-last">Dernière maintenance</label><input id="maint-last" type="datetime-local" /></div>
-        <div class="form-row"><label for="maint-interval">Intervalle (jours)</label><input id="maint-interval" type="number" min="0" /></div>
+        <div class="form-row"><label for="maint-interval">Intervalle (jours)</label><input id="maint-interval" type="number" min="1" max="3650" /></div>
         <div class="form-row"><label for="maint-next">Maintenance opportune</label><input id="maint-next" type="datetime-local" /></div>
 
         <!-- Section IA: prédiction + bouton -->
@@ -219,10 +219,10 @@
             <input id="maint-ia-date" type="datetime-local" readonly />
             <button id="btn-ia-compute" type="button" class="btn outline">Calculer (IA)</button>
           </div>
-          <div class="small" id="maint-ia-meta">Dernier calcul: — • Confiance: —</div>
+          <div class="small" id="maint-ia-meta">Aucun moteur IA connecté</div>
         </div>
 
-        <div class="form-row"><label for="maint-notes">Notes</label><textarea id="maint-notes" rows="3"></textarea></div>
+        <div class="form-row"><label for="maint-notes">Notes</label><textarea id="maint-notes" rows="3" style="resize:none"></textarea></div>
         <div class="form-actions">
           <button id="maint-save" type="button" class="btn primary">Enregistrer</button>
           <button id="maint-cancel" type="button" class="btn ghost">Annuler</button>
@@ -232,14 +232,14 @@
   </div>
 
   <!-- Modal Action (création / édition) -->
-  <div id="action-modal" class="modal hidden" role="dialog" aria-hidden="true">
+  <div id="action-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="action-modal-title" aria-hidden="true">
     <div class="modal-panel">
       <h3 id="action-modal-title">Éditer action</h3>
-      <form id="action-form">
+      <form id="action-form" novalidate>
         <input type="hidden" id="action-id" />
-        <div class="form-row"><label for="action-created">Créée le</label><input id="action-created" type="datetime-local" /></div>
+        <div class="form-row"><label for="action-created">Créée le</label><input id="action-created" type="datetime-local" readonly /></div>
         <div class="form-row"><label for="action-due">À faire avant</label><input id="action-due" type="datetime-local" /></div>
-        <div class="form-row"><label for="action-text">Action</label><textarea id="action-text" rows="3"></textarea></div>
+        <div class="form-row"><label for="action-text">Action</label><textarea id="action-text" rows="3" style="resize:none"></textarea></div>
         <div class="form-row" style="display:flex;gap:8px;align-items:center;">
           <label><input id="action-done" type="checkbox" /> Corrigée</label>
           <input id="action-done-date" type="datetime-local" placeholder="Date exécution" />

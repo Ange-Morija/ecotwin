@@ -1,5 +1,7 @@
 import os
+from pathlib import Path
 from dataclasses import dataclass
+
 
 @dataclass
 class Settings:
@@ -12,5 +14,21 @@ class Settings:
     INFLUX_ORG: str = os.getenv("INFLUX_ORG", "EcoTwin")
     INFLUX_BUCKET: str = os.getenv("INFLUX_BUCKET", "air_quality")
     MEASUREMENT: str = "air_quality"
+    DATA_DIR: Path = Path(
+        os.getenv(
+            "ECOTWIN_DATA_DIR", str(Path(__file__).resolve().parents[3] / ".runtime")
+        )
+    )
+    COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"
+    ALLOW_REGISTRATION: bool = os.getenv("ALLOW_REGISTRATION", "true").lower() == "true"
+    CORS_ORIGINS: tuple = tuple(
+        filter(
+            None,
+            os.getenv(
+                "CORS_ORIGINS", "http://localhost:8080,http://127.0.0.1:8080"
+            ).split(","),
+        )
+    )
+
 
 settings = Settings()
