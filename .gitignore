@@ -2,6 +2,7 @@ env312/
 __pycache__/
 *.pyc
 *.gitignore
+!.specify/.gitignore
 !.gitkeep
 
 .runtime/
