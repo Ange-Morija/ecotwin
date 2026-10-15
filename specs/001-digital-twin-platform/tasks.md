@@ -64,3 +64,11 @@ Stratégie: livrer le pilote mesurable, garder les lots futurs non cochés, puis
 
 ## Validation de clôture du pilote
 Voir [docs/verification.md](../../docs/verification.md): 12 tests Python avec intégration Influx réelle et 8 parcours navigateur. Les tâches T028–T034 restent planifiées.
+
+## Lot de maintenance — optimisation du pilote
+Spécification et critères : [optimization.md](optimization.md).
+- [x] T035 Supprimer sept fichiers vides ou non référencés et les panneaux inopérants dans web/ et api/src/.
+- [x] T036 Mutualiser les lectures du viewer historique et invalider les snapshots après mutation dans web/js/data-cache.js et web/js/app.js.
+- [x] T037 Conserver la scène, les filtres et la table ouverte lors des rafraîchissements dans web/js/platform.js.
+- [x] T038 Précompresser le SDK et exclure l’IFC source des images via scripts/build-web.mjs, infra/nginx.conf et .dockerignore.
+- [x] T039 Ajouter les tests unitaires natifs Node, les régressions réseau navigateur et documenter les mesures dans optimization.md.

@@ -30,7 +30,7 @@ Pour une source locale neuve, renseigner avant initialisation un mot de passe et
 ```bash
 docker compose --env-file infra/.env -f infra/docker-compose.yml --profile telemetry up -d --build
 ```
-Pour Grafana, renseigner aussi son mot de passe administrateur puis ajouter `--profile monitoring`. Grafana est facultatif et n'a pas été validé dans cette livraison. Les anciens panneaux embarqués sont une surface historique, pas le dashboard canonique.
+Pour Grafana, renseigner aussi son mot de passe administrateur puis ajouter `--profile monitoring`. Grafana est facultatif et n'a pas été validé dans cette livraison. Les iframes figées de l’ancien viewer ont été supprimées; Grafana est une console facultative autonome.
 
 Les données vivent dans des volumes nommés : app-data, influx-data, influx-config, grafana-data. Ne pas exécuter `down -v` sur un environnement contenant des données à préserver. La modification des variables d'initialisation ne renouvelle pas automatiquement les identifiants d'une base Influx déjà initialisée.
 
@@ -40,6 +40,8 @@ Pour les builds derrière le proxy géré, monter le bundle CA approprié comme 
 docker build --secret id=proxy_ca,src=/etc/ssl/certs/ca-certificates.crt -f api/Dockerfile -t ecotwin-api .
 docker build --secret id=proxy_ca,src=/etc/ssl/certs/ca-certificates.crt -f web/Dockerfile -t ecotwin-web .
 ```
+Le SDK dispose d’une version gzip préparée au build; Nginx la sert selon Accept-Encoding, sans recompresser le SDK à chaque requête. Le fichier IFC source n’est pas inclus dans les images; le modèle XKT est conservé.
+
 Les Dockerfiles conservent les vérifications TLS et ne copient pas le certificat dans l'image. Les builds Compose derrière ce proxy doivent recevoir le même secret via une configuration locale adaptée; le paramètre d'un build direct ne se transmet pas implicitement à Compose.
 
 ## Diagnostic

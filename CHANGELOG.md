@@ -29,3 +29,11 @@
 
 ### Encore planifié
 Mapping BIM-capteurs, multi-sites/IAM/SSO, import IFC, connecteurs IoT, moteurs IA, notifications et préparation de production. Aucun déploiement de production ou tag de release n'est créé par ce journal.
+
+### Optimisation du pilote
+- Retrait de sept fichiers vides ou sans référence, des iframes Grafana figées et des panneaux IA non implémentés.
+- Cache mémoire partagé : requêtes simultanées mutualisées, expiration et invalidation après mutation.
+- Filtres locaux sans relecture des huit capteurs; chargement des seuls onglets actifs.
+- Actualisation des panneaux sans reconstruire la scène BIM ni fermer la table de valeurs.
+- SDK précompressé pour Nginx; exclusion de l’IFC source et des sorties vendor préexistantes du contexte Docker. Le fichier IFC reste conservé dans Git.
+- Tests natifs Node du cache et régressions navigateur ajoutés à la CI.

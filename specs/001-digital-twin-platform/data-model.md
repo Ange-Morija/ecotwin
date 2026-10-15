@@ -4,7 +4,7 @@
 - Site: un site partagé dans ce pilote. Aucune promesse d'isolation multi-tenant.
 - Sensor(id, label, field, unit, threshold). Catalogue initial de huit métriques; les seuils de démo sont illustratifs.
 - Observation(sensor, field, value nullable, time UTC). Série réelle dans InfluxDB, jamais dans le cache de maintenance.
-- BIMModel: modèle XKT existant. BIMObject.id retourné par picking. Le fichier de mapping existant est vide: correspondance non configurée.
+- BIMModel: modèle XKT existant. BIMObject.id retourné par picking. Correspondance non configurée; le fichier de mapping vide sans usage a été retiré.
 - Maintenance(sensor PK, payload JSON, updated_by FK). État partagé du site pilote.
 - Action(id, user_id FK, payload JSON). L'auteur possède ses actions; lecture et mutation filtrées par user_id.
 - Insight(metric, observed_value, threshold, explanation, source=rule). Pas de confidence IA inventée.

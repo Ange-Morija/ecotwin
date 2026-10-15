@@ -8,3 +8,5 @@ test-results
 **/__pycache__
 **/.env
 infra/influxdb
+web/vendor
+web/assets/model.ifc

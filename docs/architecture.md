@@ -29,9 +29,9 @@ flowchart LR
 - `web/js/bim-viewer.js` possède une scène WebGL chargée à la demande. Aucun capteur n'est placé sur un objet sans mapping vérifié.
 - `web/styles/platform.css` implémente les tokens décrits dans [DESIGN.md](../DESIGN.md).
 - `web/public/index.html` conserve les outils historiques de mesure et les éditeurs maintenance/actions.
-- `npm run build` copie la distribution Xeokit installée depuis le lockfile dans `web/vendor/`. Ce dossier généré est ignoré; il n'y a pas de bundle applicatif ni de minification annoncée.
+- `npm run build` copie la distribution Xeokit installée depuis le lockfile dans `web/vendor/`. Ce dossier généré est ignoré. Le build produit aussi une version gzip du SDK, servie par Nginx lorsque le navigateur l’accepte; il n’y a pas de bundle applicatif ni de minification annoncée.
 
-Les paramètres URL restaurent métrique, période, vue et recherche. Un appel dashboard regroupe les observations; actualisation toutes les 30 secondes lorsque l'onglet est visible. Les réponses supersédées sont annulées. Une panne conserve les dernières données avec un état périmé. Les graphiques n'interpolent pas les heures absentes.
+Les paramètres URL restaurent métrique, période, vue et recherche. Un appel dashboard regroupe les observations; actualisation toutes les 30 secondes lorsque l'onglet est visible. Les réponses supersédées sont annulées. Les rafraîchissements mettent à jour les panneaux de données en conservant scène BIM, filtres et table ouverte. Dans les outils historiques, un cache mémoire de 30 secondes mutualise les lectures en cours et est invalidé après sauvegarde; seul l’onglet actif est actualisé. Une panne conserve les dernières données avec un état périmé. Les graphiques n'interpolent pas les heures absentes.
 
 ## API et stockage
 - `core/security.py` : hash scrypt, sessions opaques hachées en base, protection CSRF, garde d'accès session/clé.
@@ -49,8 +49,8 @@ Les comptes partagent le site du pilote; les actions sont filtrées par auteur. 
 
 ## Démo, règles et IA
 Le mode demo produit des observations illustratives déterministes clairement étiquetées. Il ne sert jamais de remplacement silencieux à une source réelle en panne. Les insights actuels sont des comparaisons à des seuils illustratifs, pas des prédictions IA.
-Le fichier de mapping BIM existant est vide. Multi-sites, IAM/SSO, mapping IFC-capteur et fournisseurs IA sont suivis dans [tasks.md](../specs/001-digital-twin-platform/tasks.md).
+Le mapping BIM n’est pas encore implémenté; le fichier vide sans usage a été supprimé. Multi-sites, IAM/SSO, mapping IFC-capteur et fournisseurs IA sont suivis dans [tasks.md](../specs/001-digital-twin-platform/tasks.md).
 
 ## Déploiement et CI
-Les Dockerfiles utilisent le contexte racine du dépôt et incluent scripts, styles, SDK et modèle. L'API tourne avec un utilisateur non privilégié; les fichiers copiés appartiennent aux utilisateurs qui doivent les lire. Nginx transmet `/api/` sans changer les chemins.
+Les Dockerfiles utilisent le contexte racine du dépôt et incluent scripts, styles, SDK et modèle XKT. Le fichier IFC source reste dans Git mais est exclu des images et du contexte de build, car aucun import IFC n’est implémenté. L'API tourne avec un utilisateur non privilégié; les fichiers copiés appartiennent aux utilisateurs qui doivent les lire. Nginx transmet `/api/` sans changer les chemins.
 Compose utilise des volumes nommés. InfluxDB et Grafana sont optionnels via profils. La CI exécute lint, format, tests API avec InfluxDB jetable et tests navigateur; elle ne publie pas automatiquement d'images et ne déploie pas le produit.

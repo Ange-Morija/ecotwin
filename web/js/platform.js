@@ -1834,6 +1834,7 @@ async function dashboard() {
       ),
     );
     updateRows();
+    table.refreshRows = updateRows;
     return table;
   }
   function retainFocus() {
@@ -1852,8 +1853,18 @@ async function dashboard() {
   function refreshTrend() {
     const restoreFocus = retainFocus();
     const current = mainContent.querySelector(".trend-panel");
-    if (current) current.replaceWith(trendPanel());
-    else renderData();
+    if (current) {
+      const open = current.querySelector("details")?.open;
+      const scroll = current.querySelector(".table-scroll")?.scrollTop ?? 0;
+      const next = trendPanel();
+      current.replaceWith(next);
+      if (open) {
+        const details = next.querySelector("details");
+        if (details) details.open = true;
+        const values = next.querySelector(".table-scroll");
+        if (values) values.scrollTop = scroll;
+      }
+    } else renderData();
     restoreFocus();
   }
   function renderData() {
@@ -1977,6 +1988,7 @@ async function dashboard() {
         signal: current.signal,
       });
       if (current !== requestController) return;
+      const initial = !data;
       data = result;
       feedback.replaceChildren();
       lastUpdate.textContent = `Consulté à ${time.format(new Date(data.generated_at))}`;
@@ -1984,15 +1996,15 @@ async function dashboard() {
         mode === "demo"
           ? "Données illustratives · pas horaire"
           : "Actualisation toutes les 30 s";
-      // Avoid destroying an already loaded BIM on a periodic refresh.
-      if (!bimHandle) renderData();
+      if (initial) renderData();
       else {
-        const oldTrend = mainContent.querySelector(".trend-panel");
-        if (oldTrend) refreshTrend();
+        if (mainContent.querySelector(".trend-panel")) refreshTrend();
+        mainContent.querySelector(".sensors-panel")?.refreshRows?.();
         const oldSummary = mainContent.querySelector(".summary-grid");
         if (oldSummary) oldSummary.replaceWith(summary());
         const oldInsights = mainContent.querySelector(".insights-panel");
-        if (oldInsights) oldInsights.replaceWith(insightsPanel());
+        if (oldInsights)
+          oldInsights.replaceWith(insightsPanel(view === "insights"));
       }
     } catch (error) {
       if (error.name === "AbortError" || current !== requestController) return;

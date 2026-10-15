@@ -1,5 +1,5 @@
 /* main.css
-   Styles globaux, FAB, overlay, sensors, modal, MLOps, Actions IA.
+   Outils BIM, mesures, capteurs, maintenance et actions.
    Commentaires courts.
 */
 
@@ -100,25 +100,13 @@ body{margin:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-ser
 
 /* Grilles & cards */
 .charts{display:grid;gap:10px}
-.charts-3col{grid-template-columns:repeat(3,1fr)}
 .scroll-v{flex:1 1 auto;overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:var(--muted) transparent}
 .scroll-v::-webkit-scrollbar{width:8px}
 .scroll-v::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:8px}
 
 .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px}
-.card-title{font-size:12px;color:var(--muted)}
-.dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.chip{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:2px}
-.badge{font-size:10px;color:var(--muted);text-transform:uppercase}
-.val{font-size:15px;font-weight:700}
-.unit{font-size:11px;color:var(--muted)}
-.gpanel{width:100%;height:200px;border:0;border-radius:12px;background:rgba(255,255,255,.02)}
 
-/* AQI & IA */
-.aqi-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.aqi-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:space-between}
-.aqi-label{font-size:13px;color:var(--muted)}
-.aqi-value{font-size:18px;font-weight:700;padding:4px 10px;border-radius:8px;background:var(--primary);color:#fff}
+
 
 /* Sensor tab styles */
 .sensor-filter-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
@@ -145,23 +133,13 @@ sensor-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr
 .data-quality.stale{ background: rgba(249,115,22,0.10); color: #f97316; border-color: rgba(249,115,22,0.18); }
 .data-quality.bad{ background: rgba(239,68,68,0.10); color: #ef4444; border-color: rgba(239,68,68,0.18); }
 
-.sensor-card .ts{ color: var(--muted); font-weight:600; margin-left:6px; }
 
 /* Maintenance display */
 .maintenance-row{display:flex;flex-direction:column;gap:4px;margin-top:6px}
-.maintenance-date{font-size:13px;color:var(--muted)}
-.maintenance-date strong{color:var(--text)}
 
-/* MLOps / Drift styles */
-.mlops-section{margin-top:12px;background:transparent}
-.mlops-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:8px}
-.mlops-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;min-height:80px}
-.mlops-title{font-size:12px;color:var(--muted);font-weight:600}
-.mlops-value{font-size:16px;font-weight:800}
-.mlops-meta{font-size:12px;color:var(--muted)}
-.mlops-actions{display:flex;gap:8px;align-items:center;margin-top:6px}
 
-/* Actions IA */
+
+/* Actions */
 .actions-list{display:flex;flex-direction:column;gap:10px}
 .action-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
 .action-hdr{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -196,9 +174,6 @@ sensor-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr
 @media (max-width:1200px){.et-layout{grid-template-columns:260px 1fr}}
 @media (max-width:900px){
   .et-layout{grid-template-columns:1fr}
-  .charts-3col{grid-template-columns:repeat(2,1fr)}
-  .gpanel{height:180px}
-  .ai-info{grid-template-columns:1fr}
   .btn{--h:36px}
   .tree{max-height:180px}
 }

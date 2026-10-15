@@ -33,7 +33,7 @@ jobs:
       - run: python -m pytest api/tests -q
         env:
           ECOTWIN_TEST_INFLUX_URL: http://127.0.0.1:8086
-      - run: npm run check && npm run format:check
+      - run: npm run check && npm run format:check && npm run test:unit
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4

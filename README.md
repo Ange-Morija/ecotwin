@@ -8,7 +8,7 @@ Le pilote propose une présentation produit, une connexion réelle et un dashboa
 
 [Présentation, connexion et captures mobiles](docs/product.md) · [Documentation complète](docs/README.md) · [Architecture](docs/architecture.md) · [Déploiement](docs/deployment.md)
 
-Le pilote livre 27 tâches; 7 lots restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le moteur IA n’est pas connecté. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
+Le pilote et son lot de maintenance livrent 32 tâches; 7 lots restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le moteur IA n’est pas connecté. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
 
 ## Démarrage
 Python 3.11+ (3.12 testé), Node.js 22+ et uv.
@@ -22,7 +22,9 @@ npm run build
 ```
 Routes: `/` présentation, `/login` connexion, `/register` création de compte local, `/dashboard` espace connecté, `/dashboard?mode=demo` découverte publique. Le serveur fournit frontend et API sur la même origine. Aucun compte par défaut: créez explicitement votre compte local.
 
-La démonstration est étiquetée et contient des données illustratives. Le viewer charge le véritable modèle `web/assets/model.xkt` avec un SDK Xeokit figé, servi localement. Le lien entre objets BIM et capteurs n'est pas encore configuré.
+Le nettoyage et ses mesures sont décrits dans [le lot d’optimisation](specs/001-digital-twin-platform/optimization.md). Les outils historiques se limitent désormais aux fonctions disponibles : BIM, capteurs, maintenance et actions; les panneaux de prédiction et iframes non raccordés ont été retirés.
+
+La démonstration est étiquetée et contient des données illustratives. Le viewer charge le véritable modèle `web/assets/model.xkt` avec un SDK Xeokit figé, servi localement et précompressé pour Nginx. Le lien entre objets BIM et capteurs n'est pas encore configuré.
 
 ## Données réelles et configuration
 La page connectée ne bascule jamais silencieusement en démo si InfluxDB est absent.
@@ -63,6 +65,7 @@ Le certificat est monté pendant l'installation et n'est pas embarqué dans l'im
 .venv/bin/python -m ruff format --check api/src api/tests
 npm run check
 npm run format:check
+npm run test:unit
 npx playwright install chromium
 npm run test:e2e
 ```

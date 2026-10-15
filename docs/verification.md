@@ -39,3 +39,10 @@ Les tests navigateur couvrent aussi les champs invalides, le message d'identifia
 - La publication et la restauration dans une nouvelle tâche cloud n'ont pas été effectuées.
 
 Aucun résultat absent ou ignoré n'est présenté comme réussi. Les conteneurs et comptes des tests sont isolés des données du pilote.
+
+## Lot d’optimisation suivant
+- 4 tests natifs Node du cache : mutualisation, expiration, invalidation concurrente et reprise après échec.
+- 9 parcours navigateur réussis sur le serveur source; régressions supplémentaires pour le canvas conservé, la table ouverte et les filtres locaux sans relecture.
+- Contrôle Python de ce lot : 11 réussis et 1 ignoré. Le test Influx réel n’a pas été relancé pour ce nettoyage de fichiers sans modification des opérations de données; son exécution initiale à 12 tests reste documentée ci-dessus.
+- Nginx : transfert du SDK gzip vérifié par comparaison après décompression, et réponse non compressée lorsque gzip;q=0 est demandé. IFC absent de la livraison mais toujours présent dans Git.
+- Mesures avant/après et périmètre conservé : [optimization.md](../specs/001-digital-twin-platform/optimization.md).

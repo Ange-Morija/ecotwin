@@ -9,6 +9,7 @@ EcoTwin est un pilote de plateforme de jumeaux numériques **mono-site partagé*
 - [Déploiement et configuration](deployment.md)
 - [Sécurité et limites du pilote](security.md)
 - [Tests exécutés et limites de validation](verification.md)
+- [Nettoyage et mesures d’optimisation](../specs/001-digital-twin-platform/optimization.md)
 - [Intégration IA future](ai-integration.md)
 
 ## Concevoir et contribuer

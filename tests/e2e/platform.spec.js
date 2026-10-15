@@ -25,6 +25,12 @@ test("présentation, démo, filtres partageables et export", async ({ page }) =>
     page.getByRole("img", { name: /168 observations/ }),
   ).toBeVisible();
   await page.getByText("Consulter les valeurs du graphique").click();
+  const updated = page.waitForResponse((response) =>
+    response.url().includes("/api/dashboard?"),
+  );
+  await page.getByRole("button", { name: "Actualiser les données" }).click();
+  await updated;
+  await expect(page.locator(".chart-table")).toHaveAttribute("open", "");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Exporter les observations" }).click();
   expect((await downloadPromise).suggestedFilename()).toBe(
@@ -120,6 +126,22 @@ test("le vrai modèle BIM se charge localement sans dépendance CDN", async ({
   const failures = [];
   page.on("pageerror", (error) => failures.push(error.message));
   await page.goto("/dashboard?mode=demo&view=bim");
+  await expect(
+    page.getByRole("button", { name: "Charger le modèle 3D" }),
+  ).toBeVisible();
+  await page.evaluate(() => {
+    window.originalCanvas = document.querySelector("#twin-canvas");
+  });
+  const updated = page.waitForResponse((response) =>
+    response.url().includes("/api/dashboard?"),
+  );
+  await page.getByRole("button", { name: "Actualiser les données" }).click();
+  await updated;
+  expect(
+    await page
+      .locator("#twin-canvas")
+      .evaluate((canvas) => canvas === window.originalCanvas),
+  ).toBe(true);
   await page.getByRole("button", { name: "Charger le modèle 3D" }).click();
   await expect(page.locator(".twin-viewport")).toHaveAttribute(
     "data-ready",
@@ -226,6 +248,8 @@ test("ancien viewer : actions persistantes et texte externe sans injection HTML"
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/public/index.html");
+  await expect(page.locator("iframe")).toHaveCount(0);
+  await page.getByRole("button", { name: "Actions", exact: true }).click();
   await expect(page.locator(".action-card")).toHaveCount(1);
   expect(await page.locator(".action-card").textContent()).toContain(
     '<img src=x onerror="window.injected=true">',
@@ -233,8 +257,8 @@ test("ancien viewer : actions persistantes et texte externe sans injection HTML"
   expect(await page.locator(".action-card img").count()).toBe(0);
   expect(await page.evaluate(() => window.injected)).toBeUndefined();
   await page.reload();
+  await page.getByRole("button", { name: "Actions", exact: true }).click();
   await expect(page.locator(".action-card")).toHaveCount(1);
-  await page.getByRole("button", { name: "Actions IA", exact: true }).click();
   await page
     .getByRole("button", { name: "Nouvelle action", exact: true })
     .click();
@@ -262,4 +286,76 @@ test("ancien viewer : actions persistantes et texte externe sans injection HTML"
     .click();
   await expect(page.locator(".action-card")).toHaveCount(1);
   expect(errors).toEqual([]);
+});
+
+test("outils BIM : filtres locaux, lectures mutualisées et cache invalidé après sauvegarde", async ({
+  page,
+}) => {
+  let latest = 0,
+    maintenance = 0,
+    actions = 0,
+    saved = 0;
+  let notes = "";
+  await page.route("**/api/telemetry/latest?*", (route) => {
+    latest++;
+    return route.fulfill({
+      json: { temperature: 21, humidity: 45, _time: new Date().toISOString() },
+    });
+  });
+  await page.route("**/api/telemetry/maintenance?*", async (route) => {
+    if (route.request().method() === "POST") {
+      notes = route.request().postDataJSON().maintenance.notes;
+      saved++;
+      return route.fulfill({
+        json: { maintenance: { notes, interval_days: 30 } },
+      });
+    }
+    maintenance++;
+    return route.fulfill({
+      json: { maintenance: { notes, interval_days: 30 } },
+    });
+  });
+  await page.route("**/api/mlops/actions", (route) => {
+    actions++;
+    return route.fulfill({ json: [] });
+  });
+  await page.goto("/public/index.html");
+  await expect(page.locator(".sensor-card")).toHaveCount(8);
+  expect(latest).toBe(8);
+  expect(maintenance).toBe(8);
+  expect(actions).toBe(0);
+  await page.locator("#sensor-filter").fill("Température");
+  await expect(page.locator(".sensor-card")).toHaveCount(1);
+  await page
+    .locator(".sensor-filter-row")
+    .getByRole("button", { name: "Effacer la recherche" })
+    .click();
+  await expect(page.locator(".sensor-card")).toHaveCount(8);
+  await expect(
+    page
+      .locator(".sensor-card")
+      .filter({ hasText: "CAP_PM25" })
+      .locator(".sensor-value"),
+  ).toHaveText("—");
+  expect(latest).toBe(8);
+  expect(maintenance).toBe(8);
+  await page
+    .locator(".sensor-card")
+    .first()
+    .getByTitle("Éditer maintenance", { exact: true })
+    .click();
+  await page.locator("#maint-notes").fill("Contrôle du filtre");
+  await page.locator("#maint-save").click();
+  await expect(page.locator("#maint-modal")).toBeHidden();
+  await expect(page.locator(".sensor-card").first()).toContainText(
+    "Contrôle du filtre",
+  );
+  expect(saved).toBe(1);
+  expect(latest).toBe(16);
+  expect(maintenance).toBe(16);
+  await page.getByRole("button", { name: "Actions", exact: true }).click();
+  await expect(page.locator("#actions-list")).toContainText("Aucune action.");
+  await page.locator("#action-filter").fill("filtre local");
+  await expect(page.locator("#actions-list")).toContainText("Aucune action.");
+  expect(actions).toBe(1);
 });

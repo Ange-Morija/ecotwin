@@ -1,8 +1,7 @@
-// app.js (corrigé)
-// Viewer + Arborescence + Mesures 3D + Capteurs + Maintenance + Actions IA
-// Commentaires courts, propres et concis.
+// Outils BIM, capteurs et maintenance du site pilote.
 
 import { Viewer, NavCubePlugin, XKTLoaderPlugin } from "/vendor/xeokit-sdk.es.js";
+import {createSnapshotLoader} from "./data-cache.js";
 
 
 function apiFetch(url, options={}) {
@@ -46,9 +45,6 @@ const maintInterval = document.getElementById('maint-interval');
 const maintNotes    = document.getElementById('maint-notes');
 const maintSaveBtn  = document.getElementById('maint-save');
 const maintCancel   = document.getElementById('maint-cancel');
-const maintIaDate   = document.getElementById('maint-ia-date');
-const btnIaCompute  = document.getElementById('btn-ia-compute');
-const maintIaMeta   = document.getElementById('maint-ia-meta');
 
 /* Actions modal DOM */
 maintForm?.addEventListener('submit',event=>event.preventDefault());
@@ -157,8 +153,8 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
     btn.classList.add("active");
     document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
     document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
-    if(btn.dataset.tab==='actions'){ setTimeout(()=> renderActions(actionFilterInput?.value||''),80); }
-    if(btn.dataset.tab==='sensors'){ setTimeout(()=> renderSensors(sensorFilterInput?.value||''),80); }
+    if(btn.dataset.tab==='actions'){ renderActions(actionFilterInput?.value||''); }
+    if(btn.dataset.tab==='sensors'){ renderSensors(sensorFilterInput?.value||''); }
   });
 });
 
@@ -426,41 +422,30 @@ function extractQuality(obj){
   return null;
 }
 function extractMaintenance(obj){
-  if(!obj) return { lastMaintenance:null, nextMaintenance:null, intervalDays:null, notes:null, iaPredicted:null };
-  const lastKeys=["last_maintenance","last_maint","maintenance_last","maintenance_date","last_service","lastServiced"];
-  const nextKeys=["next_maintenance","next_maint","maintenance_due","maintenance_next","nextService"];
-  const intervalKeys=["maintenance_interval_days","maint_interval_days","maintenance_interval","maint_interval_days"];
-  let last=null, next=null, interval=null, notes=null, iaPred=null;
-  for(const k of lastKeys){ if(obj[k]){ last=parseTimestamp({time:obj[k]})||parseTimestamp(obj[k]); break; } }
-  for(const k of nextKeys){ if(obj[k]){ next=parseTimestamp({time:obj[k]})||parseTimestamp(obj[k]); break; } }
-  for(const k of intervalKeys){ if(obj[k]!==undefined){ const n=Number(obj[k]); if(!Number.isNaN(n)) interval=n; break; } }
-  if(obj.meta){
-    if(!last && obj.meta.last_maintenance) last=parseTimestamp({time:obj.meta.last_maintenance});
-    if(!next && obj.meta.next_maintenance) next=parseTimestamp({time:obj.meta.next_maintenance});
-    if(!interval && obj.meta.maintenance_interval_days) interval=Number(obj.meta.maintenance_interval_days);
-    if(obj.meta.maintenance_notes) notes=obj.meta.maintenance_notes;
-    if(obj.meta.maintenance_ia_predicted_next) iaPred = obj.meta.maintenance_ia_predicted_next;
-    if(obj.meta.maintenance_ia && obj.meta.maintenance_ia.predicted_next) iaPred = obj.meta.maintenance_ia.predicted_next;
-  }
-  if(obj.maintenance){
-    if(!last && obj.maintenance.last) last=parseTimestamp({time:obj.maintenance.last});
-    if(!next && obj.maintenance.next) next=parseTimestamp({time:obj.maintenance.next});
-    if(!interval && obj.maintenance.interval_days) interval=Number(obj.maintenance.interval_days);
-    if(obj.maintenance.notes) notes = obj.maintenance.notes;
-  }
-  if(!iaPred && obj.maintenance_ia_predicted_next) iaPred = obj.maintenance_ia_predicted_next;
-  return { lastMaintenance:last, nextMaintenance:next, intervalDays:interval, notes:notes||null, iaPredicted:iaPred||null };
+  const maintenance=obj?.maintenance||{};
+  return {
+    lastMaintenance: maintenance.last ? parseTimestamp({time:maintenance.last}) : null,
+    nextMaintenance: maintenance.next ? parseTimestamp({time:maintenance.next}) : null,
+    intervalDays: maintenance.interval_days ?? null,
+    notes: maintenance.notes ?? null
+  };
 }
 
-/* IA prediction endpoint helper */
-async function fetchIaPredictionForSensor(sensorId){
-  return null; // No provider is connected; do not manufacture a prediction.
-}
-if(btnIaCompute) { btnIaCompute.disabled=true; btnIaCompute.title='Aucun moteur IA connecté'; }
-
-/* ---------- Render sensors (affiche maintenance + IA) ---------- */
+/* ---------- Capteurs et maintenance ---------- */
 (function populateUnitFilter(){ if(!sensorUnitSelect) return; const units = Array.from(new Set(SENSORS.map(s=>s.unit).filter(Boolean))); for(const u of units){ const o=document.createElement('option'); o.value=u; o.textContent=u; sensorUnitSelect.appendChild(o); } })();
 
+const sensorSnapshots=createSnapshotLoader(async()=>{
+  const jobs = SENSORS.map(async s => {
+    const raw = await getLatestRaw(s.id).catch(()=>null);
+    let val = null;
+    if(raw){
+      if(typeof raw[s.field] === 'number') val = raw[s.field];
+    }
+    return { sensor:s, raw, value:val };
+  });
+
+  return Promise.all(jobs);
+});
 let sensorRenderGeneration=0;
 async function renderSensors(filterText=''){
   const generation=++sensorRenderGeneration;
@@ -469,23 +454,12 @@ async function renderSensors(filterText=''){
   const q = (filterText||'').trim().toLowerCase();
   const unitFilter = sensorUnitSelect ? sensorUnitSelect.value : '';
 
-  const jobs = SENSORS.map(async s => {
-    const raw = await getLatestRaw(s.id).catch(()=>null);
-    let val = null;
-    if(raw){
-      if(raw[s.field] !== undefined) val = raw[s.field];
-      else if(raw.value !== undefined) val = raw.value;
-      else { for(const k of Object.keys(raw)){ if(typeof raw[k] === "number"){ val = raw[k]; break; } } }
-    }
-    return { sensor:s, raw, value:val };
-  });
-
-  const results = await Promise.all(jobs);
+  const results = await sensorSnapshots.load();
   if(generation!==sensorRenderGeneration)return;
   sensorListRoot.replaceChildren();
   const now = Date.now();
   const STALE_THRESHOLD_SEC = 300;
-  const csvRows = [["id","name","value","unit","last_seen","age_s","quality","last_maintenance","next_maintenance","ia_predicted","notes"].join(",")];
+  const csvRows = [["id","name","value","unit","last_seen","age_s","quality","last_maintenance","next_maintenance","notes"].join(",")];
 
   for(const rj of results){
     const s = rj.sensor;
@@ -507,7 +481,6 @@ async function renderSensors(filterText=''){
     let nextMaint = m.nextMaintenance;
     if(!nextMaint && m.lastMaintenance && m.intervalDays){ nextMaint = new Date(m.lastMaintenance.getTime() + m.intervalDays*24*3600*1000); }
     const nextMaintText = nextMaint ? fmtDateShort(nextMaint) : "—";
-    const iaText = m.iaPredicted ? fmtDateShort(m.iaPredicted) : "—";
 
     const isStale = (!ts) || (ageSec > STALE_THRESHOLD_SEC);
     const staleText = isStale ? `Trous/stale (${isNaN(ageSec)?'?' : ageSec+'s'})` : `OK (${ageSec}s)`;
@@ -526,7 +499,7 @@ async function renderSensors(filterText=''){
     else if(isStale) qPill.classList.add('stale'); else qPill.classList.add('good');
 
     const maintenanceRow = document.createElement('div'); maintenanceRow.className='maintenance-row';
-    maintenanceRow.textContent = `Dernière maintenance: ${lastMaintText} · Prochaine maintenance: ${nextMaintText} · IA: ${iaText}`;
+    maintenanceRow.textContent = `Dernière maintenance: ${lastMaintText} · Prochaine maintenance: ${nextMaintText}`;
 
     const notesRow = document.createElement('div'); notesRow.className='sensor-meta'; notesRow.style.marginTop='6px';
     notesRow.textContent = `Notes maintenance: ${m.notes||'—'}`;
@@ -547,22 +520,9 @@ async function renderSensors(filterText=''){
     card.append(title, meta, valueRow, qPill, maintenanceRow, notesRow, staleEl, actions);
     sensorListRoot.appendChild(card);
 
-    csvRows.push([id, name, val===null?'':val, s.unit||'', ts?ts.toISOString():'', isFinite(ageSec)?ageSec:'', qualText, m.lastMaintenance?m.lastMaintenance.toISOString():'', nextMaint?nextMaint.toISOString():'', m.iaPredicted||'', m.notes||''].map(csvQ).join(","));
+    csvRows.push([id, name, val===null?'':val, s.unit||'', ts?ts.toISOString():'', isFinite(ageSec)?ageSec:'', qualText, m.lastMaintenance?m.lastMaintenance.toISOString():'', nextMaint?nextMaint.toISOString():'', m.notes||''].map(csvQ).join(","));
 
-    if(!m.iaPredicted){
-      (async ()=>{
-        try{
-          const res = await fetchIaPredictionForSensor(id);
-          if(res && res.predicted_next){
-            const el = document.getElementById(`ia-${id.replace(/[^a-zA-Z0-9_-]/g,'_')}`);
-            if(el) el.textContent = new Date(res.predicted_next).toLocaleString();
-            raw.meta = raw.meta || {};
-            raw.meta.maintenance_ia_predicted_next = res.predicted_next;
 
-          }
-        }catch(e){ /* ignore */ }
-      })();
-    }
   }
 
   if(sensorListRoot.children.length===0) sensorListRoot.replaceChildren(legacyCard('Aucun capteur trouvé pour ce filtre.'));
@@ -570,10 +530,10 @@ async function renderSensors(filterText=''){
 }
 
 /* Hook filters / initial render */
-if(sensorFilterInput){let pending; sensorFilterInput.addEventListener('input',event=>{clearTimeout(pending);if(!event.isComposing)pending=setTimeout(()=>renderSensors(sensorFilterInput.value),300);});sensorFilterInput.addEventListener('compositionend',()=>{clearTimeout(pending);pending=setTimeout(()=>renderSensors(sensorFilterInput.value),300);});}
+if(sensorFilterInput){sensorFilterInput.addEventListener('input',event=>{if(!event.isComposing)renderSensors(sensorFilterInput.value);});sensorFilterInput.addEventListener('compositionend',()=>renderSensors(sensorFilterInput.value));}
 if(sensorUnitSelect) sensorUnitSelect.addEventListener('change', ()=> renderSensors(sensorFilterInput?sensorFilterInput.value:'') );
 
-setInterval(()=>{ if(!document.hidden) renderSensors(sensorFilterInput?sensorFilterInput.value:''); }, 30000);
+setInterval(()=>{if(document.hidden)return; if(document.getElementById('tab-sensors').classList.contains('active'))renderSensors(sensorFilterInput?.value||'');else if(document.getElementById('tab-actions').classList.contains('active'))renderActions(actionFilterInput?.value||'');},30000);
 
 /* ---------- Maintenance modal helpers ---------- */
 function openMaintenanceEditor(sensorId, raw){
@@ -584,20 +544,13 @@ function openMaintenanceEditor(sensorId, raw){
   maintNext.value = m.nextMaintenance ? dateToLocalInput(m.nextMaintenance) : '';
   maintInterval.value = m.intervalDays || '';
   maintNotes.value = m.notes || '';
-  maintIaDate.value = m.iaPredicted ? dateToLocalInput(m.iaPredicted) : '';
-  maintIaMeta.textContent = 'Dernier calcul: — • Confiance: —';
   if(!maintNext.value) updateMaintNextFromInputs();
   maintNext.removeAttribute('data-manual');
   maintModal.classList.remove('hidden'); maintModal.setAttribute('aria-hidden','false');
 
-  fetchIaPredictionForSensor(sensorId).then(res=>{
-    if(res && res.predicted_next){
-      maintIaDate.value = isoToLocalInputValue(res.predicted_next);
-      maintIaMeta.textContent = `Dernier calcul: ${res.computed_at?new Date(res.computed_at).toLocaleString():'—'} • Confiance: ${res.confidence??'—'}`;
-    }
-  }).catch(()=>{/*ignore*/});
 }
-function closeMaintenanceEditor(){ if(!maintModal) return; maintModal.classList.add('hidden'); maintModal.setAttribute('aria-hidden','true'); maintForm?.reset(); maintIaDate.value=''; maintIaMeta.textContent='Dernier calcul: — • Confiance: —'; }
+
+function closeMaintenanceEditor(){ if(!maintModal) return; maintModal.classList.add('hidden'); maintModal.setAttribute('aria-hidden','true'); maintForm?.reset(); }
 if(maintCancel) maintCancel.addEventListener('click', ()=> closeMaintenanceEditor());
 
 function computeNextIsoFromLocal(lastLocalInputValue, intervalDays){
@@ -624,9 +577,6 @@ async function saveMaintenanceForSensor(sensorId){
       next: maintNext.value ? new Date(maintNext.value).toISOString() : null,
       interval_days: maintInterval.value ? Number(maintInterval.value) : null,
       notes: maintNotes.value || null
-    },
-    maintenance_ia: {
-      predicted_next: maintIaDate.value ? new Date(maintIaDate.value).toISOString() : null
     }
   };
 
@@ -635,41 +585,12 @@ async function saveMaintenanceForSensor(sensorId){
     const r = await apiFetch(`${API_BASE}/telemetry/maintenance?sensor=${encodeURIComponent(sensorId)}`, {
       method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
     });
-    if(r.ok){ hud("Maintenance enregistrée (serveur)."); closeMaintenanceEditor(); setTimeout(()=> renderSensors(sensorFilterInput?.value||''),200); return; }
-  }catch(e){ /* ignore */ }
-
-  try{
-    const r2 = await apiFetch(`${API_BASE}/sensors/${encodeURIComponent(sensorId)}/maintenance`, {
-      method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
-    });
-    if(r2.ok){ hud("Maintenance enregistrée (endpoint alternative)."); closeMaintenanceEditor(); setTimeout(()=> renderSensors(sensorFilterInput?.value||''),200); return; }
+    if(r.ok){ sensorSnapshots.invalidate(); hud("Maintenance enregistrée (serveur)."); closeMaintenanceEditor(); renderSensors(sensorFilterInput?.value||''); return; }
   }catch(e){ /* ignore */ }
 
   hud("Maintenance non enregistrée. Vérifiez votre connexion et votre session, puis réessayez.");
 }
 
-if(btnIaCompute){
-  btnIaCompute.addEventListener('click', async ()=>{
-    const sensorId = maintSensorId.textContent;
-    if(!sensorId) return hud("Aucun capteur sélectionné.");
-    btnIaCompute.disabled = true;
-    maintIaMeta.textContent = 'Calcul IA en cours…';
-    try{
-      const r = await fetchIaPredictionForSensor(sensorId);
-      if(r && r.predicted_next){
-        maintIaDate.value = isoToLocalInputValue(r.predicted_next);
-        maintIaMeta.textContent = `Dernier calcul: ${r.computed_at?new Date(r.computed_at).toLocaleString():'—'} • Confiance: ${r.confidence??'—'}`;
-        hud("Prédiction IA récupérée.");
-      } else {
-        maintIaMeta.textContent = 'IA indisponible';
-        hud("IA indisponible.");
-      }
-    }catch(e){
-      maintIaMeta.textContent = 'Erreur IA';
-      hud("Erreur IA.");
-    } finally { btnIaCompute.disabled = false; }
-  });
-}
 if(maintSaveBtn) maintSaveBtn.addEventListener('click', async ()=>{
   const sid = maintSensorId.textContent; if(!sid) return hud("Aucun capteur sélectionné.");
   maintSaveBtn.disabled = true;
@@ -677,18 +598,15 @@ if(maintSaveBtn) maintSaveBtn.addEventListener('click', async ()=>{
   maintSaveBtn.disabled = false;
 });
 
-/* ========= Actions IA (nouvel onglet) ========= */
-async function fetchActions(force=false){
-  if(!force && fetchActions._cache) return fetchActions._cache;
-  try{
-    const r = await apiFetch(`${API_BASE}/mlops/actions`);
-    if(!r.ok) throw new Error('nok');
-    const j = await r.json();
-    fetchActions._cache = Array.isArray(j) ? j : (j.actions||[]);
-    return fetchActions._cache;
-  }catch(e){
-    hud('Actions indisponibles. Vérifiez votre session et réessayez.'); return [];
-  }
+/* ========= Actions persistées ========= */
+const actionSnapshots=createSnapshotLoader(async()=>{
+  const response=await apiFetch(`${API_BASE}/mlops/actions`);
+  if(!response.ok)throw new Error('Actions indisponibles');
+  return response.json();
+});
+async function fetchActions(){
+  try { return await actionSnapshots.load(); }
+  catch { hud('Actions indisponibles. Vérifiez votre session et réessayez.'); return actionSnapshots.peek()||[]; }
 }
 async function postActionToApi(action){
   const r = await apiFetch(`${API_BASE}/mlops/actions`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(action) });
@@ -706,10 +624,13 @@ async function deleteActionApi(id){
   return true;
 }
 
+let actionRenderGeneration=0;
 async function renderActions(filter=''){
+  const generation=++actionRenderGeneration;
   if(!actionsListRoot) return;
   actionsListRoot.replaceChildren(legacyCard('Chargement…'));
-  const items = await fetchActions(true).catch(()=>[]);
+  const items = await fetchActions();
+  if(generation!==actionRenderGeneration)return;
   const q = (filter||'').trim().toLowerCase();
   actionsListRoot.replaceChildren();
 
@@ -748,6 +669,7 @@ async function renderActions(filter=''){
       if(!await messageDialog("Supprimer cette action ? Cette suppression est définitive.", true)) return;
       try{
         await deleteActionApi(id);
+        actionSnapshots.invalidate();
         hud("Action supprimée (serveur).");
       }catch(e){
         hud("Suppression non enregistrée. Vérifiez votre session puis réessayez.");
@@ -765,7 +687,7 @@ async function renderActions(filter=''){
       openActionEditor({ id, created_at:created, due_at:due, text, done:checked, done_at: checked ? new Date().toISOString() : null, done_by: checked ? (window.USER_NAME||'technicien') : '' });
     });
 
-    rows.push([id, created||'', due||'', text, done?1:0, done_at||'', done_by||'', a.source||'ai'].map(csvQ).join(","));
+    rows.push([id, created||'', due||'', text, done?1:0, done_at||'', done_by||'', a.source||'manual'].map(csvQ).join(","));
   }
 
   if(btnExportActions) btnExportActions.onclick = ()=> downloadFile(`actions_${Date.now()}.csv`, rows.join("\n"));
@@ -801,7 +723,7 @@ async function saveActionFromModal(){
   try {
     if(id) await putActionToApi(id,payload); else await postActionToApi(payload);
     hud('Action enregistrée sur le serveur.');
-    fetchActions._cache=null;
+    actionSnapshots.invalidate();
     closeActionEditor();
     renderActions(actionFilterInput?.value||'');
   } catch {
@@ -814,7 +736,7 @@ if(actionCancelBtn) actionCancelBtn.addEventListener('click', ()=> closeActionEd
 if(actionFilterInput) actionFilterInput.addEventListener('input', ()=> renderActions(actionFilterInput.value));
 
 /* initial render */
-setTimeout(()=>{ renderActions(); renderSensors(); }, 200);
+renderSensors(sensorFilterInput?.value||'');
 
 /* End of file */
 

@@ -14,6 +14,7 @@ Les commandes reproductibles se trouvent dans [README.md](README.md). Avant de p
 npm run build
 npm run check
 npm run format:check
+npm run test:unit
 npm run test:e2e
 git diff --check
 ```

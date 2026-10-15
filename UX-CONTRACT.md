@@ -19,3 +19,5 @@ Identité: [DESIGN.md](DESIGN.md). Locale fr-FR; dates Europe/Paris. Route / pub
 - Select et date: affichage et contrôle natifs acceptés; aucun calendrier personnalisé.
 - Graphique SVG avec axes/unités, résumé, table alternative et export CSV. WebGL facultatif avec erreur textuelle et modèle téléchargeable.
 - Ancien viewer conservé pour outils de mesure; la nouvelle navigation et le dashboard sont canoniques.
+
+- Rafraîchir les données conserve la scène BIM et l’ouverture de la table de valeurs. Les filtres du viewer historique exploitent un cache mémoire de 30 secondes, invalidé après mutation; aucun stockage navigateur persistant. Les onglets sans implémentation et la prédiction IA inopérante ont été retirés.
