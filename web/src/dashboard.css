@@ -1,0 +1,474 @@
+/* Dashboard: a quiet instrument panel, with a clear navigation rail. */
+.dashboard-layout {
+  --nav-text: #d4e3eb;
+  --nav-active: #2c5169;
+  grid-template-columns: 232px minmax(0, 1fr);
+}
+.dashboard-layout .sidebar {
+  background: var(--ink);
+  color: var(--nav-text);
+  border-right: 0;
+  padding: 28px 16px 20px;
+}
+.sidebar > .brand {
+  color: var(--surface);
+  margin-bottom: 36px;
+}
+.sidebar .brand-dot {
+  color: #77c8cd;
+}
+.sidebar .workspace {
+  background: transparent;
+  border-color: #405866;
+  padding: 14px 10px;
+  margin-bottom: 28px;
+}
+.sidebar .workspace-icon {
+  background: var(--nav-active);
+  color: var(--surface);
+}
+.sidebar .workspace strong,
+.sidebar .profile strong,
+.sidebar .ai-status strong {
+  color: var(--surface);
+}
+.sidebar .workspace div > span,
+.sidebar .nav-label,
+.sidebar .profile div > span,
+.sidebar .ai-status span {
+  color: var(--nav-text);
+}
+.sidebar .side-link {
+  color: var(--nav-text);
+  padding: 14px 12px;
+  gap: 12px;
+  font-size: 13px;
+}
+.sidebar .side-link:hover,
+.sidebar .side-link.active {
+  color: var(--surface);
+  background: var(--nav-active);
+}
+.sidebar .side-link.active::before {
+  display: none;
+}
+.sidebar .sidebar-bottom {
+  padding-top: 32px;
+}
+.sidebar .ai-status {
+  color: #77c8cd;
+}
+.sidebar .profile {
+  border-color: #405866;
+}
+.sidebar .sidebar-bottom .button {
+  color: var(--surface);
+  background: transparent;
+  border: 1px solid #718c9c;
+}
+.sidebar .sidebar-bottom .button:hover {
+  background: var(--nav-active);
+}
+.sidebar :focus-visible {
+  outline-color: #91d9df;
+}
+.dashboard-layout .app-header {
+  height: 64px;
+  padding-inline: 32px;
+}
+.dashboard-layout .header-right .icon-button {
+  width: 44px;
+  height: 44px;
+  border-color: var(--border);
+}
+.dashboard-layout .dashboard-main {
+  padding: 28px 32px;
+}
+.dashboard-layout .page-heading {
+  margin-bottom: 20px;
+}
+.dashboard-layout .page-heading h1 {
+  font-size: 30px;
+  letter-spacing: -0.025em;
+}
+.dashboard-layout .page-heading h1 + p {
+  font-size: 13px;
+  margin-top: 5px;
+}
+.dashboard-layout .demo-banner {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0 0 16px;
+  margin-bottom: 20px;
+}
+.dashboard-layout .demo-banner > a {
+  min-height: 44px;
+}
+.site-summary.summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 0;
+  margin-bottom: 24px;
+}
+.summary-item {
+  padding: 0 24px;
+  display: grid;
+  gap: 5px;
+  align-content: start;
+  min-width: 0;
+}
+.summary-item + .summary-item {
+  border-left: 1px solid var(--border);
+}
+.summary-item > span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.summary-item > strong {
+  font-size: 30px;
+  letter-spacing: -0.025em;
+  line-height: 1.35;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.summary-item strong small {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.summary-item .text-button {
+  padding: 0;
+  min-height: 24px;
+  justify-self: start;
+  font-size: 12px;
+}
+.summary-item .vigilance-value {
+  color: var(--warning);
+}
+.metric-strip {
+  margin-bottom: 24px;
+}
+.metric-strip-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.metric-strip-heading h2 {
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.metric-strip-heading .text-button {
+  font-size: 12px;
+}
+.metric-options {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 4px 4px 10px;
+  margin-inline: -4px;
+}
+.metric-option {
+  flex: 1 0 122px;
+  padding: 12px;
+  min-height: 92px;
+  text-align: left;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--control-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+.metric-option:hover {
+  background: var(--soft);
+  border-color: #94adbd;
+}
+.metric-option[aria-pressed="true"] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--surface);
+}
+.metric-name {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.metric-reading {
+  font-size: 20px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.metric-reading small {
+  font-size: 11px;
+  font-weight: 400;
+}
+.metric-state {
+  font-size: 11px;
+  color: var(--warning);
+}
+.metric-option[aria-pressed="true"] .metric-state {
+  color: #ffe1a9;
+}
+.dashboard-layout .primary-grid {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.dashboard-layout .primary-grid.bim-workspace {
+  grid-template-columns: minmax(0, 1fr);
+}
+.dashboard-layout .panel-heading {
+  padding: 20px 22px 16px;
+}
+.dashboard-layout .panel-heading h2 {
+  font-size: 17px;
+  font-weight: 650;
+}
+.panel-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+.dashboard-layout .twin-viewport {
+  height: 414px;
+}
+.dashboard-layout .bim-workspace .twin-viewport {
+  height: 560px;
+}
+.dashboard-layout .bim-launch > .building-drawing {
+  object-fit: contain;
+  padding: 20px 36px 48px 0;
+  opacity: 1;
+}
+.dashboard-layout .bim-launch > .button {
+  bottom: 20px;
+  box-shadow: none;
+}
+.bim-preview-note {
+  position: absolute;
+  bottom: 82px;
+  z-index: 1;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--surface);
+  padding: 3px 8px;
+  border-radius: 4px;
+  max-width: 80%;
+  text-align: center;
+}
+.dashboard-layout .model-tag {
+  font: 11px var(--font);
+  letter-spacing: 0.02em;
+  top: 16px;
+  left: 16px;
+}
+.dashboard-layout .viewer-controls {
+  top: 16px;
+  right: 14px;
+}
+.dashboard-layout .twin-footer {
+  padding: 16px 20px 4px;
+}
+.dashboard-layout .bim-selection {
+  padding: 8px 20px 16px;
+}
+.dashboard-layout .twin-panel > .panel-note {
+  background: var(--surface);
+  padding: 12px 20px;
+}
+.dashboard-layout .chart-controls {
+  padding: 0 22px 12px;
+  gap: 12px;
+}
+.chart-filter {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  flex: 1;
+}
+.chart-filter label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.chart-filter select {
+  width: 100%;
+  font-size: 12px;
+  padding: 8px 10px;
+  min-height: 44px;
+}
+.dashboard-layout .chart-value {
+  padding-top: 0;
+}
+.dashboard-layout .chart-value > strong {
+  font-size: 36px;
+}
+.dashboard-layout .trend-chart {
+  height: auto;
+  aspect-ratio: 570 / 215;
+  margin-top: 6px;
+}
+.dashboard-layout .observation-picker {
+  padding-bottom: 8px;
+}
+.dashboard-layout .observation-picker input {
+  min-height: 32px;
+}
+.dashboard-layout .insights-panel .panel-heading {
+  padding-bottom: 16px;
+}
+.dashboard-layout .insight {
+  padding: 18px 22px;
+}
+.dashboard-layout .insight h3 {
+  font-size: 14px;
+}
+.dashboard-layout .insight p {
+  font-size: 13px;
+}
+.dashboard-layout .insight p.quiet {
+  font-size: 12px;
+}
+@media (max-width: 1200px) and (min-width: 801px) {
+  .dashboard-layout {
+    grid-template-columns: 204px minmax(0, 1fr);
+  }
+  .dashboard-layout .dashboard-main {
+    padding: 24px;
+  }
+  .dashboard-layout .primary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashboard-layout .twin-viewport {
+    height: 380px;
+  }
+}
+@media (max-width: 800px) {
+  .dashboard-layout {
+    display: block;
+  }
+  .dashboard-layout .sidebar {
+    position: static;
+    height: auto;
+    padding: 18px 16px 0;
+  }
+  .dashboard-layout .sidebar > .brand {
+    margin-bottom: 0;
+  }
+  .dashboard-layout .workspace {
+    margin: 0;
+    border: 0;
+    padding: 0;
+  }
+  .dashboard-layout .sidebar nav {
+    margin-top: 18px;
+  }
+  .dashboard-layout .sidebar .side-link {
+    font-size: 12px;
+    padding: 12px 7px;
+  }
+  .dashboard-layout .app-header {
+    height: auto;
+    min-height: 64px;
+    padding: 10px 16px;
+  }
+  .dashboard-layout .dashboard-main {
+    padding: 24px 16px;
+  }
+  .dashboard-layout .page-heading {
+    align-items: flex-start;
+  }
+  .dashboard-layout .page-heading h1 {
+    font-size: 27px;
+  }
+  .dashboard-layout .update-block {
+    min-width: 0;
+    text-align: left;
+  }
+  .site-summary.summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px 0;
+  }
+  .summary-item {
+    padding-inline: 16px;
+  }
+  .summary-item strong {
+    font-size: 28px;
+  }
+  .summary-item strong small {
+    display: block;
+    font-size: 12px;
+  }
+  .summary-item .text-button {
+    min-height: 44px;
+  }
+  .summary-item.acquisition-summary {
+    grid-column: 1 / -1;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+    padding-top: 12px;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+  .acquisition-summary > strong {
+    font-size: 22px;
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+  .acquisition-summary > span:last-child {
+    font-size: 11px;
+  }
+  .metric-options {
+    padding-bottom: 12px;
+  }
+  .metric-option {
+    flex-basis: 136px;
+  }
+  .dashboard-layout .primary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashboard-layout .twin-viewport {
+    height: 390px;
+  }
+  .dashboard-layout .bim-workspace .twin-viewport {
+    height: 440px;
+  }
+  .dashboard-layout .chart-controls {
+    flex-wrap: nowrap;
+  }
+  .chart-filter {
+    flex-basis: 50%;
+  }
+  .chart-filter select {
+    font-size: 12px;
+  }
+  .dashboard-layout .panel-heading,
+  .dashboard-layout .insight {
+    padding-inline: 18px;
+  }
+}
+@media (max-width: 800px) {
+  .dashboard-layout .sidebar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 12px;
+    align-items: center;
+  }
+  .dashboard-layout .workspace,
+  .dashboard-layout .workspace > div {
+    min-width: 0;
+  }
+  .dashboard-layout .workspace strong {
+    overflow-wrap: anywhere;
+  }
+}

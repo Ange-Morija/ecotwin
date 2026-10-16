@@ -551,3 +551,36 @@ test("React : panne du SDK BIM puis nouvelle tentative sans recharger la page", 
   );
   expect(errors).toEqual([]);
 });
+
+test("dashboard : sélection rapide des mesures et résumé fondé sur les acquisitions", async ({
+  page,
+}) => {
+  let calls = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/api/dashboard?")) calls++;
+  });
+  await page.goto("/dashboard?mode=demo");
+  await expect(
+    page.getByRole("region", { name: "Indicateurs du site" }),
+  ).toContainText("Dernière acquisition");
+  await expect(page.locator(".summary-item")).toHaveCount(3);
+  const initial = calls;
+  const pm25 = page
+    .locator(".metric-options")
+    .getByRole("button", { name: /^Particules PM2.5/ });
+  await pm25.click();
+  await expect(pm25).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByLabel("Métrique", { exact: true })).toHaveValue(
+    "CAP_PM25",
+  );
+  await expect(page.locator(".chart-value strong")).toHaveText("18,6");
+  await expect(page).toHaveURL(/metric=CAP_PM25/);
+  expect(calls).toBe(initial);
+  await expect(
+    page.getByText("APERÇU SCHÉMATIQUE", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Ouvrir le catalogue" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Capteurs & données", exact: true }),
+  ).toBeVisible();
+});

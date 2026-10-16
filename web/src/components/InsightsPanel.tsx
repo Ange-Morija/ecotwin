@@ -20,7 +20,7 @@ export default function InsightsPanel({
       className={`panel insights-panel ${expanded ? "expanded" : ""}`}
     >
       <div className="panel-heading">
-        <h2>Les signaux qui comptent</h2>
+        <h2>Points à examiner</h2>
         <Pill tone={data.insights.length ? "warning" : "neutral"}>
           {data.insights.length} point{data.insights.length > 1 ? "s" : ""}
         </Pill>

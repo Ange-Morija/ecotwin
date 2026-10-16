@@ -1,7 +1,8 @@
+import "../dashboard.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { DashboardData, Mode, Period, User, View } from "../lib/types";
-import { api, time } from "../lib/api";
+import { api, date, time, valueText } from "../lib/api";
 import { useDashboard } from "../lib/useDashboard";
 import {
   ActionLink,
@@ -37,65 +38,104 @@ function Summary({
   data: DashboardData;
   change: (patch: Record<string, string>) => void;
 }) {
+  const acquisitions = data.sensors.flatMap((sensor) =>
+    sensor.time ? [new Date(sensor.time).getTime()] : [],
+  );
+  const latest = acquisitions.length
+    ? new Date(Math.max(...acquisitions))
+    : null;
   return (
-    <section className="summary-grid" aria-label="Indicateurs du site">
-      <article className="summary-card">
-        <div className="summary-title">
-          <Icon name="cube" />
-          <span>Modèle BIM</span>
-        </div>
-        <div className="summary-value">
-          1 <span>modèle XKT</span>
-        </div>
-        <p>Contexte spatial consultable</p>
-      </article>
-      <article className="summary-card">
-        <div className="summary-title">
-          <Icon name="sensor" />
-          <span>Mesures disponibles</span>
-        </div>
-        <div className="summary-value">
-          {data.sensors.filter((s) => s.value !== null).length}{" "}
-          <span>/ {data.sensors.length} métriques</span>
-        </div>
-        <p>
-          {data.source === "demo"
-            ? "Jeu de données illustratif"
-            : "Observations reçues sur la période"}
-        </p>
-      </article>
-      <article
-        className={`summary-card ${data.insights.length ? "attention" : ""}`}
-      >
-        <div className="summary-title">
-          <Icon name="alert" />
-          <span>Points de vigilance</span>
-        </div>
-        <div className="summary-value">
-          {data.insights.length}{" "}
-          <span>
+    <section
+      className="summary-grid site-summary"
+      aria-label="Indicateurs du site"
+    >
+      <div className="summary-item">
+        <span>Mesures disponibles</span>
+        <strong>
+          {data.sensors.filter((sensor) => sensor.value !== null).length}
+          <small> / {data.sensors.length}</small>
+        </strong>
+        <span>métriques sur la période</span>
+      </div>
+      <div className="summary-item">
+        <span>Points de vigilance</span>
+        <strong className={data.insights.length ? "vigilance-value" : ""}>
+          {data.insights.length}
+          <small>
+            {" "}
             seuil{data.insights.length > 1 ? "s" : ""} dépassé
             {data.insights.length > 1 ? "s" : ""}
-          </span>
-        </div>
+          </small>
+        </strong>
         <Button
           className="text-button"
           onClick={() => change({ view: "insights" })}
         >
-          Consulter les insights
+          Consulter les insights <Icon name="arrow" size={14} />
         </Button>
-      </article>
-      <article className="summary-card">
-        <div className="summary-title">
-          <Icon name="spark" />
-          <span>Analyse du site</span>
-        </div>
-        <div className="summary-text">Règles explicables</div>
-        <p>Intégration IA à configurer</p>
-      </article>
+      </div>
+      <div className="summary-item acquisition-summary">
+        <span>Dernière acquisition</span>
+        <strong>{latest ? time.format(latest) : "—"}</strong>
+        <span>
+          {latest
+            ? date.format(latest) + " · Europe/Paris"
+            : "Aucune mesure reçue"}
+        </span>
+      </div>
     </section>
   );
 }
+function MetricStrip({
+  data,
+  metric,
+  change,
+}: {
+  data: DashboardData;
+  metric: string;
+  change: (patch: Record<string, string>) => void;
+}) {
+  return (
+    <section
+      className="metric-strip"
+      aria-label="Sélection rapide des métriques"
+    >
+      <div className="metric-strip-heading">
+        <h2>Mesures suivies</h2>
+        <Button
+          className="text-button"
+          onClick={() => change({ view: "sensors" })}
+        >
+          Ouvrir le catalogue <Icon name="arrow" size={16} />
+        </Button>
+      </div>
+      <div
+        className="metric-options"
+        tabIndex={0}
+        role="region"
+        aria-label="Métriques, défilement horizontal"
+      >
+        {data.sensors.map((sensor) => (
+          <Button
+            key={sensor.id}
+            className={`metric-option ${sensor.status === "warning" ? "metric-warning" : ""}`}
+            aria-pressed={sensor.id === metric}
+            onClick={() => change({ metric: sensor.id })}
+          >
+            <span className="metric-name">{sensor.name}</span>
+            <span className="metric-reading">
+              {valueText(sensor.value)} <small>{sensor.unit}</small>
+            </span>
+            {sensor.status === "warning" && (
+              <span className="metric-state">À surveiller</span>
+            )}
+          </Button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Dashboard({ mode }: { mode: Mode }) {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -231,7 +271,7 @@ function Dashboard({ mode }: { mode: Mode }) {
           <div className="ai-status">
             <Icon name="spark" size={18} />
             <div>
-              <strong>Prêt pour vos analyses</strong>
+              <strong>Analyse par seuils</strong>
               <span>IA non connectée</span>
             </div>
           </div>
@@ -392,6 +432,7 @@ function Dashboard({ mode }: { mode: Mode }) {
               <>
                 <div hidden={view !== "overview"}>
                   <Summary data={data} change={change} />
+                  <MetricStrip data={data} metric={metric} change={change} />
                 </div>
                 <div
                   className={`primary-grid ${view === "bim" ? "bim-workspace" : ""}`}

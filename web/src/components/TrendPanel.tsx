@@ -200,35 +200,48 @@ export default function TrendPanel({
   return (
     <section className="panel trend-panel">
       <div className="panel-heading">
-        <h2>Un signal, dans le temps</h2>
+        <div>
+          <h2>Historique des mesures</h2>
+          <p className="panel-subtitle">
+            Une acquisition, son contexte, son évolution
+          </p>
+        </div>
         <Icon name="chart" />
       </div>
       <div className="chart-controls">
-        <select
-          aria-label="Métrique"
-          value={sensor.id}
-          onChange={(event) => {
-            setSelection(null);
-            change({ metric: event.target.value });
-          }}
-        >
-          {data.sensors.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-        <select
-          aria-label="Période"
-          value={period}
-          onChange={(e) => {
-            setSelection(null);
-            change({ period: e.target.value });
-          }}
-        >
-          <option value="24h">Dernières 24 heures</option>
-          <option value="7d">7 derniers jours</option>
-        </select>
+        <div className="chart-filter">
+          <label htmlFor="trend-metric">Métrique</label>
+          <select
+            aria-label="Métrique"
+            id="trend-metric"
+            value={sensor.id}
+            onChange={(event) => {
+              setSelection(null);
+              change({ metric: event.target.value });
+            }}
+          >
+            {data.sensors.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="chart-filter">
+          <label htmlFor="trend-period">Période</label>
+          <select
+            aria-label="Période"
+            id="trend-period"
+            value={period}
+            onChange={(e) => {
+              setSelection(null);
+              change({ period: e.target.value });
+            }}
+          >
+            <option value="24h">Dernières 24 heures</option>
+            <option value="7d">7 derniers jours</option>
+          </select>
+        </div>
       </div>
       <div className="chart-value">
         <strong>{valueText(sensor.value)}</strong>

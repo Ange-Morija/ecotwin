@@ -80,3 +80,9 @@ Méthode de référence : [les huit méthodes de conception](docs/design-workflo
 ## Frontend React
 
 React possède les interfaces déclaratives, les contrôles, les états et les textes; Xeokit possède la géométrie et la sélection GPU. React Router conserve les filtres dans l’URL et la scène reste montée entre vues du dashboard. La charte couleur, les familles système et la réduction des animations restent les mêmes. Le graphique propose une observation sélectionnée au pointeur ou avec un curseur natif au clavier; aucune information ne dépend uniquement du survol. Les boutons, messages et champs restent partagés, sans nouvelle bibliothèque de style concurrente.
+
+## Poste de surveillance — affinement du dashboard
+
+Le dashboard adopte un rail de navigation bleu encre (`--ink`), sur un espace de travail clair inchangé. Les seuls tokens propres au rail sont `--nav-text: #d4e3eb` et `--nav-active: #2c5169`, définis dans `web/src/dashboard.css`; la palette métier reste issue de platform.css. La feuille dashboard est chargée avec la route React et ne modifie pas les pages publiques.
+
+Le résumé est un bandeau de trois informations : mesures disponibles, dépassements observés et date de dernière acquisition réellement reçue. L’absence de mesure affiche un tiret, jamais l’heure de consultation. Les huit métriques sont des boutons de sélection avec valeur/unité, état sélectionné et accès au catalogue; leur défilement horizontal reste accessible au clavier. Les panneaux BIM et historique sont alignés sur ordinateur et passent en colonne sous 1200 px; sur mobile les points à examiner précèdent le graphique puis le BIM. Le modèle est chargé à la demande; le dessin préalable est explicitement marqué « Aperçu schématique ». Les filtres du graphique disposent de libellés visibles.

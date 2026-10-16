@@ -38,7 +38,10 @@ export default function BimPanel() {
   return (
     <section className="panel twin-panel">
       <div className="panel-heading">
-        <h2>Le jumeau du bâtiment</h2>
+        <div>
+          <h2>Le jumeau du bâtiment</h2>
+          <p className="panel-subtitle">Explorer le contexte de vos mesures</p>
+        </div>
         <a
           href="/assets/model.xkt"
           download="model.xkt"
@@ -57,11 +60,15 @@ export default function BimPanel() {
           aria-label="Vue 3D du modèle BIM. Utilisez les boutons de rotation et de zoom pour naviguer."
         />
         <span className="model-tag">
-          <Icon name="cube" size={14} /> MODÈLE XKT
+          <Icon name="cube" size={14} />{" "}
+          {ready ? "MODÈLE XKT" : "APERÇU SCHÉMATIQUE"}
         </span>
         <div className="twin-grid" />
         {!ready && (
           <div className="bim-launch">
+            <span className="bim-preview-note">
+              Le modèle BIM réel se charge à la demande.
+            </span>
             <BuildingDrawing />
             <Button
               onClick={() => setAttempt((v) => v + 1)}

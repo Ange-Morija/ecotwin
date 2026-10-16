@@ -52,3 +52,9 @@ Mapping BIM-capteurs, multi-sites/IAM/SSO, import IFC, connecteurs IoT, moteurs 
 - Chunks JS/CSS minifiés par route, distribution `web/dist` commune à FastAPI et Nginx, Docker et développement Vite adaptés.
 - Anciens moteurs platform.js/bim-viewer.js supprimés; outils avancés BIM/maintenance/actions conservés et testés.
 - Spécification, plan et tâches du lot 007, contrats UX, documentation et tests actualisés.
+
+## Interface du dashboard — affinement
+- Navigation bleu encre et hiérarchie plus nette; trois indicateurs fondés sur les données remplacent les quatre cartes génériques.
+- Accès direct aux huit métriques avec valeurs/unités et sélection synchronisée au graphique et à l’URL.
+- Espace BIM agrandi, aperçu schématique explicitement identifié, filtres du graphique libellés et points à examiner mis en évidence.
+- Styles du dashboard isolés dans une feuille chargée avec la route; adaptation aux écrans intermédiaires et mobiles.

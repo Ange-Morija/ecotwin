@@ -30,3 +30,6 @@ Identité: [DESIGN.md](DESIGN.md). Locale fr-FR; dates Europe/Paris. Route / pub
 - La sélection d’observation est accessible par curseur natif (Home/End/flèches), avec date, valeur et unité en texte; elle reste en place pendant le rafraîchissement. Les acquisitions espacées de plus de 90 minutes ne sont pas reliées dans la série horaire.
 - BimPanel conserve le canvas pendant la navigation entre vues; bim-engine détruit la scène et ses événements à la sortie du dashboard. Une erreur de modèle permet de réessayer et laisse le téléchargement disponible.
 - Aucun composant ne modifie directement le DOM possédé par React. Les outils historiques restent isolés sous `/public/index.html`.
+
+- La sélection rapide d’une métrique met à jour le graphique, le select et l’URL sans nouvelle lecture réseau; `aria-pressed` expose la sélection. La dernière acquisition du résumé provient du maximum des dates reçues, distinct de l’heure de consultation.
+- Les filtres métrique/période ont des labels visibles. L’aperçu BIM indique son caractère schématique jusqu’au chargement du modèle réel; les boutons de navigation 3D restent désactivés avant ce chargement.
