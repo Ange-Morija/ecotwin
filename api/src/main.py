@@ -49,9 +49,9 @@ app.include_router(operations_router)
 app.include_router(telemetry_router, prefix="/api/telemetry")
 app.include_router(telemetry_router, include_in_schema=False)
 
-WEB_ROOT = Path(__file__).resolve().parents[2] / "web"
+WEB_ROOT = Path(__file__).resolve().parents[2] / "web" / "dist"
 if WEB_ROOT.is_dir():
-    for folder in ("js", "styles", "assets", "vendor", "public"):
+    for folder in ("js", "styles", "assets", "vendor", "public", "app-assets"):
         directory = WEB_ROOT / folder
         if directory.is_dir():
             app.mount(f"/{folder}", StaticFiles(directory=directory), name=folder)

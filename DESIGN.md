@@ -60,7 +60,7 @@ Surfaces blanches et bordures gris bleu; ombre légère pour la vue axonométriq
 Contrôles 8 px, panneaux 14 px. Pas de piles de capsules décoratives. Icônes linéaires partagées.
 
 ## Components
-platform.js possède navigation, boutons, champs, messages et rendu sûr des données. platform.css possède tous les tokens, les scrollbars et leurs états. bim-viewer.js possède exclusivement la scène WebGL. Les légendes ne reposent pas sur le survol.
+web/src/components/ui.tsx possède les primitives React; pages/Auth.tsx possède les formulaires. platform.css possède tous les tokens, les scrollbars et leurs états; react.css adapte les compositions. lib/bim-engine.ts possède exclusivement la scène WebGL et remonte les états à BimPanel.tsx par callbacks. Les légendes ne reposent pas sur le survol.
 
 ## Do's and Don'ts
 Afficher source, unité, date et absence de données. Aucun badge «live» pour la démo, aucun graphique inventé pour une panne réelle. Respecter prefers-reduced-motion; focus explicite; cibles 44 px. Exporter les observations effectivement affichées. Rendu de données externes via textContent.
@@ -76,3 +76,7 @@ Le tri natif du catalogue expose `aria-sort` sur la colonne active, avec boutons
 Mouvement : transitions de couleur de 150 ms pour confirmer un état; aucun effet d’entrée décoratif. Le défilement doux est désactivé avec `prefers-reduced-motion`. Police système conservée pour la continuité visuelle et l’absence de téléchargement.
 
 Méthode de référence : [les huit méthodes de conception](docs/design-workflow.md). Aucune nouvelle référence externe consultée pendant cette passe; l’inspiration métier Tandem n’implique aucune affiliation Autodesk.
+
+## Frontend React
+
+React possède les interfaces déclaratives, les contrôles, les états et les textes; Xeokit possède la géométrie et la sélection GPU. React Router conserve les filtres dans l’URL et la scène reste montée entre vues du dashboard. La charte couleur, les familles système et la réduction des animations restent les mêmes. Le graphique propose une observation sélectionnée au pointeur ou avec un curseur natif au clavier; aucune information ne dépend uniquement du survol. Les boutons, messages et champs restent partagés, sans nouvelle bibliothèque de style concurrente.

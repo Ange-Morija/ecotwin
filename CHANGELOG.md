@@ -43,3 +43,12 @@ Mapping BIM-capteurs, multi-sites/IAM/SSO, import IFC, connecteurs IoT, moteurs 
 - Interface lisible sur mobile : texte minimum 12 px hors annotations graphiques, commandes opérationnelles de 44 px et en-tête adaptable.
 - Catalogue triable par métrique, état et acquisition avec indication accessible; export limité à la recherche et respectant le tri.
 - Huit méthodes de conception intégrées à la documentation et au suivi Spec Kit.
+
+## Migration React — 16 octobre 2026
+- Présentation, connexion, inscription et dashboard réécrits en React 19 et TypeScript strict, avec React Router et Vite.
+- Navigation sans rechargement; filtre d’état et tri partageables dans l’URL, recherche compatible IME et exports des lignes visibles.
+- Sélection d’observation au clavier/tactile et au pointeur; axe temporel réel, interruption des lignes aux acquisitions manquantes et état vide explicite.
+- Scène BIM conservée entre vues et rafraîchissements, destruction à la sortie, rechargement possible après échec du SDK, ajustement sans animation lorsque demandé.
+- Chunks JS/CSS minifiés par route, distribution `web/dist` commune à FastAPI et Nginx, Docker et développement Vite adaptés.
+- Anciens moteurs platform.js/bim-viewer.js supprimés; outils avancés BIM/maintenance/actions conservés et testés.
+- Spécification, plan et tâches du lot 007, contrats UX, documentation et tests actualisés.

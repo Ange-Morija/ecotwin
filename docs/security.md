@@ -4,3 +4,9 @@ L'inscription ouverte est réservée au développement (désactivée par défaut
 La télémétrie machine utilise X-API-Key, jamais des clés en query string. Aucun fournisseur IA n'est connecté. Les règles et leur seuil sont illustratifs.
 Les fichiers .env et l'état InfluxDB précédemment suivis sont retirés du suivi sans supprimer les copies locales. Cela n'efface pas les anciens commits. Avant usage réel: vérifier et renouveler les identifiants historiques, réinitialiser les accès concernés et décider d'une purge d'historique dédiée. Aucun identifiant n'est reproduit dans cette documentation.
 Avant production: IAM/SSO, validation e-mail/récupération, politique de mot de passe et quotas, RBAC/multi-tenant, rétention et backups, TLS, origine et monitoring. Voir T028–T034.
+
+## Dépendances frontend — migration React
+
+Les versions React, React DOM, React Router, TypeScript et Vite sont exactes et installées depuis le lockfile. Les dépendances Node sont utilisées au build; ni node_modules ni un serveur Vite ne sont copiés dans les images finales.
+
+L’audit npm exécuté le 16 octobre 2026 signale 7 entrées (5 hautes, 2 modérées) dans la chaîne du SDK Xeokit existant : loaders.gl → texture-compressor → image-size / argparse / sprintf-js. Les avis directs concernent notamment [image-size](https://github.com/advisories/GHSA-w3rx-r6r6-pgpr) et [sprintf-js](https://github.com/advisories/GHSA-hp3w-g68c-fv3c). La proposition automatique rétrograde Xeokit en 2.2.5; elle n’est pas appliquée sans validation de compatibilité. L’application utilise le bundle navigateur Xeokit et un modèle XKT local; elle n’expose pas un service Node de compression de textures. Cela ne constitue pas une preuve d’absence de risque dans le SDK. Analyser une mise à jour compatible ou le retrait des outils transitifs inutilisés avant production; tâche R007 du lot React.

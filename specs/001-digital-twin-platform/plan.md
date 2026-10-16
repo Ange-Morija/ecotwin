@@ -33,3 +33,7 @@ Budget: une série <=168 points et une scène; SDK local lazy, pas d'animation c
 
 ## Delivery boundaries
 Le mapping BIM-capteur, import IFC, multi-sites, RBAC/SSO, fournisseurs IA et alertes externes font l'objet de tâches futures, jamais de faux boutons de fonctionnalités actives.
+
+## Évolution du frontend — 16 octobre 2026
+
+La réalisation JavaScript initiale décrite ci-dessus est remplacée par les composants React/TypeScript de [007-react-frontend](../007-react-frontend/plan.md). Les contrats API et frontières métier restent valides; le nouveau build Vite sert `web/dist`. Les chemins platform.js et bim-viewer.js du plan initial sont historiques.

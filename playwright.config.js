@@ -38,13 +38,13 @@ export default defineConfig({
   webServer: process.env.ECOTWIN_E2E_URL
     ? undefined
     : {
-        command: `${python} -m uvicorn api.src.main:app --host 127.0.0.1 --port 8010`,
+        command: `npm run build && ${python} -m uvicorn api.src.main:app --host 127.0.0.1 --port 8010`,
         url: "http://127.0.0.1:8010/health",
         env: {
           ECOTWIN_DATA_DIR: resolve("test-results/runtime"),
           ALLOW_REGISTRATION: "true",
         },
         reuseExistingServer: false,
-        timeout: 30000,
+        timeout: 60000,
       },
 });

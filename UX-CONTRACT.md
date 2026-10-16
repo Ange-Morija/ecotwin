@@ -3,11 +3,11 @@ Identité: [DESIGN.md](DESIGN.md). Locale fr-FR; dates Europe/Paris. Route / pub
 
 | Capability | Canonical owner | Source of truth | Allowed variants | Verification |
 |---|---|---|---|---|
-| Form | platform.js authForm | UX-CONTRACT.md | login/register | tests/e2e/platform.spec.js |
-| Select/Listbox | HTML select natif | UX-CONTRACT.md | période et métrique; popup OS accepté | tests/e2e/platform.spec.js |
+| Form | web/src/pages/Auth.tsx | UX-CONTRACT.md | login/register | tests/e2e/platform.spec.js |
+| Select/Listbox | HTML select natif dans les composants React | UX-CONTRACT.md | période et métrique; popup OS accepté | tests/e2e/platform.spec.js |
 | Date | Intl.DateTimeFormat | UX-CONTRACT.md | affichage fr-FR Europe/Paris | tests/e2e/platform.spec.js |
 | Scrollbar | platform.css global | DESIGN.md | tous les débordements | tests/e2e/platform.spec.js |
-| Toast | platform.js status region | UX-CONTRACT.md | statut non modal, erreurs inline | tests/e2e/platform.spec.js |
+| Toast | components/ui.tsx ErrorBanner + useDashboard | UX-CONTRACT.md | statut non modal, erreurs inline | tests/e2e/platform.spec.js |
 | CRUD | API operations + session | contracts/api.md | actions de l'auteur, maintenance mono-site | api/tests/test_platform.py |
 
 - Navigation par vrais liens; URL conserve view/metric/period/q et retour arrière.
@@ -24,3 +24,9 @@ Identité: [DESIGN.md](DESIGN.md). Locale fr-FR; dates Europe/Paris. Route / pub
 
 - Catalogue triable au clavier par nom, état et acquisition; `aria-sort` décrit l’ordre. Le tri reste actif pendant recherche et rafraîchissement. Export du catalogue limité aux lignes visibles, dans le même ordre; les métriques d’unités différentes ne sont pas triées par valeur.
 - La procédure [design-workflow](docs/design-workflow.md) guide chaque évolution d’interface, avec vérification des états et des captures mobile/ordinateur.
+
+- React Router possède les routes canoniques. Les liens conservent la navigation clavier; les changements de surface déplacent le focus vers le contenu, les changements de métrique conservent le focus du contrôle.
+- L’URL restaure aussi `state`, `sort` et `dir` du catalogue. Recherche et filtres d’état se combinent, sans appel réseau; la composition IME est validée avant mise à jour de l’URL.
+- La sélection d’observation est accessible par curseur natif (Home/End/flèches), avec date, valeur et unité en texte; elle reste en place pendant le rafraîchissement. Les acquisitions espacées de plus de 90 minutes ne sont pas reliées dans la série horaire.
+- BimPanel conserve le canvas pendant la navigation entre vues; bim-engine détruit la scène et ses événements à la sortie du dashboard. Une erreur de modèle permet de réessayer et laisse le téléchargement disponible.
+- Aucun composant ne modifie directement le DOM possédé par React. Les outils historiques restent isolés sous `/public/index.html`.

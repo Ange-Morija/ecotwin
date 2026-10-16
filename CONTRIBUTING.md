@@ -10,8 +10,8 @@ Les commandes reproductibles se trouvent dans [README.md](README.md). Avant de p
 ```bash
 .venv/bin/python -m ruff check api/src api/tests
 .venv/bin/python -m ruff format --check api/src api/tests
-.venv/bin/python -m pytest api/tests -q
 npm run build
+.venv/bin/python -m pytest api/tests -q
 npm run check
 npm run format:check
 npm run test:unit
@@ -30,3 +30,5 @@ Le test Influx réel nécessite une base neuve jetable; son absence doit être d
 Ne jamais committer .env, comptes de tests persistants, secrets, dossiers de dépendances ou fichiers internes d'une base. Ne pas publier de valeurs sensibles dans une issue ou un rapport. Les changements d'historique, de production ou de politique d'accès doivent être explicitement décidés.
 
 Méthode UI : [huit méthodes de conception et de validation](docs/design-workflow.md).
+
+Frontend : travailler dans `web/src`, réutiliser `components/ui.tsx` et les tokens existants. `npm run dev` active le rechargement Vite; `npm run build` vérifie le typage et reconstruit les fichiers réellement servis par FastAPI. Ne pas modifier `web/dist` directement. Le SDK WebGL est isolé dans `lib/bim-engine.ts`; ne pas muter le DOM React depuis le renderer.

@@ -78,3 +78,5 @@ Spécification et critères : [optimization.md](optimization.md).
 - [x] T041 Ajouter tri accessible et export du catalogue filtré, préserver recherche et ordre lors des rafraîchissements.
 - [x] T042 Améliorer lisibilité mobile, cibles tactiles et retour à la ligne des commandes.
 - [x] T043 Intégrer les huit méthodes dans `docs/design-workflow.md`, DESIGN.md et le contrat UX; documenter les méthodes conditionnelles.
+
+Les chemins JavaScript des tâches initiales sont historiques après la [migration React](../007-react-frontend/tasks.md); leurs propriétaires actuels sont décrits dans le plan du lot 007.

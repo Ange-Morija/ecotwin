@@ -169,7 +169,7 @@ for (const width of [390, 1440]) {
       await page.goto(path);
       if (path.includes("dashboard"))
         await expect(
-          page.locator(".summary-grid,.sensors-panel"),
+          page.locator(".summary-grid:visible,.sensors-panel:visible"),
         ).toBeVisible();
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       expect(
@@ -377,7 +377,9 @@ test("catalogue : tri accessible, recherche et export des lignes affichées", as
   await expect(
     page.getByRole("columnheader", { name: /Métrique/ }),
   ).toHaveAttribute("aria-sort", "descending");
-  expect(await names()).toEqual([...ascending].reverse());
+  await expect(table.locator("tbody tr td:first-child strong")).toHaveText(
+    [...ascending].reverse(),
+  );
   await page.getByRole("searchbox").fill("CAP_TEMP");
   await expect(table.locator("tbody tr")).toHaveCount(1);
   const download = page.waitForEvent("download");
@@ -389,7 +391,9 @@ test("catalogue : tri accessible, recherche et export des lignes affichées", as
   expect(csv).toContain("CAP_TEMP");
   expect(csv).not.toContain("CAP_PM25");
   await page.getByRole("button", { name: "Effacer la recherche" }).click();
-  expect(await names()).toEqual([...ascending].reverse());
+  await expect(table.locator("tbody tr td:first-child strong")).toHaveText(
+    [...ascending].reverse(),
+  );
   await page.getByRole("button", { name: /Trier par Acquisition/ }).focus();
   await page.keyboard.press("Enter");
   await expect(
@@ -435,4 +439,115 @@ test("petits écrans, textes longs et réduction des animations", async ({
       ).toBe("auto");
     }
   }
+});
+
+test("React : navigation sans rechargement, scène conservée et filtres restaurés", async ({
+  page,
+}) => {
+  const documents = [];
+  page.on("request", (request) => {
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame())
+      documents.push(request.url());
+  });
+  await page.goto("/dashboard?mode=demo");
+  await expect(page.locator(".summary-grid")).toBeVisible();
+  await expect(page.locator(".integration-panel")).toBeHidden();
+  await page.evaluate(() => {
+    window.reactCanvas = document.querySelector("#twin-canvas");
+  });
+  await page.getByRole("link", { name: "Capteurs & données" }).click();
+  await expect(page.locator(".primary-grid")).toBeHidden();
+  await page.getByLabel("État des métriques").selectOption("warning");
+  await expect(page.getByText("1 métrique sur 8")).toBeVisible();
+  await expect(page).toHaveURL(/state=warning/);
+  await page.getByRole("button", { name: /Trier par Métrique/ }).click();
+  await expect(page).toHaveURL(/dir=desc/);
+  await page.getByRole("link", { name: "Jumeau BIM", exact: true }).click();
+  await expect(page.locator(".sensors-panel")).toBeHidden();
+  expect(
+    await page
+      .locator("#twin-canvas")
+      .evaluate((canvas) => canvas === window.reactCanvas),
+  ).toBe(true);
+  await page.goBack();
+  await expect(page.getByLabel("État des métriques")).toHaveValue("warning");
+  await expect(
+    page.getByRole("columnheader", { name: /Métrique/ }),
+  ).toHaveAttribute("aria-sort", "descending");
+  await page.reload();
+  await expect(page.getByLabel("État des métriques")).toHaveValue("warning");
+  expect(documents).toHaveLength(2);
+});
+
+test("React : graphique au clavier, images chargées et état vide honnête", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const drawing = page.locator(".hero-visual .building-drawing");
+  await expect(drawing).toBeVisible();
+  await expect
+    .poll(() => drawing.evaluate((image) => image.naturalWidth))
+    .toBeGreaterThan(0);
+  await page
+    .getByRole("link", { name: "Explorer le jumeau numérique" })
+    .click();
+  const slider = page.getByRole("slider", { name: "Observation sélectionnée" });
+  await slider.focus();
+  await page.keyboard.press("Home");
+  await expect(slider).toHaveValue("0");
+  await page.keyboard.press("ArrowRight");
+  await expect(slider).toHaveValue("1");
+  const selected = await page
+    .locator(".observation-picker output")
+    .textContent();
+  await page.getByRole("button", { name: "Actualiser les données" }).click();
+  await expect(page.locator(".observation-picker output")).toHaveText(selected);
+  await page.route("**/api/dashboard?*", async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    data.sensors = data.sensors.map((sensor) => ({
+      ...sensor,
+      value: null,
+      time: null,
+      status: "missing",
+    }));
+    data.history = Object.fromEntries(
+      data.sensors.map((sensor) => [sensor.id, []]),
+    );
+    data.insights = [];
+    await route.fulfill({ response, json: data });
+  });
+  await page.getByRole("button", { name: "Actualiser les données" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Aucune observation sur cette période" }),
+  ).toBeVisible();
+  await expect(page.locator(".chart-value strong")).toHaveText("—");
+  await expect(
+    page.getByRole("heading", { name: "Aucun dépassement observé" }),
+  ).toBeVisible();
+});
+
+test("React : panne du SDK BIM puis nouvelle tentative sans recharger la page", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.route("**/vendor/xeokit-sdk.es.js*", (route) => route.abort());
+  await page.goto("/dashboard?mode=demo&view=bim");
+  await page.getByRole("button", { name: "Charger le modèle 3D" }).click();
+  await expect(
+    page.getByText("La vue 3D nécessite WebGL.", { exact: false }),
+  ).toBeVisible();
+  await page.unroute("**/vendor/xeokit-sdk.es.js*");
+  await page.getByRole("button", { name: "Réessayer le modèle 3D" }).click();
+  await expect(page.locator(".twin-viewport")).toHaveAttribute(
+    "data-ready",
+    "true",
+    { timeout: 45000 },
+  );
+  await page.getByRole("link", { name: "EcoTwin, accueil" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Votre bâtiment.",
+  );
+  expect(errors).toEqual([]);
 });

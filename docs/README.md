@@ -12,6 +12,8 @@ EcoTwin est un pilote de plateforme de jumeaux numériques **mono-site partagé*
 - [Nettoyage et mesures d’optimisation](../specs/001-digital-twin-platform/optimization.md)
 - [Intégration IA future](ai-integration.md)
 
+- [Migration du frontend React](../specs/007-react-frontend/spec.md) et [plan technique](../specs/007-react-frontend/plan.md)
+
 ## Concevoir et contribuer
 - [Constitution](../.specify/memory/constitution.md)
 - [Spécification du pilote](../specs/001-digital-twin-platform/spec.md)

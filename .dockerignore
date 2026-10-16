@@ -10,3 +10,5 @@ test-results
 infra/influxdb
 web/vendor
 web/assets/model.ifc
+
+web/dist

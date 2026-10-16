@@ -4,19 +4,27 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build-web.mjs",
-    "check": "node --check web/js/platform.js && node --check web/js/bim-viewer.js && node --check web/js/app.js && node --check web/js/data-cache.js && node --check scripts/build-web.mjs",
+    "build": "tsc --noEmit && node scripts/build-web.mjs",
+    "check": "tsc --noEmit && node --check web/js/app.js && node --check web/js/data-cache.js && node --check scripts/build-web.mjs",
     "test:e2e": "playwright test",
     "test:a11y": "playwright test --grep accessibilit\u00e9",
-    "format:check": "prettier --check web/index.html web/js/platform.js web/js/bim-viewer.js web/styles/platform.css tests/e2e/platform.spec.js playwright.config.js web/js/data-cache.js scripts/build-web.mjs tests/unit/data-cache.test.js",
-    "test:unit": "node --test tests/unit/*.test.js"
+    "format:check": "prettier --check \"web/src/**/*.{ts,tsx,css}\" web/index.html web/styles/platform.css tests/e2e/platform.spec.js playwright.config.js vite.config.ts tsconfig.json web/js/data-cache.js scripts/build-web.mjs tests/unit/data-cache.test.js",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "dev": "vite --config vite.config.ts"
   },
   "dependencies": {
-    "@xeokit/xeokit-sdk": "2.6.114"
+    "@xeokit/xeokit-sdk": "2.6.114",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-router-dom": "7.18.4"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.10.2",
     "@playwright/test": "1.56.1",
-    "prettier": "3.6.2"
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "prettier": "3.6.2",
+    "typescript": "7.0.2",
+    "vite": "8.3.4"
   }
 }

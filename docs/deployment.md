@@ -54,3 +54,7 @@ Les Dockerfiles conservent les vérifications TLS et ne copient pas le certifica
 
 ## Limites avant production
 Le pilote n'est pas un service multi-client. SSO/RBAC, récupération de compte, politique de rétention, sauvegardes et accès aux données réelles doivent être définis avant production. Consulter [security.md](security.md) et la liste de tâches.
+
+## Build React
+
+Node.js 22.12+ et les dépendances de développement sont nécessaires dans l’étape de construction (`npm ci`, puis `npm run build`). Le runtime ne contient ni node_modules ni serveur Vite : Nginx reçoit `web/dist` et l’image API le place dans `/app/web/dist`. Ne pas copier le `web/index.html` source dans le répertoire servi; il contient l’entrée TypeScript de développement. Les bundles minifiés par route sont sous `/app-assets/`. Recréer le build avant de redémarrer un serveur FastAPI après une modification du frontend.

@@ -162,7 +162,7 @@ textarea {
   color: var(--ink);
 }
 [hidden] {
-  display: none;
+  display: none !important;
 }
 .sr-only {
   position: absolute;
@@ -450,7 +450,7 @@ textarea {
   box-shadow: 0 24px 60px -35px #355e7a55;
   overflow: hidden;
 }
-.hero-visual > svg {
+.hero-visual > .building-drawing {
   width: 100%;
   height: auto;
   display: block;
@@ -668,7 +668,7 @@ textarea {
   margin-top: 20px;
   line-height: 1.15;
 }
-.auth-story svg[viewBox="0 0 620 460"] {
+.auth-story .building-drawing {
   width: 100%;
   height: auto;
   margin-top: 25px;
@@ -1773,7 +1773,7 @@ td .text-button {
     width: 100%;
     margin: auto;
   }
-  .hero-visual > svg {
+  .hero-visual > .building-drawing {
     max-height: 430px;
   }
   .hero-actions .button {
@@ -2011,7 +2011,7 @@ td .text-button {
     font-size: 12px;
     margin-top: 12px;
   }
-  .hero-visual > svg {
+  .hero-visual > .building-drawing {
     min-height: 270px;
   }
   .visual-footer {

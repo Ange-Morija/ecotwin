@@ -1,17 +1,17 @@
 # EcoTwin
 Une plateforme de jumeaux numériques pour relier le contexte BIM aux observations du bâtiment et aux décisions d'exploitation.
 
-Le pilote propose une présentation produit, une connexion réelle et un dashboard responsive avec modèle XKT, huit métriques environnementales, historique, export CSV et insights par règles. Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
+Le frontend React et TypeScript propose une présentation produit, une connexion réelle et un dashboard responsive avec modèle XKT, huit métriques environnementales, historique, export CSV et insights par règles. Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
 
 ## Aperçu
 ![Dashboard EcoTwin — démonstration BIM et données](docs/images/dashboard-desktop.png)
 
 [Présentation, connexion et captures mobiles](docs/product.md) · [Documentation complète](docs/README.md) · [Architecture](docs/architecture.md) · [Déploiement](docs/deployment.md)
 
-Le pilote et son lot de maintenance livrent 36 tâches; 7 lots restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le moteur IA n’est pas connecté. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
+Le pilote et ses lots de maintenance livrent 36 tâches. La [migration React](specs/007-react-frontend/spec.md) modernise les interfaces; 7 lots métier restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le moteur IA n’est pas connecté. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
 
 ## Démarrage
-Python 3.11+ (3.12 testé), Node.js 22+ et uv.
+Python 3.11+ (3.12 testé), Node.js 22.12+ et uv.
 Depuis la racine du dépôt:
 ```bash
 uv venv .venv --python python3
@@ -20,11 +20,17 @@ npm ci
 npm run build
 .venv/bin/python -m uvicorn api.src.main:app --host 0.0.0.0 --port 8000
 ```
-Routes: `/` présentation, `/login` connexion, `/register` création de compte local, `/dashboard` espace connecté, `/dashboard?mode=demo` découverte publique. Le serveur fournit frontend et API sur la même origine. Aucun compte par défaut: créez explicitement votre compte local.
+Routes: `/` présentation, `/login` connexion, `/register` création de compte local, `/dashboard` espace connecté, `/dashboard?mode=demo` découverte publique. Le serveur fournit la distribution `web/dist` et l’API sur la même origine. Exécutez `npm run build` avant de démarrer FastAPI. Aucun compte par défaut: créez explicitement votre compte local.
 
 Le nettoyage et ses mesures sont décrits dans [le lot d’optimisation](specs/001-digital-twin-platform/optimization.md). Les outils historiques se limitent désormais aux fonctions disponibles : BIM, capteurs, maintenance et actions; les panneaux de prédiction et iframes non raccordés ont été retirés.
 
 La démonstration est étiquetée et contient des données illustratives. Le viewer charge le véritable modèle `web/assets/model.xkt` avec un SDK Xeokit figé, servi localement et précompressé pour Nginx. Le lien entre objets BIM et capteurs n'est pas encore configuré.
+
+## Développement frontend
+
+Après le premier build, lancer FastAPI sur le port 8000 puis `npm run dev` dans un second terminal. Vite recharge les composants pendant les modifications et transmet `/api` et `/health` au backend. Les cookies restent HttpOnly et les requêtes passent par le proxy de développement de même origine. Pour vérifier la distribution finale, relancer `npm run build` et utiliser le serveur FastAPI.
+
+Stack : React 19, TypeScript strict, React Router 7 et Vite 8. Les versions exactes sont verrouillées dans package-lock.json. Navigation sans rechargement, filtres partageables, tri du catalogue, sélection d’observation au clavier et scène BIM conservée entre vues. Voir le [plan de migration](specs/007-react-frontend/plan.md).
 
 ## Données réelles et configuration
 La page connectée ne bascule jamais silencieusement en démo si InfluxDB est absent.
@@ -60,6 +66,7 @@ Le certificat est monté pendant l'installation et n'est pas embarqué dans l'im
 
 ## Tests
 ```bash
+npm run build
 .venv/bin/python -m pytest api/tests -q
 .venv/bin/python -m ruff check api/src api/tests
 .venv/bin/python -m ruff format --check api/src api/tests
@@ -89,7 +96,7 @@ Les prochains lots couvrent multi-sites/RBAC/SSO, import et mapping IFC-capteur,
 
 ## Structure
 - `api/src/`: FastAPI, sécurité, stockage et données.
-- `web/`: produit, connexion, dashboard et viewer avancé historique sous `/public/index.html`.
+- `web/src/`: composants et pages React TypeScript; `web/dist/`: distribution générée; `web/public/index.html`: outils BIM avancés historiques.
 - `infra/`: Compose et reverse proxy.
 - `api/tests/`, `tests/e2e/`: tests API et navigateur.
 - `specs/`, `.specify/`, `.agents/skills/`: workflow Spec Kit.

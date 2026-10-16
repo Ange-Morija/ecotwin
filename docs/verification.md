@@ -60,3 +60,20 @@ Vérifications exécutées sur Chromium local :
 - Inspection visuelle des captures avant/après : présentation ordinateur et dashboard mobile. Captures de la suite dans `test-results/`, non versionnées.
 
 Limites : Chromium uniquement; aucun nouveau test sur Safari/Firefox, lecteur d’écran réel ou appareil physique. Le test Influx réel et les images Docker n’ont pas été relancés pour cette modification frontend/documentaire. Les résultats premium antérieurs ci-dessus concernent la livraison précédente; le lanceur Impeccable est absent de cet environnement. Pas de nouvelle recherche Godly, ni de composant Aceternity puisque la stack reste JavaScript native. Aucun résultat de CI distante n’est affirmé.
+
+## Migration React — 16 octobre 2026
+
+Les pages principales utilisent React 19.3.1, React DOM 19.3.1, React Router 7.18.4, TypeScript 7.0.2 et Vite 8.3.4, versions exactes dans le lockfile. Les outils historiques BIM/maintenance/actions sont conservés séparément; ils n’ont pas été convertis en React. Les captures `docs/images` ont été actualisées depuis les captures navigateur de cette migration (démo explicitement illustrative).
+
+Vérifications locales exécutées :
+- Build Vite et TypeScript strict réussis; pages chargées en chunks, SDK Xeokit externe local à la demande. Le build affiche un avertissement Rolldown sur la directive `use client` de React Router : l’application est exclusivement cliente, sans frontière serveur React.
+- `npm run test:e2e` : 13 scénarios réussis sur la distribution servie par FastAPI. Après amélioration de la reprise du SDK et de la préférence de mouvement, 4 scénarios ciblés réussis (chargement XKT, navigation React, graphique/état vide et erreur SDK suivie d’une nouvelle tentative). Ce dernier porte la suite à 14 scénarios distincts.
+- Contrôles axe WCAG A/AA sur présentation, connexion, dashboard et catalogue à 390 et 1440 px; petit écran 320 px, intermédiaire 768 px, textes longs et réduction des animations vérifiés par la suite. Inspection des captures ordinateur/mobile; illustration SVG et masquage des sections corrigés avant succès final.
+- `npm run check`, `npm run format:check` et `npm run test:unit` réussis : 4 tests de cache Node.
+- Ruff check et format réussis. Après adaptation du test d’assets au HTML compilé : pytest 11 réussis, 1 test Influx ignoré faute de base jetable. Le test vérifie les bundles réellement référencés, le XKT et l’absence d’exposition de l’IFC et des sources TypeScript par FastAPI.
+- DESIGN.md lint : 0 erreur, 0 avertissement. Audit premium strict : 0 finding, rapport `docs/premium-audit.json`. Ces contrôles statiques complètent les parcours, sans prouver seuls l’accessibilité.
+- Les deux images Docker sont reconstruites avec vérification TLS et secret CA; FastAPI sert le HTML compilé depuis `/app/web/dist`, le XKT est inclus et l’IFC source est absent. Validation navigateur via Nginx consignée ci-dessous.
+
+Limites : Chromium uniquement, pas de lecteur d’écran réel, de Safari/Firefox ou de mesure de gain FPS/latence. Pas de nouvelle validation Influx/Grafana; aucune CI distante déclarée réussie. `npm audit` signale 7 entrées sur les dépendances transitives du SDK Xeokit existant (5 hautes, 2 modérées); voir `docs/security.md` et R007. Aucun nouvel outil IA ou mapping objet-capteur n’est annoncé comme livré.
+
+Validation finale de la distribution Docker : `ECOTWIN_E2E_URL=http://127.0.0.1:8021 npm run test:e2e` → **14/14 réussis** derrière Nginx, avec API non-root et stockage de test isolé. La première exécution avait 13 succès et une assertion de tri exécutée avant la fin du rendu React; remplacée par une attente Playwright sur les lignes affichées avant cette exécution complète réussie. Le SDK est servi en gzip (881 478 octets), décompression identique au fichier local de 5 104 210 octets. Les conteneurs et le réseau de validation sont ensuite supprimés; aucune instance de production n’a été déployée ou modifiée.

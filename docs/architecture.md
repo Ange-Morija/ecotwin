@@ -1,7 +1,7 @@
 # Architecture EcoTwin
 
 ## Périmètre livré
-Monolithe modulaire FastAPI, frontend JavaScript ESM/CSS et SDK Xeokit local figé. L'application peut être servie intégralement par FastAPI ou via un frontend Nginx avec proxy vers l'API. Aucun WebSocket, pipeline ML, service d'import IFC ou orchestration Kubernetes n'est implémenté.
+Monolithe modulaire FastAPI, frontend React/TypeScript construit par Vite et SDK Xeokit local figé. L'application peut être servie intégralement par FastAPI ou via un frontend Nginx avec proxy vers l'API. Aucun WebSocket, pipeline ML, service d'import IFC ou orchestration Kubernetes n'est implémenté.
 
 ```mermaid
 flowchart LR
@@ -24,14 +24,17 @@ flowchart LR
 ```
 
 ## Frontend
-- `web/index.html` est le point d'entrée pour `/`, `/login`, `/register` et `/dashboard`.
-- `web/js/platform.js` possède navigation, formulaires, récupération des données, graphique SVG, table alternative, export et états de panne.
-- `web/js/bim-viewer.js` possède une scène WebGL chargée à la demande. Aucun capteur n'est placé sur un objet sans mapping vérifié.
-- `web/styles/platform.css` implémente les tokens décrits dans [DESIGN.md](../DESIGN.md).
+- `web/index.html` et `web/src/main.tsx` sont les entrées Vite; `App.tsx` charge les pages React à la demande avec React Router.
+- `web/src/components/ui.tsx` possède les primitives; `pages/Auth.tsx` possède la validation des formulaires.
+- `components/TrendPanel.tsx`, `SensorTable.tsx` et `InsightsPanel.tsx` possèdent leur interaction; le SVG est déclaratif et propose une sélection d’observation accessible au clavier.
+- `components/BimPanel.tsx` possède les états et commandes React; `lib/bim-engine.ts` possède les objets GPU, les événements et leur destruction. Le SDK reste chargé à la demande.
+- `lib/useDashboard.ts` gère les requêtes annulables, le polling et les pannes. `types.ts` décrit les contrats; `api.ts` conserve cookies et header CSRF.
+- `web/styles/platform.css` possède les tokens; `web/src/react.css` adapte la composition aux composants.
 - `web/public/index.html` conserve les outils historiques de mesure et les éditeurs maintenance/actions.
-- `npm run build` copie la distribution Xeokit installée depuis le lockfile dans `web/vendor/`. Ce dossier généré est ignoré. Le build produit aussi une version gzip du SDK, servie par Nginx lorsque le navigateur l’accepte; il n’y a pas de bundle applicatif ni de minification annoncée.
+- `npm run build` vérifie TypeScript puis construit `web/dist` : routes en chunks JS minifiés, CSS, assets utiles, SDK local et sa version gzip. Le fichier IFC source n’est pas copié. `web/dist` et `web/vendor` sont générés et ignorés.
+- FastAPI et Nginx servent cette même distribution; Node est nécessaire au build et au développement, pas à l’exécution en production.
 
-Les paramètres URL restaurent métrique, période, vue et recherche. Un appel dashboard regroupe les observations; actualisation toutes les 30 secondes lorsque l'onglet est visible. Les réponses supersédées sont annulées. Les rafraîchissements mettent à jour les panneaux de données en conservant scène BIM, filtres et table ouverte. Dans les outils historiques, un cache mémoire de 30 secondes mutualise les lectures en cours et est invalidé après sauvegarde; seul l’onglet actif est actualisé. Une panne conserve les dernières données avec un état périmé. Les graphiques n'interpolent pas les heures absentes.
+Les paramètres URL restaurent métrique, période, vue, recherche, état et tri du catalogue. Un appel dashboard regroupe les observations; actualisation toutes les 30 secondes lorsque l'onglet est visible. Les réponses supersédées sont annulées. Les rafraîchissements mettent à jour les panneaux de données en conservant scène BIM, filtres et table ouverte. Dans les outils historiques, un cache mémoire de 30 secondes mutualise les lectures en cours et est invalidé après sauvegarde; seul l’onglet actif est actualisé. Une panne conserve les dernières données avec un état périmé. Les graphiques n'interpolent pas les heures absentes.
 
 ## API et stockage
 - `core/security.py` : hash scrypt, sessions opaques hachées en base, protection CSRF, garde d'accès session/clé.
@@ -54,3 +57,5 @@ Le mapping BIM n’est pas encore implémenté; le fichier vide sans usage a ét
 ## Déploiement et CI
 Les Dockerfiles utilisent le contexte racine du dépôt et incluent scripts, styles, SDK et modèle XKT. Le fichier IFC source reste dans Git mais est exclu des images et du contexte de build, car aucun import IFC n’est implémenté. L'API tourne avec un utilisateur non privilégié; les fichiers copiés appartiennent aux utilisateurs qui doivent les lire. Nginx transmet `/api/` sans changer les chemins.
 Compose utilise des volumes nommés. InfluxDB et Grafana sont optionnels via profils. La CI exécute lint, format, tests API avec InfluxDB jetable et tests navigateur; elle ne publie pas automatiquement d'images et ne déploie pas le produit.
+
+Décision et critères de migration : [specs/007-react-frontend](../specs/007-react-frontend/plan.md).

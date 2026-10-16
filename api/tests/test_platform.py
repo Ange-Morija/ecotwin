@@ -1,3 +1,4 @@
+import re
 import time
 from unittest.mock import MagicMock
 
@@ -40,7 +41,8 @@ def test_health_and_assets(client):
         "/",
         "/login",
         "/dashboard",
-        "/js/platform.js",
+        "/js/app.js",
+        "/assets/building-schematic.svg",
         "/styles/platform.css",
         "/assets/model.xkt",
         "/vendor/xeokit-sdk.es.js",
@@ -48,6 +50,15 @@ def test_health_and_assets(client):
         response = client.get(path)
         assert response.status_code == 200, path
         assert response.content
+
+    html = client.get("/").text
+    bundles = re.findall(r'(?:src|href)="(/app-assets/[^" ]+\.(?:js|css))"', html)
+    assert bundles, "Le HTML doit référencer la distribution compilée"
+    for path in bundles:
+        assert client.get(path).status_code == 200, path
+    assert "/src/main.tsx" not in html
+    assert client.get("/src/main.tsx").status_code == 404
+    assert client.get("/assets/model.ifc").status_code == 404
 
 
 def test_auth_session_hash_revocation_and_expiry(client):

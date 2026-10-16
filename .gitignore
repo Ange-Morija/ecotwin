@@ -16,3 +16,5 @@ test-results/
 infra/influxdb/data/
 infra/influxdb/config/
 !.env.example
+
+web/dist/
