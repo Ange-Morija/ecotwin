@@ -10,6 +10,10 @@ Donner aux équipes d'exploitation une lecture commune du bâtiment : son contex
 4. **Explorer** : le modèle XKT réel est chargé à la demande. La sélection d'un élément montre son identifiant BIM sans inventer de correspondance capteur.
 5. **Examiner** : les insights expliquent les dépassements observés. Les observations affichées sont exportables en CSV.
 
+## Composition du poste de surveillance
+
+Navigation claire, police Manrope locale et grille asymétrique : le BIM est le panneau principal, les métriques sont sélectionnables dans une liste latérale, puis historique et points de vigilance occupent la seconde rangée. Sur mobile les mesures passent en deux colonnes et les alertes restent prioritaires. La refonte est une création originale; aucun fichier Figma n’a été consulté ou importé dans cette session.
+
 ## Interfaces dynamiques
 
 Le frontend React permet de naviguer sans recharger le document. Le catalogue combine recherche et état, conserve le tri dans l’URL et exporte les lignes visibles. Le graphique offre une sélection d’acquisition au clavier/tactile. La scène BIM reste en place entre les vues et les rafraîchissements; une erreur de chargement peut être relancée. La maintenance et les actions restent disponibles dans les outils BIM avancés.

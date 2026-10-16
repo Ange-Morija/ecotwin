@@ -64,3 +64,9 @@ Mapping BIM-capteurs, multi-sites/IAM/SSO, import IFC, connecteurs IoT, moteurs 
 - Recherche accessible au clavier (`/`), focus sur le catalogue et raccourci ignoré pendant la saisie.
 - Pause/reprise de l’actualisation automatique, commande manuelle conservée et période accessible depuis les vues de détail.
 - Réinitialisation des filtres, saisie mobile à 16 px et textes d’accueil/connexion simplifiés.
+
+## Nouvelle composition du dashboard
+- Rail blanc, sélection vert sauge et typographie Manrope variable auto-hébergée avec licence SIL OFL.
+- BIM dans le panneau principal, métriques en liste latérale; historique et points à examiner regroupés sur la rangée suivante.
+- Liste de mesures en deux colonnes sur mobile, filtres et commandes conservés, sans nouvelle bibliothèque d’animation.
+- Création originale : le connecteur Figma n’était pas disponible, aucun modèle Figma n’est présenté comme consulté ou importé.

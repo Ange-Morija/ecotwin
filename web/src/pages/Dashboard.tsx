@@ -1,3 +1,4 @@
+import "@fontsource-variable/manrope";
 import "../dashboard.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -113,7 +114,7 @@ function MetricStrip({
         className="metric-options"
         tabIndex={0}
         role="region"
-        aria-label="Métriques, défilement horizontal"
+        aria-label="Métriques disponibles"
       >
         {data.sensors.map((sensor) => (
           <Button
@@ -531,9 +532,8 @@ function Dashboard({ mode }: { mode: Mode }) {
               )
             ) : (
               <>
-                <div hidden={view !== "overview"}>
+                <div className="overview-intro" hidden={view !== "overview"}>
                   <Summary data={data} change={change} />
-                  <MetricStrip data={data} metric={metric} change={change} />
                 </div>
                 <div
                   className={`primary-grid ${view === "bim" ? "bim-workspace" : ""}`}
@@ -548,6 +548,9 @@ function Dashboard({ mode }: { mode: Mode }) {
                       change={change}
                     />
                   </div>
+                </div>
+                <div className="metrics-slot" hidden={view !== "overview"}>
+                  <MetricStrip data={data} metric={metric} change={change} />
                 </div>
                 <SensorTable
                   data={data}

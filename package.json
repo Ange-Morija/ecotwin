@@ -7,12 +7,13 @@
     "build": "tsc --noEmit && node scripts/build-web.mjs",
     "check": "tsc --noEmit && node --check web/js/app.js && node --check web/js/data-cache.js && node --check scripts/build-web.mjs",
     "test:e2e": "playwright test",
-    "test:a11y": "playwright test --grep accessibilit\u00e9",
+    "test:a11y": "playwright test --grep accessibilité",
     "format:check": "prettier --check \"web/src/**/*.{ts,tsx,css}\" web/index.html web/styles/platform.css tests/e2e/platform.spec.js playwright.config.js vite.config.ts tsconfig.json web/js/data-cache.js scripts/build-web.mjs tests/unit/data-cache.test.js",
     "test:unit": "node --test tests/unit/*.test.js",
     "dev": "vite --config vite.config.ts"
   },
   "dependencies": {
+    "@fontsource-variable/manrope": "5.3.0",
     "@xeokit/xeokit-sdk": "2.6.114",
     "react": "19.3.1",
     "react-dom": "19.3.1",

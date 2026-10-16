@@ -9,16 +9,24 @@ colors:
   accent: "#167d88"
   warning: "#9a5b10"
   danger: "#b43c44"
+  workspaceBackground: "#f5f7f9"
+  workspaceText: "#1a2a38"
+  workspaceMuted: "#526777"
+  workspaceAccent: "#1d6f68"
+  workspaceSelected: "#e8f4f0"
 typography:
   display:
     fontFamily: "'Segoe UI', system-ui, sans-serif"
   body:
     fontFamily: "'Segoe UI', system-ui, sans-serif"
+  workspace:
+    fontFamily: "'Manrope Variable', 'Segoe UI', system-ui, sans-serif"
   data:
     fontFamily: "'SFMono-Regular', Consolas, monospace"
 rounded:
   control: "8px"
   panel: "14px"
+  workspacePanel: "16px"
 spacing:
   unit: "4px"
   panel: "24px"
@@ -38,6 +46,14 @@ components:
     textColor: "{colors.warning}"
   error:
     textColor: "{colors.danger}"
+  workspaceSurface:
+    backgroundColor: "{colors.workspaceBackground}"
+    textColor: "{colors.workspaceText}"
+  workspaceCaption:
+    textColor: "{colors.workspaceMuted}"
+  workspaceSelection:
+    backgroundColor: "{colors.workspaceSelected}"
+    textColor: "{colors.workspaceAccent}"
 ---
 # EcoTwin design system
 
@@ -48,16 +64,16 @@ Un poste de pilotage architectural pour responsables de bâtiments: précis, cal
 Les variables de web/styles/platform.css sont la source d'exécution canonique (modèle B); le frontmatter reflète leurs valeurs. primary→--primary; ink→--ink; muted→--muted; background→--bg; surface→--surface; accent→--accent; warning→--warning; danger→--danger. Accent bleu pétrole pour sélection, ambre pour vigilance, rouge pour erreur; toujours un libellé en plus de la couleur.
 
 ## Typography
-Familles système pour zéro téléchargement ni décalage. Titres marketing grands et légèrement resserrés, titres produit sobres, mesures en chiffres tabulaires et légendes techniques monospace. Français fr-FR; dates Europe/Paris. Aucune police décorative dans les tableaux.
+Familles système sur les pages publiques; Manrope variable auto-hébergée sur le dashboard (paquet @fontsource-variable/manrope 5.3.0, SIL OFL). La police est chargée avec la route et possède un repli système; aucune requête à Google Fonts. Titres marketing grands et légèrement resserrés, titres produit sobres, mesures en chiffres tabulaires et légendes techniques monospace. Français fr-FR; dates Europe/Paris. Aucune police décorative dans les tableaux.
 
 ## Layout
-Rythme 4 px, panneaux 24 px. Accueil asymétrique texte/axonométrie; dashboard barre latérale 228 px, en-tête et grille principale BIM/historique. À 900 px navigation horizontale; à 600 px une colonne et résumé avant BIM. Le document reste scrollable.
+Rythme 4 px, panneaux 24 px. Accueil asymétrique texte/axonométrie; dashboard rail blanc 224 px et grille asymétrique : BIM/historique dans la colonne principale, métriques/points à examiner dans une colonne de 304 px (340 px au-delà de 1600 px). Sous 1150 px les panneaux passent en colonne; sous 800 px la navigation est horizontale et les alertes précèdent les mesures puis graphique/BIM. Le document reste scrollable.
 
 ## Elevation & Depth
 Surfaces blanches et bordures gris bleu; ombre légère pour la vue axonométrique et panneaux flottants seulement. La profondeur 3D encode l'orientation du bâtiment.
 
 ## Shapes
-Contrôles 8 px, panneaux 14 px. Pas de piles de capsules décoratives. Icônes linéaires partagées.
+Contrôles 8 px, panneaux 14 px sur les pages publiques et 16 px dans le dashboard. Pas de piles de capsules décoratives. Icônes linéaires partagées.
 
 ## Components
 web/src/components/ui.tsx possède les primitives React; pages/Auth.tsx possède les formulaires. platform.css possède tous les tokens, les scrollbars et leurs états; react.css adapte les compositions. lib/bim-engine.ts possède exclusivement la scène WebGL et remonte les états à BimPanel.tsx par callbacks. Les légendes ne reposent pas sur le survol.
@@ -73,19 +89,21 @@ Texte d’interface au minimum 12 px, corps 14 px, titres 15–34 px selon le r�
 
 Le tri natif du catalogue expose `aria-sort` sur la colonne active, avec boutons nommés et focus visible. L’export respecte recherche et ordre affichés. Les dates absentes restent en fin de liste. Pas de tri transversal des valeurs de métriques d’unités différentes.
 
-Mouvement : transitions de couleur de 150 ms pour confirmer un état; aucun effet d’entrée décoratif. Le défilement doux est désactivé avec `prefers-reduced-motion`. Police système conservée pour la continuité visuelle et l’absence de téléchargement.
+Mouvement : transitions de couleur de 150 ms pour confirmer un état; aucun effet d’entrée décoratif. Le défilement doux est désactivé avec `prefers-reduced-motion`. Les pages publiques conservent leurs polices système; le dashboard charge sa police locale avec la route.
 
 Méthode de référence : [les huit méthodes de conception](docs/design-workflow.md). Aucune nouvelle référence externe consultée pendant cette passe; l’inspiration métier Tandem n’implique aucune affiliation Autodesk.
 
 ## Frontend React
 
-React possède les interfaces déclaratives, les contrôles, les états et les textes; Xeokit possède la géométrie et la sélection GPU. React Router conserve les filtres dans l’URL et la scène reste montée entre vues du dashboard. La charte couleur, les familles système et la réduction des animations restent les mêmes. Le graphique propose une observation sélectionnée au pointeur ou avec un curseur natif au clavier; aucune information ne dépend uniquement du survol. Les boutons, messages et champs restent partagés, sans nouvelle bibliothèque de style concurrente.
+React possède les interfaces déclaratives, les contrôles, les états et les textes; Xeokit possède la géométrie et la sélection GPU. React Router conserve les filtres dans l’URL et la scène reste montée entre vues du dashboard. Les pages publiques conservent leur palette et leurs familles système; le dashboard utilise les variantes documentées ci-dessous. La réduction des animations reste respectée. Le graphique propose une observation sélectionnée au pointeur ou avec un curseur natif au clavier; aucune information ne dépend uniquement du survol. Les boutons, messages et champs restent partagés, sans nouvelle bibliothèque de style concurrente.
 
 ## Poste de surveillance — affinement du dashboard
 
-Le dashboard adopte un rail de navigation bleu encre (`--ink`), sur un espace de travail clair inchangé. Les seuls tokens propres au rail sont `--nav-text: #d4e3eb` et `--nav-active: #2c5169`, définis dans `web/src/dashboard.css`; la palette métier reste issue de platform.css. La feuille dashboard est chargée avec la route React et ne modifie pas les pages publiques.
+Le dashboard adopte un rail blanc, un espace gris bleuté et une sélection vert sauge. Il s’agit d’une création originale répondant à la demande d’une composition de dashboard de type kit UI; aucun fichier ni modèle Figma n’a été consulté (connecteur absent de la session). Aucun élément n’est présenté comme importé de Figma.
 
-Le résumé est un bandeau de trois informations : mesures disponibles, dépassements observés et date de dernière acquisition réellement reçue. L’absence de mesure affiche un tiret, jamais l’heure de consultation. Les huit métriques sont des boutons de sélection avec valeur/unité, état sélectionné et accès au catalogue; leur défilement horizontal reste accessible au clavier. Les panneaux BIM et historique sont alignés sur ordinateur et passent en colonne sous 1200 px; sur mobile les points à examiner précèdent le graphique puis le BIM. Le modèle est chargé à la demande; le dessin préalable est explicitement marqué « Aperçu schématique ». Les filtres du graphique disposent de libellés visibles.
+`web/src/dashboard.css` possède les tokens `--workspace-bg`, `--workspace-text`, `--workspace-muted`, `--workspace-line`, `--workspace-accent`, `--workspace-selected` correspondant aux rôles workspace du système. Les cinq couleurs de surface/texte/sélection sont dans le frontmatter; le séparateur `--workspace-line: #e3e8ee` est documenté ici car le schéma de composants ne possède pas de propriété de bordure. Manrope correspond à typography.workspace et le rayon 16 px à rounded.workspacePanel. Les tokens des pages publiques restent dans platform.css. La feuille et la police sont chargées avec la route.
+
+Le résumé présente trois informations calculées : mesures disponibles, dépassements observés et dernière acquisition reçue. Les huit métriques deviennent une liste latérale sélectionnable avec valeur/unité et état; aucune courbe miniature ni progression fictive. Sur mobile, cette liste devient une grille de deux colonnes. Le panneau BIM est principal; le dessin préalable est marqué « Aperçu schématique ». L’historique reste accessible avec ses filtres libellés, sa sélection clavier et sa table alternative. La composition change sans détruire la scène WebGL ni ses états.
 
 ## Commandes de travail
 

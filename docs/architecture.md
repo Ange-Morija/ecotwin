@@ -59,3 +59,5 @@ Les Dockerfiles utilisent le contexte racine du dépôt et incluent scripts, sty
 Compose utilise des volumes nommés. InfluxDB et Grafana sont optionnels via profils. La CI exécute lint, format, tests API avec InfluxDB jetable et tests navigateur; elle ne publie pas automatiquement d'images et ne déploie pas le produit.
 
 Décision et critères de migration : [specs/007-react-frontend](../specs/007-react-frontend/plan.md).
+
+Le dashboard utilise Manrope variable depuis le paquet verrouillé @fontsource-variable/manrope. Vite produit les fichiers WOFF2 locaux avec le chunk de route; la licence est distribuée sous assets/manrope-OFL.txt. Les pages publiques conservent la police système. La grille de composition utilise CSS et garde le canvas React monté entre vues.

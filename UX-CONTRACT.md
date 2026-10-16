@@ -37,3 +37,6 @@ Identité: [DESIGN.md](DESIGN.md). Locale fr-FR; dates Europe/Paris. Route / pub
 - Recherche : le bouton « Rechercher » et `/` ouvrent le catalogue et focalisent la recherche. Le raccourci est inactif dans les champs et zones éditables; il n’intercepte pas les combinaisons Ctrl/Meta/Alt.
 - Le contrôle « Actualisation automatique » suspend les lectures périodiques et la reprise automatique au retour réseau/onglet. La lecture en cours peut finir; l’actualisation manuelle et un changement de période restent possibles. Ce choix est éphémère, ne modifie ni données ni session, et reste en place entre vues du dashboard.
 - La période est accessible dans le catalogue, le BIM et les insights; elle partage le paramètre URL `period` du graphique. Réinitialiser les filtres remet métrique/période/recherche/état/tri à leurs valeurs initiales en conservant la vue et le mode réel/démo.
+
+- Composition du dashboard : liste des métriques à côté du BIM sur grand écran, historique à côté des points à examiner en dessous. Les huit boutons gardent sélection, unité et synchronisation avec l’URL. Sur mobile les métriques sont en deux colonnes; aucune donnée n’est supprimée.
+- Manrope est chargée localement avec le dashboard; la licence accompagne la distribution sous `/assets/manrope-OFL.txt`. Les pages publiques gardent leurs familles système.

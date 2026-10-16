@@ -98,3 +98,13 @@ Vérifications réellement exécutées :
 - DESIGN.md lint : aucune erreur ni avertissement. Huit empreintes des références originales vérifiées, liens de documentation contrôlés et prérequis Spec Kit du lot 007 valides.
 
 Limites : Chromium; pas de nouveau test Python/Influx, de reconstruction Docker ou d’audit npm pour cette évolution du frontend. Les constats de dépendances Xeokit restent suivis séparément en R007. Aucune référence Godly ni documentation Aceternity n’a été présentée comme consultée. La plateforme connectée n’est pas remplacée par le modèle HTML autonome présent dans l’archive.
+
+## Composition claire et asymétrique — 16 octobre 2026
+
+Création originale pour la demande d’un dashboard de type kit UI : navigation blanche, sélection vert sauge, Manrope variable auto-hébergée, BIM principal avec métriques en liste latérale, puis historique et points à examiner. Le connecteur Figma n’était pas disponible dans la session; aucun fichier Figma ni modèle communautaire n’a été consulté, importé ou revendiqué comme source. L’URL Design4Users n’a pas pu être consultée lors de la demande précédente (réseau 403).
+
+Validation finale : **17/17 parcours Playwright réussis** sur le build statique FastAPI, après contrôle des captures ordinateur/mobile et ajustement groupé des textes et cibles. Axe A/AA sur les pages principales à 390/1440 px, 320/768 px avec textes longs, navigation clavier, authentification réelle, filtres/exports, pause/reprise, conservation du canvas et chargement/reprise SDK inclus. TypeScript, build Vite, format et 4 tests Node réussis. DESIGN.md lint : 0 erreur, 0 avertissement. L’essai initial d’import d’un sous-fichier de police inexistant a été corrigé avant le premier build réussi et les tests.
+
+Manrope est verrouillée en 5.3.0; ses fichiers WOFF2 sont intégrés par Vite, sans dépendance à une URL Google Fonts à l’exécution. La licence SIL OFL est conservée dans web/assets/manrope-OFL.txt et copiée dans la distribution. Les captures docs/images/dashboard-desktop.png et dashboard-mobile.png montrent l’état initial avec aperçu schématique explicitement nommé; le XKT réel a été vérifié par les parcours.
+
+Limites : Chromium uniquement; pas de nouvelle reconstruction Docker, de test Python/Influx, de mesure FPS/latence ou de validation CI distante. Les limitations métier et le suivi des dépendances Xeokit restent inchangés.
