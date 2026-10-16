@@ -21,3 +21,6 @@ Identité: [DESIGN.md](DESIGN.md). Locale fr-FR; dates Europe/Paris. Route / pub
 - Ancien viewer conservé pour outils de mesure; la nouvelle navigation et le dashboard sont canoniques.
 
 - Rafraîchir les données conserve la scène BIM et l’ouverture de la table de valeurs. Les filtres du viewer historique exploitent un cache mémoire de 30 secondes, invalidé après mutation; aucun stockage navigateur persistant. Les onglets sans implémentation et la prédiction IA inopérante ont été retirés.
+
+- Catalogue triable au clavier par nom, état et acquisition; `aria-sort` décrit l’ordre. Le tri reste actif pendant recherche et rafraîchissement. Export du catalogue limité aux lignes visibles, dans le même ordre; les métriques d’unités différentes ne sont pas triées par valeur.
+- La procédure [design-workflow](docs/design-workflow.md) guide chaque évolution d’interface, avec vérification des états et des captures mobile/ordinateur.

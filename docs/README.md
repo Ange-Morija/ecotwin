@@ -27,3 +27,5 @@ EcoTwin est un pilote de plateforme de jumeaux numériques **mono-site partagé*
 - [Rétention des observations](../data-model/influx/retention_policies.md)
 
 L'OpenAPI interactive est servie sous `/docs` par FastAPI. Le frontend Nginx sert les pages produit; pour consulter l'OpenAPI dans un déploiement à deux conteneurs, utiliser le port API local documenté. Les fonctionnalités non livrées ne sont pas décrites comme disponibles.
+
+Méthode UI : [huit méthodes de conception et de validation](design-workflow.md).

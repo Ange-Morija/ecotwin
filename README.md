@@ -8,7 +8,7 @@ Le pilote propose une présentation produit, une connexion réelle et un dashboa
 
 [Présentation, connexion et captures mobiles](docs/product.md) · [Documentation complète](docs/README.md) · [Architecture](docs/architecture.md) · [Déploiement](docs/deployment.md)
 
-Le pilote et son lot de maintenance livrent 32 tâches; 7 lots restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le moteur IA n’est pas connecté. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
+Le pilote et son lot de maintenance livrent 36 tâches; 7 lots restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le moteur IA n’est pas connecté. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
 
 ## Démarrage
 Python 3.11+ (3.12 testé), Node.js 22+ et uv.
@@ -99,3 +99,5 @@ Les fichiers secrets et les anciens fichiers internes InfluxDB sont retirés du 
 
 ## Contribuer et suivre les évolutions
 Voir [CONTRIBUTING.md](CONTRIBUTING.md) et [CHANGELOG.md](CHANGELOG.md). Les changements de ce pilote sont publiés via Git; aucune mise en production automatique n’est configurée.
+
+Méthode UI : [huit méthodes de conception et de validation](docs/design-workflow.md).

@@ -64,3 +64,15 @@ platform.js possède navigation, boutons, champs, messages et rendu sûr des don
 
 ## Do's and Don'ts
 Afficher source, unité, date et absence de données. Aucun badge «live» pour la démo, aucun graphique inventé pour une panne réelle. Respecter prefers-reduced-motion; focus explicite; cibles 44 px. Exporter les observations effectivement affichées. Rendu de données externes via textContent.
+
+## Lisibilité et interaction
+
+Public principal : responsables de bâtiments et équipes techniques. Présentation : expliquer les capacités et ouvrir la démo; connexion : accéder au pilote; dashboard : examiner une mesure et prioriser les vérifications.
+
+Texte d’interface au minimum 12 px, corps 14 px, titres 15–34 px selon le rôle. Les libellés ne rétrécissent pas sur mobile. Le graphique conserve une table alternative; ses annotations SVG restent contraintes par son repère. Espacements : 4, 8, 12, 16, 24, 32 et 48 px. Cibles opérationnelles de 44 px minimum. Les fonctionnalités de présentation utilisent des colonnes ouvertes séparées par un filet, sans cartes ni icônes répétitives. Les panneaux du dashboard regroupent des tâches distinctes.
+
+Le tri natif du catalogue expose `aria-sort` sur la colonne active, avec boutons nommés et focus visible. L’export respecte recherche et ordre affichés. Les dates absentes restent en fin de liste. Pas de tri transversal des valeurs de métriques d’unités différentes.
+
+Mouvement : transitions de couleur de 150 ms pour confirmer un état; aucun effet d’entrée décoratif. Le défilement doux est désactivé avec `prefers-reduced-motion`. Police système conservée pour la continuité visuelle et l’absence de téléchargement.
+
+Méthode de référence : [les huit méthodes de conception](docs/design-workflow.md). Aucune nouvelle référence externe consultée pendant cette passe; l’inspiration métier Tandem n’implique aucune affiliation Autodesk.

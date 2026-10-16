@@ -72,3 +72,9 @@ Spécification et critères : [optimization.md](optimization.md).
 - [x] T037 Conserver la scène, les filtres et la table ouverte lors des rafraîchissements dans web/js/platform.js.
 - [x] T038 Précompresser le SDK et exclure l’IFC source des images via scripts/build-web.mjs, infra/nginx.conf et .dockerignore.
 - [x] T039 Ajouter les tests unitaires natifs Node, les régressions réseau navigateur et documenter les mesures dans optimization.md.
+
+## Affinement UI — huit méthodes
+- [x] T040 Simplifier la présentation et retirer les titres décoratifs et cartes répétées; conserver l’identité métier.
+- [x] T041 Ajouter tri accessible et export du catalogue filtré, préserver recherche et ordre lors des rafraîchissements.
+- [x] T042 Améliorer lisibilité mobile, cibles tactiles et retour à la ligne des commandes.
+- [x] T043 Intégrer les huit méthodes dans `docs/design-workflow.md`, DESIGN.md et le contrat UX; documenter les méthodes conditionnelles.

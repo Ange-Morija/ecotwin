@@ -28,3 +28,5 @@ Le test Influx réel nécessite une base neuve jetable; son absence doit être d
 - Documentation : distinguer ce qui fonctionne, ce qui a été exécuté et ce qui reste planifié.
 
 Ne jamais committer .env, comptes de tests persistants, secrets, dossiers de dépendances ou fichiers internes d'une base. Ne pas publier de valeurs sensibles dans une issue ou un rapport. Les changements d'historique, de production ou de politique d'accès doivent être explicitement décidés.
+
+Méthode UI : [huit méthodes de conception et de validation](docs/design-workflow.md).

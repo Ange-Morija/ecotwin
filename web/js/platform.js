@@ -462,12 +462,6 @@ function landing() {
       "div",
       { class: "hero-copy" },
       h(
-        "div",
-        { class: "eyebrow" },
-        h("span", { class: "line" }),
-        "DU BIM AU BÂTIMENT VIVANT",
-      ),
-      h(
         "h1",
         {},
         "Votre bâtiment.",
@@ -479,7 +473,7 @@ function landing() {
       h(
         "p",
         { class: "hero-description" },
-        "Réunissez vos maquettes BIM et vos données dans un même espace. Comprenez ce qui se passe. Agissez là où cela compte.",
+        "Réunissez vos maquettes BIM et vos données dans un même espace. Consultez les mesures datées, repérez les seuils dépassés et préparez les interventions.",
       ),
       h(
         "div",
@@ -516,17 +510,14 @@ function landing() {
   );
   const features = [
     [
-      "cube",
       "Un contexte spatial",
       "Explorez le modèle BIM, sélectionnez un objet et retrouvez sa place dans le bâtiment.",
     ],
     [
-      "sensor",
       "Des données lisibles",
       "Suivez température, humidité et qualité de l’air avec leurs unités, leur source et leur historique.",
     ],
     [
-      "spark",
       "Des décisions éclairées",
       "Repérez les dépassements de seuil et préparez l’intégration de vos futurs outils d’IA.",
     ],
@@ -557,7 +548,7 @@ function landing() {
         h(
           "div",
           { class: "section-heading" },
-          h("p", { class: "eyebrow" }, "LA PLATEFORME"),
+
           h(
             "h2",
             {},
@@ -574,11 +565,10 @@ function landing() {
         h(
           "div",
           { class: "feature-grid" },
-          features.map(([symbol, title, description]) =>
+          features.map(([title, description]) =>
             h(
               "article",
               { class: "feature" },
-              h("div", { class: "feature-icon" }, icon(symbol, 25)),
               h("h3", {}, title),
               h("p", {}, description),
             ),
@@ -591,7 +581,6 @@ function landing() {
         h(
           "div",
           {},
-          h("p", { class: "eyebrow" }, "DE LA CONCEPTION À L’EXPLOITATION"),
           h(
             "h2",
             {},
@@ -639,12 +628,7 @@ function landing() {
       h(
         "section",
         { class: "closing" },
-        h(
-          "div",
-          {},
-          h("p", { class: "eyebrow" }, "CHANGEZ DE POINT DE VUE"),
-          h("h2", {}, "Donnez du sens à votre bâtiment."),
-        ),
+        h("div", {}, h("h2", {}, "Donnez du sens à votre bâtiment.")),
         link("Explorer EcoTwin", "/dashboard?mode=demo"),
       ),
     ),
@@ -809,7 +793,6 @@ async function authPage(register = false) {
         h(
           "div",
           {},
-          h("p", { class: "eyebrow" }, "UN NOUVEAU REGARD SUR VOS ESPACES"),
           h("h2", {}, "Le contexte fait", h("br"), "toute la différence."),
           buildingDrawing(),
         ),
@@ -827,7 +810,7 @@ async function authPage(register = false) {
           "div",
           { class: "auth-card" },
           h("div", { class: "feature-icon" }, icon("lock", 24)),
-          h("p", { class: "eyebrow" }, "VOTRE ESPACE ECOTWIN"),
+
           h(
             "h1",
             {},
@@ -1025,6 +1008,7 @@ async function dashboard() {
   let metric = url.searchParams.get("metric") || "CAP_TEMP";
   let period = url.searchParams.get("period") === "7d" ? "7d" : "24h";
   let query = url.searchParams.get("q") || "";
+  let catalogSort = { key: "name", direction: 1 };
   let data,
     requestController,
     timer,
@@ -1246,7 +1230,6 @@ async function dashboard() {
           h(
             "div",
             {},
-            h("p", { class: "eyebrow" }, "EXPLOITATION DU BÂTIMENT"),
             h("h1", {}, titles[view][0]),
             h("p", {}, titles[view][1]),
           ),
@@ -1480,12 +1463,7 @@ async function dashboard() {
       h(
         "div",
         { class: "panel-heading" },
-        h(
-          "div",
-          {},
-          h("p", { class: "eyebrow" }, "CONTEXTE SPATIAL"),
-          h("h2", {}, "Le jumeau du bâtiment"),
-        ),
+        h("div", {}, h("h2", {}, "Le jumeau du bâtiment")),
         h(
           "a",
           {
@@ -1518,12 +1496,7 @@ async function dashboard() {
       h(
         "div",
         { class: "panel-heading" },
-        h(
-          "div",
-          {},
-          h("p", { class: "eyebrow" }, "ÉVOLUTION DES MESURES"),
-          h("h2", {}, "Un signal, dans le temps"),
-        ),
+        h("div", {}, h("h2", {}, "Un signal, dans le temps")),
         icon("chart"),
       ),
       h("div", { class: "chart-controls" }, sensorSelect(), periodSelect()),
@@ -1607,12 +1580,7 @@ async function dashboard() {
       h(
         "div",
         { class: "panel-heading" },
-        h(
-          "div",
-          {},
-          h("p", { class: "eyebrow" }, "À SURVEILLER"),
-          h("h2", {}, "Les signaux qui comptent"),
-        ),
+        h("div", {}, h("h2", {}, "Les signaux qui comptent")),
         pill(
           `${insights.length} ${insights.length > 1 ? "points" : "point"}`,
           insights.length ? "warning" : "neutral",
@@ -1695,13 +1663,67 @@ async function dashboard() {
       stale: "Donnée ancienne",
       missing: "Sans mesure",
     };
-    function updateRows() {
-      clear.hidden = !query;
-      const rows = data.sensors.filter((sensor) =>
-        `${sensor.name} ${sensor.id}`
-          .toLocaleLowerCase("fr")
-          .includes(query.toLocaleLowerCase("fr")),
+    const headers = new Map();
+    const sortedHeader = (label, key) => {
+      const control = button(
+        label,
+        () => {
+          catalogSort = {
+            key,
+            direction: catalogSort.key === key ? -catalogSort.direction : 1,
+          };
+          updateRows();
+        },
+        "sort-button",
       );
+      const heading = h("th", { scope: "col" }, control);
+      headers.set(key, heading);
+      return heading;
+    };
+    function visibleRows() {
+      return data.sensors
+        .filter((sensor) =>
+          `${sensor.name} ${sensor.id}`
+            .toLocaleLowerCase("fr")
+            .includes(query.toLocaleLowerCase("fr")),
+        )
+        .sort((a, b) => {
+          const key = catalogSort.key;
+          // Missing acquisitions remain last in either direction.
+          if (key === "time" && (!a.time || !b.time))
+            return Number(!a.time) - Number(!b.time);
+          return (
+            catalogSort.direction *
+            (key === "time"
+              ? new Date(a.time) - new Date(b.time)
+              : String(
+                  key === "status" ? states[a.status] : a[key],
+                ).localeCompare(
+                  String(key === "status" ? states[b.status] : b[key]),
+                  "fr",
+                  { numeric: true },
+                ))
+          );
+        });
+    }
+    function updateRows() {
+      for (const [key, heading] of headers) {
+        const active = catalogSort.key === key;
+        heading.setAttribute(
+          "aria-sort",
+          active
+            ? catalogSort.direction === 1
+              ? "ascending"
+              : "descending"
+            : "none",
+        );
+        heading.firstChild.setAttribute(
+          "aria-label",
+          `Trier par ${heading.firstChild.textContent}, ordre ${active && catalogSort.direction === 1 ? "décroissant" : "croissant"}`,
+        );
+      }
+      clear.hidden = !query;
+      const rows = visibleRows();
       count.textContent = `${rows.length} métrique${rows.length > 1 ? "s" : ""} sur 8`;
       tbody.replaceChildren(
         ...rows.map((sensor) =>
@@ -1784,15 +1806,10 @@ async function dashboard() {
       h(
         "div",
         { class: "panel-heading" },
-        h(
-          "div",
-          {},
-          h("p", { class: "eyebrow" }, "CATALOGUE DU SITE"),
-          h("h2", {}, "Les données environnementales"),
-        ),
+        h("div", {}, h("h2", {}, "Les données environnementales")),
         button(
           "Exporter le catalogue",
-          () => exportCatalog(),
+          () => exportCatalog(visibleRows()),
           "button secondary small",
           "download",
         ),
@@ -1820,13 +1837,11 @@ async function dashboard() {
             h(
               "tr",
               {},
-              [
-                "Métrique",
-                "Dernière valeur",
-                "État",
-                "Acquisition",
-                "Explorer",
-              ].map((label) => h("th", { scope: "col" }, label)),
+              sortedHeader("Métrique", "name"),
+              h("th", { scope: "col" }, "Dernière valeur"),
+              sortedHeader("État", "status"),
+              sortedHeader("Acquisition", "time"),
+              h("th", { scope: "col" }, "Explorer"),
             ),
           ),
           tbody,
@@ -1952,10 +1967,10 @@ async function dashboard() {
       ...points.map((p) => [mode, sensor.id, p.time, p.value, sensor.unit]),
     ]);
   }
-  function exportCatalog() {
+  function exportCatalog(rows) {
     download("ecotwin-capteurs.csv", [
       ["source", "capteur", "metrique", "valeur", "unite", "acquisition"],
-      ...data.sensors.map((sensor) => [
+      ...rows.map((sensor) => [
         mode,
         sensor.id,
         sensor.name,

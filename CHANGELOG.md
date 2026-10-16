@@ -37,3 +37,9 @@ Mapping BIM-capteurs, multi-sites/IAM/SSO, import IFC, connecteurs IoT, moteurs 
 - Actualisation des panneaux sans reconstruire la scène BIM ni fermer la table de valeurs.
 - SDK précompressé pour Nginx; exclusion de l’IFC source et des sorties vendor préexistantes du contexte Docker. Le fichier IFC reste conservé dans Git.
 - Tests natifs Node du cache et régressions navigateur ajoutés à la CI.
+
+## Affinement UI — 16 octobre 2026
+- Présentation allégée : colonnes ouvertes, retrait des icônes répétitives et titres décoratifs.
+- Interface lisible sur mobile : texte minimum 12 px hors annotations graphiques, commandes opérationnelles de 44 px et en-tête adaptable.
+- Catalogue triable par métrique, état et acquisition avec indication accessible; export limité à la recherche et respectant le tri.
+- Huit méthodes de conception intégrées à la documentation et au suivi Spec Kit.

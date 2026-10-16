@@ -359,3 +359,80 @@ test("outils BIM : filtres locaux, lectures mutualisées et cache invalidé apr�
   await expect(page.locator("#actions-list")).toContainText("Aucune action.");
   expect(actions).toBe(1);
 });
+
+test("catalogue : tri accessible, recherche et export des lignes affichées", async ({
+  page,
+}) => {
+  await page.goto("/dashboard?mode=demo&view=sensors");
+  const table = page.getByRole("table");
+  const metric = page.getByRole("button", { name: /Trier par Métrique/ });
+  await expect(table.locator("tbody tr")).toHaveCount(8);
+  const names = () =>
+    table.locator("tbody tr td:first-child strong").allTextContents();
+  const ascending = await names();
+  expect(ascending).toEqual(
+    [...ascending].sort((a, b) => a.localeCompare(b, "fr", { numeric: true })),
+  );
+  await metric.click();
+  await expect(
+    page.getByRole("columnheader", { name: /Métrique/ }),
+  ).toHaveAttribute("aria-sort", "descending");
+  expect(await names()).toEqual([...ascending].reverse());
+  await page.getByRole("searchbox").fill("CAP_TEMP");
+  await expect(table.locator("tbody tr")).toHaveCount(1);
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Exporter le catalogue" }).click();
+  const file = await download;
+  const stream = await file.createReadStream();
+  let csv = "";
+  for await (const chunk of stream) csv += chunk.toString();
+  expect(csv).toContain("CAP_TEMP");
+  expect(csv).not.toContain("CAP_PM25");
+  await page.getByRole("button", { name: "Effacer la recherche" }).click();
+  expect(await names()).toEqual([...ascending].reverse());
+  await page.getByRole("button", { name: /Trier par Acquisition/ }).focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByRole("columnheader", { name: /Acquisition/ }),
+  ).toHaveAttribute("aria-sort", "ascending");
+});
+
+test("petits écrans, textes longs et réduction des animations", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route("**/api/dashboard?*", async (route) => {
+    const response = await route.fetch();
+    const payload = await response.json();
+    payload.sensors[0].name =
+      "Température du local technique et des équipements de ventilation du bâtiment principal";
+    await route.fulfill({ response, json: payload });
+  });
+  for (const width of [320, 768]) {
+    await page.setViewportSize({ width, height: 960 });
+    for (const route of [
+      "/",
+      "/register",
+      "/dashboard?mode=demo&view=sensors",
+    ]) {
+      await page.goto(route);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      if (route.includes("dashboard")) {
+        await expect(page.getByText("8 métriques sur 8")).toBeVisible();
+        await expect(
+          page.getByRole("cell", { name: /Température du local technique/ }),
+        ).toBeVisible();
+      }
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      expect(
+        await page
+          .locator("html")
+          .evaluate((el) => getComputedStyle(el).scrollBehavior),
+      ).toBe("auto");
+    }
+  }
+});

@@ -46,3 +46,17 @@ Aucun résultat absent ou ignoré n'est présenté comme réussi. Les conteneurs
 - Contrôle Python de ce lot : 11 réussis et 1 ignoré. Le test Influx réel n’a pas été relancé pour ce nettoyage de fichiers sans modification des opérations de données; son exécution initiale à 12 tests reste documentée ci-dessus.
 - Nginx : transfert du SDK gzip vérifié par comparaison après décompression, et réponse non compressée lorsque gzip;q=0 est demandé. IFC absent de la livraison mais toujours présent dans Git.
 - Mesures avant/après et périmètre conservé : [optimization.md](../specs/001-digital-twin-platform/optimization.md).
+
+## Affinement des huit méthodes — 16 octobre 2026
+
+Modifications : présentation sans cartes répétitives ni titres décoratifs, texte d’interface minimum 12 px hors annotations SVG, cibles opérationnelles 44 px, en-tête mobile adaptable, catalogue triable et CSV respectant recherche et ordre. Procédure intégrée dans `docs/design-workflow.md`, DESIGN.md, UX-CONTRACT.md et les tâches T040–T043.
+
+Vérifications exécutées sur Chromium local :
+- `npm run test:e2e` : 10 parcours réussis, dont axe WCAG A/AA sur présentation, connexion, dashboard et catalogue à 390 et 1440 px. Le premier passage avait révélé un débordement mobile; corrigé avant cette exécution réussie.
+- `ECOTWIN_E2E_URL=http://127.0.0.1:8011 npx playwright test --grep 'petits écrans'` : 1 parcours supplémentaire réussi, à 320 et 768 px, présentation/inscription/catalogue, nom long et réduction des animations. Exécuté après la suite principale sur un serveur isolé; les deux résultats représentent 11 scénarios distincts. Une tentative concurrente sur le port 8010 occupé n’a exécuté aucun test et n’est pas comptée.
+- `npm run test:unit` : 4 réussis.
+- `npm run check` et `npm run format:check` : réussis.
+- `python -m pytest api/tests -q` dans l’environnement Python du projet : 11 réussis, 1 ignoré faute d’instance Influx de test; avertissements de dépréciation existants des dépendances.
+- Inspection visuelle des captures avant/après : présentation ordinateur et dashboard mobile. Captures de la suite dans `test-results/`, non versionnées.
+
+Limites : Chromium uniquement; aucun nouveau test sur Safari/Firefox, lecteur d’écran réel ou appareil physique. Le test Influx réel et les images Docker n’ont pas été relancés pour cette modification frontend/documentaire. Les résultats premium antérieurs ci-dessus concernent la livraison précédente; le lanceur Impeccable est absent de cet environnement. Pas de nouvelle recherche Godly, ni de composant Aceternity puisque la stack reste JavaScript native. Aucun résultat de CI distante n’est affirmé.
