@@ -125,6 +125,7 @@ export function MarketingNav() {
       <nav aria-label="Navigation principale">
         <Link to="/#platform">La plateforme</Link>
         <Link to="/#uses">Les usages</Link>
+        <Link to="/business">Business</Link>
       </nav>
       <div className="nav-actions">
         <Link to="/login" className="login-link">

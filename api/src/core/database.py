@@ -21,6 +21,16 @@ def database():
 def initialize():
     with database() as db:
         db.executescript("""
+        CREATE TABLE IF NOT EXISTS usage_limits (
+          user_id TEXT NOT NULL, bucket INTEGER NOT NULL, count INTEGER NOT NULL,
+          PRIMARY KEY(user_id, bucket));
+        CREATE TABLE IF NOT EXISTS billing (
+          user_id TEXT PRIMARY KEY REFERENCES users(id), customer TEXT UNIQUE NOT NULL,
+          checkout_id TEXT, checkout_url TEXT, checkout_expires REAL);
+        CREATE TABLE IF NOT EXISTS billing_checkout_attempts (
+          user_id TEXT PRIMARY KEY REFERENCES users(id), attempt TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS billing_events (
+          id TEXT PRIMARY KEY, received REAL NOT NULL);
         CREATE TABLE IF NOT EXISTS users (
           id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL,
           password_hash TEXT NOT NULL, created_at REAL NOT NULL);

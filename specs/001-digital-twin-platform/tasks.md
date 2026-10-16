@@ -38,7 +38,7 @@
 - [x] T021 [US3] Vérifier filtre, URL, export, panne et BIM dans `tests/e2e/platform.spec.js`.
 
 ## Phase 6 — US4 Insights explicables et frontière IA (P2)
-**Test indépendant**: chaque alerte décrit observation/seuil/source et indique IA non connectée.
+**Test indépendant**: chaque alerte décrit observation/seuil/source et reste identifiée comme règle; le chatbot configurable est séparé.
 - [x] T022 [US4] Créer règles et statuts honnêtes dans `api/src/services/dashboard_service.py`.
 - [x] T023 [US4] Présenter les insights et l'état IA dans `web/js/platform.js`.
 - [x] T024 [US4] Documenter le contrat futur fournisseur/preuves/validation dans `docs/ai-integration.md`.
@@ -53,7 +53,7 @@
 - [ ] T029 Choisir et intégrer OIDC/SSO, invitation, récupération et vérification e-mail dans `specs/002-multi-site-iam/`.
 - [ ] T030 Définir import IFC, versionnement, mapping objet-capteur vérifié et sélection liée dans `specs/003-bim-data-mapping/`.
 - [ ] T031 Ajouter connecteurs IoT/MQTT, gestion de qualité et seuils métier configurables dans `specs/004-data-connectors/`.
-- [ ] T032 Intégrer fournisseur IA configurable, preuves, coûts, permission et revue humaine dans `specs/005-ai-insights/`.
+- [ ] T032 Finaliser preuves vérifiées et revue humaine structurée : le premier chatbot configurable, ses limites et son consentement sont livrés dans `specs/008-auth-ai-business/`; activation réelle et analyses BIM tracées restent ouvertes.
 - [ ] T033 Ajouter notifications, acquittement et historique des interventions dans `specs/006-operations/`.
 - [ ] T034 Valider conservation des données et rotation des identifiants historiques avant production dans `docs/security.md`.
 

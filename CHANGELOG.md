@@ -1,5 +1,12 @@
 # Journal des changements
 
+## 2026-10-16 — Comptes, assistant et Business
+- Espace compte, changement du mot de passe et révocation de toutes les sessions.
+- Chatbot OpenAI configurable avec consentement, contexte borné et quotas persistés; pas d’activation sans clé/modèle.
+- Offre Business lue depuis Stripe, Checkout/Portal, webhooks signés et dédupliqués, reprise des tentatives concurrentes ou interrompues.
+- Palette utilisateur, courbes animées avec mouvement réduit, chronologie des observations et liens compte/facturation sur mobile.
+- Spécification 008, documentation d’activation, captures et tests; fournisseurs externes encore à valider avec les identifiants du propriétaire.
+
 ## Non publié — pilote 0.2.0
 
 ### Produit

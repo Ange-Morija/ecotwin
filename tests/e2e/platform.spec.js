@@ -49,7 +49,9 @@ test("présentation, démo, filtres partageables et export", async ({ page }) =>
   await expect(page.getByText("8 métriques sur 8")).toBeVisible();
   await page.getByRole("link", { name: "Insights", exact: true }).click();
   await expect(
-    page.getByText("Analyse par seuils · IA non connectée.", { exact: false }),
+    page.getByText("Analyse par seuils · règles explicables.", {
+      exact: false,
+    }),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });

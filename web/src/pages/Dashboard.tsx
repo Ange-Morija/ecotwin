@@ -19,6 +19,8 @@ import type { IconName } from "../components/ui";
 import BimPanel from "../components/BimPanel";
 import TrendPanel from "../components/TrendPanel";
 import SensorTable from "../components/SensorTable";
+import Assistant from "../components/Assistant";
+import ObservationTimeline from "../components/ObservationTimeline";
 import InsightsPanel from "../components/InsightsPanel";
 const views: [View, string, IconName][] = [
   ["overview", "Vue d’ensemble", "grid"],
@@ -170,6 +172,7 @@ function Dashboard({ mode }: { mode: Mode }) {
       const target = event.target as HTMLElement | null;
       if (
         event.key !== "/" ||
+        Boolean(document.querySelector("dialog[open]")) ||
         event.ctrlKey ||
         event.metaKey ||
         event.altKey ||
@@ -310,11 +313,17 @@ function Dashboard({ mode }: { mode: Mode }) {
           ))}
         </nav>
         <div className="sidebar-bottom">
+          <Link to="/account" className="side-link">
+            Mon compte
+          </Link>
+          <Link to="/business" className="side-link">
+            Business et facturation
+          </Link>
           <div className="ai-status">
             <Icon name="spark" size={18} />
             <div>
               <strong>Analyse par seuils</strong>
-              <span>IA non connectée</span>
+              <span>Règles explicables</span>
             </div>
           </div>
           <Link to="/" className="side-link">
@@ -362,6 +371,7 @@ function Dashboard({ mode }: { mode: Mode }) {
             <strong>{data?.site.name || "Atelier EcoTwin"}</strong>
           </div>
           <div className="header-right">
+            <Assistant mode={mode} />
             <Button
               className="workspace-search"
               symbol="search"
@@ -399,6 +409,10 @@ function Dashboard({ mode }: { mode: Mode }) {
             )}
           </div>
         </header>
+        <nav className="mobile-services" aria-label="Compte et facturation">
+          <Link to="/account">Mon compte</Link>
+          <Link to="/business">Business et facturation</Link>
+        </nav>
         <main id="main" className="dashboard-main">
           <div className="page-heading">
             <div>
@@ -564,24 +578,23 @@ function Dashboard({ mode }: { mode: Mode }) {
                   hidden={view !== "overview" && view !== "insights"}
                   change={change}
                 />
-                <section
-                  className="panel integration-panel"
-                  hidden={view !== "insights"}
-                >
-                  <Icon name="spark" size={26} />
-                  <div>
-                    <h2>Une base pour vos futures analyses IA</h2>
-                    <p>
-                      Les observations et les objets BIM formeront le contexte
-                      des analyses. Aucun modèle de prédiction ni fournisseur IA
-                      n’est connecté à ce stade.
-                    </p>
-                    <p className="quiet">
-                      Prochaines étapes : sources vérifiées, moteur
-                      configurable, preuves associées et validation humaine.
-                    </p>
-                  </div>
-                </section>
+                {view === "overview" && (
+                  <ObservationTimeline data={data} metric={metric} />
+                )}
+                {view === "insights" && (
+                  <section className="panel integration-panel">
+                    <Icon name="spark" size={26} />
+                    <div>
+                      <h2>Compléter vos analyses avec l’assistant</h2>
+                      <p>
+                        Ouvrez « Assistant IA » pour poser une question. L’envoi
+                        d’observations demande votre accord. Les alertes
+                        ci-dessus restent calculées par des règles,
+                        indépendamment du chatbot.
+                      </p>
+                    </div>
+                  </section>
+                )}
                 {view === "bim" && (
                   <p className="bim-notice">
                     Le modèle est réel; la correspondance entre objets et

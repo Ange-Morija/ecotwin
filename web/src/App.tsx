@@ -7,6 +7,8 @@ import {
   Loading,
   MarketingNav,
 } from "./components/ui";
+const Business = lazy(() => import("./pages/Business"));
+const Account = lazy(() => import("./pages/Account"));
 const Landing = lazy(() => import("./pages/Landing"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -77,6 +79,8 @@ export default function App() {
               path="/register"
               element={<Auth key="register" register />}
             />
+            <Route path="/business" element={<Business />} />
+            <Route path="/account" element={<Account />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route
               path="*"

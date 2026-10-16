@@ -44,6 +44,19 @@ Les captures montrent la démonstration, avec des valeurs illustratives.
 | Insights par seuils explicables | Livré; seuils illustratifs |
 | Liaison vérifiée objet BIM-capteur et import IFC | Planifié |
 | Multi-sites, RBAC et SSO | Planifié |
-| Fournisseur IA, prédictions et validation humaine | Planifié |
+| Chatbot OpenAI | Intégré, configurable; non activé sans clé/modèle |
+| Prédictions et validation humaine structurée | Planifié |
+| Abonnement et facturation Stripe | Intégré; prix et clés à configurer |
 
 Les limites de validation sont décrites dans [verification.md](verification.md). Les lots futurs sont suivis dans [tasks.md](../specs/001-digital-twin-platform/tasks.md).
+
+## Comptes et Business
+`/account` permet de consulter l’identité et de changer le mot de passe; `/business` affiche l’offre réellement configurée et ouvre le paiement/portail Stripe. Le chatbot est accessible dans l’en-tête du dashboard. Les règles de seuil restent distinctes de ses réponses. Chronologie et graphique partagent la métrique sélectionnée, avec observations datées et source visible.
+
+### Captures des nouveaux parcours
+Ces captures montrent l’état réel sans clés externes configurées : pas de prix inventé et assistant explicitement indisponible. Les scénarios de conversation/paiement actifs sont testés avec réponses réseau simulées, séparément des captures produit.
+
+![Business — configuration absente explicite](images/business-desktop.png)
+![Assistant — disponibilité et consentement](images/assistant-desktop.png)
+
+[Business mobile](images/business-mobile.png) · [Assistant mobile](images/assistant-mobile.png)

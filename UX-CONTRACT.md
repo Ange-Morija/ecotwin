@@ -12,10 +12,10 @@ Identité: [DESIGN.md](DESIGN.md). Locale fr-FR; dates Europe/Paris. Route / pub
 
 - Navigation par vrais liens; URL conserve view/metric/period/q et retour arrière.
 - Validation formulaire possédée par l'application, novalidate, erreurs en texte liées aux champs, focus sur la première erreur, valeurs conservées. Mot de passe masqué avec révélation accessible. Aucun secret localStorage.
-- Requête en cours: bouton désactivé avec largeur stable. Connexion réussie vers /dashboard. Déconnexion invalide la session côté serveur et retourne /login.
+- Requête en cours: bouton désactivé avec largeur stable. Connexion réussie vers /dashboard ou la destination account/business autorisée. Déconnexion invalide la session côté serveur et retourne /login.
 - Recherche locale de huit capteurs: pas de requête réseau, clear explicite, composition IME respectée; requêtes dashboard annulées si filtres changent.
 - Chargement sur une région stable; absence de mesure affichée «—», série vide expliquée; panne conserve la dernière réponse réussie avec badge périmé et réessayer.
-- Données démo déterministes et isolées des écritures. Les insights sont des règles explicables; IA non connectée.
+- Données démo déterministes et isolées des écritures. Les insights sont des règles explicables; chatbot configurable séparé.
 - Select et date: affichage et contrôle natifs acceptés; aucun calendrier personnalisé.
 - Graphique SVG avec axes/unités, résumé, table alternative et export CSV. WebGL facultatif avec erreur textuelle et modèle téléchargeable.
 - Ancien viewer conservé pour outils de mesure; la nouvelle navigation et le dashboard sont canoniques.
@@ -40,3 +40,8 @@ Identité: [DESIGN.md](DESIGN.md). Locale fr-FR; dates Europe/Paris. Route / pub
 
 - Composition du dashboard : liste des métriques à côté du BIM sur grand écran, historique à côté des points à examiner en dessous. Les huit boutons gardent sélection, unité et synchronisation avec l’URL. Sur mobile les métriques sont en deux colonnes; aucune donnée n’est supprimée.
 - Manrope est chargée localement avec le dashboard; la licence accompagne la distribution sous `/assets/manrope-OFL.txt`. Les pages publiques gardent leurs familles système.
+
+- Compte : formulaire natif requis avec longueurs déclarées; erreur serveur inline et champs conservés. Changer le mot de passe ferme toutes les sessions puis demande une nouvelle connexion.
+- Assistant : dialogue natif modal avec titre, fermeture/Échap et retour du focus au bouton. Le raccourci de recherche du dashboard reste inactif pendant ce dialogue. Consentement décoché par défaut, question/historique transmise uniquement à l’envoi, observations jointes consultables. Les anciens échanges contenant des observations sont exclus du contexte lorsque le partage est décoché. Aucun rendu HTML de réponse.
+- Business : prix lu chez Stripe; configuration absente distincte de panne; bouton bloqué pendant la demande et si le statut n’est pas connu. Aucun succès déduit de checkout=returned; statut actualisable depuis la source Stripe.
+- Chronologie : quatre observations les plus récentes de la métrique sélectionnée, dates/valeurs/unités, état vide explicite. Animation du tracé de 650 ms à la sélection, dialogue 180 ms; animations et transitions désactivées en mouvement réduit.

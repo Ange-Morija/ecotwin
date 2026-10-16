@@ -52,7 +52,7 @@ Les comptes partagent le site du pilote; les actions sont filtrées par auteur. 
 
 ## Démo, règles et IA
 Le mode demo produit des observations illustratives déterministes clairement étiquetées. Il ne sert jamais de remplacement silencieux à une source réelle en panne. Les insights actuels sont des comparaisons à des seuils illustratifs, pas des prédictions IA.
-Le mapping BIM n’est pas encore implémenté; le fichier vide sans usage a été supprimé. Multi-sites, IAM/SSO, mapping IFC-capteur et fournisseurs IA sont suivis dans [tasks.md](../specs/001-digital-twin-platform/tasks.md).
+Le mapping BIM n’est pas encore implémenté; le fichier vide sans usage a été supprimé. Multi-sites, IAM/SSO, mapping IFC-capteur et analyses IA avec preuves vérifiées sont suivis dans [tasks.md](../specs/001-digital-twin-platform/tasks.md).
 
 ## Déploiement et CI
 Les Dockerfiles utilisent le contexte racine du dépôt et incluent scripts, styles, SDK et modèle XKT. Le fichier IFC source reste dans Git mais est exclu des images et du contexte de build, car aucun import IFC n’est implémenté. L'API tourne avec un utilisateur non privilégié; les fichiers copiés appartiennent aux utilisateurs qui doivent les lire. Nginx transmet `/api/` sans changer les chemins.
@@ -61,3 +61,6 @@ Compose utilise des volumes nommés. InfluxDB et Grafana sont optionnels via pro
 Décision et critères de migration : [specs/007-react-frontend](../specs/007-react-frontend/plan.md).
 
 Le dashboard utilise Manrope variable depuis le paquet verrouillé @fontsource-variable/manrope. Vite produit les fichiers WOFF2 locaux avec le chunk de route; la licence est distribuée sous assets/manrope-OFL.txt. Les pages publiques conservent la police système. La grille de composition utilise CSS et garde le canvas React monté entre vues.
+
+## Comptes, IA et facturation
+`routers/assistant.py` possède le fournisseur et les quotas, `routers/business.py` les prix/Checkout/Portal/webhooks, `routers/auth.py` le changement de mot de passe. Les tables billing/billing_events/usage_limits sont additives. La source d’état d’abonnement reste Stripe; les événements ne peuvent attribuer de droits par leur ordre d’arrivée. Conversations uniquement en mémoire du composant Assistant. Les pages Account/Business sont chargées par route; aucun changement des frontières de la scène Xeokit. Voir [plan 008](../specs/008-auth-ai-business/plan.md).

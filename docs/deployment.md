@@ -58,3 +58,10 @@ Le pilote n'est pas un service multi-client. SSO/RBAC, récupération de compte,
 ## Build React
 
 Node.js 22.12+ et les dépendances de développement sont nécessaires dans l’étape de construction (`npm ci`, puis `npm run build`). Le runtime ne contient ni node_modules ni serveur Vite : Nginx reçoit `web/dist` et l’image API le place dans `/app/web/dist`. Ne pas copier le `web/index.html` source dans le répertoire servi; il contient l’entrée TypeScript de développement. Les bundles minifiés par route sont sous `/app-assets/`. Recréer le build avant de redémarrer un serveur FastAPI après une modification du frontend.
+
+## Assistant et abonnement
+Les variables facultatives sont transmises par Compose et décrites dans infra/.env.example. Voir [activation OpenAI](ai-integration.md) et [configuration Stripe](billing.md). Utiliser des secrets d’hébergement, jamais des valeurs committées. Après modification, recréer l’API; le frontend ne reçoit aucune clé.
+
+`APP_URL` est l’origine visible du navigateur : défaut http://localhost:8080 dans Compose, http://localhost:8000 hors conteneur. Adapter si WEB_PORT change. HTTPS et COOKIE_SECURE=true en production. Le secret de signature Stripe doit être brut dans le processus, pas un placeholder de proxy. Aucun test externe OpenAI/Stripe ne fait partie des vérifications sans ces prérequis.
+
+Dans un conteneur de développement utilisant le proxy TLS de ce cloud, monter le bundle CA combiné en lecture seule et renseigner `REQUESTS_CA_BUNDLE` (Stripe/Requests) ainsi que `SSL_CERT_FILE` (OpenAI/urllib) vers ce montage. Conserver les proxys hérités et la vérification TLS; ne pas embarquer le certificat de session dans l’image.

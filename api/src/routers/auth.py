@@ -147,3 +147,46 @@ def logout(request: Request, response: Response):
         samesite="strict",
     )
     return {"status": "ok"}
+
+
+class PasswordChange(BaseModel):
+    current_password: str = Field(min_length=1, max_length=128)
+    new_password: str = Field(min_length=12, max_length=128)
+
+
+@router.post("/password", dependencies=[Depends(check_csrf)])
+def change_password(
+    body: PasswordChange, response: Response, user=Depends(current_user)
+):
+    with database() as db:
+        db.execute("BEGIN IMMEDIATE")
+        attempts_key = "password:" + user["id"]
+        now = time.time()
+        db.execute("DELETE FROM login_attempts WHERE attempted<?", (now - 600,))
+        attempts = db.execute(
+            "SELECT COUNT(*) FROM login_attempts WHERE address=?", (attempts_key,)
+        ).fetchone()[0]
+        if attempts >= 5:
+            raise HTTPException(429, "Trop de tentatives. Réessayez dans 10 minutes.")
+        row = db.execute(
+            "SELECT password_hash FROM users WHERE id=?", (user["id"],)
+        ).fetchone()
+        if not row or not verify_password(body.current_password, row["password_hash"]):
+            db.execute("INSERT INTO login_attempts VALUES (?,?)", (attempts_key, now))
+            db.commit()
+            raise HTTPException(400, "Le mot de passe actuel est incorrect.")
+        if body.current_password == body.new_password:
+            raise HTTPException(400, "Choisissez un nouveau mot de passe différent.")
+        db.execute(
+            "UPDATE users SET password_hash=? WHERE id=?",
+            (password_hash(body.new_password), user["id"]),
+        )
+        db.execute("DELETE FROM sessions WHERE user_id=?", (user["id"],))
+    response.delete_cookie(
+        COOKIE_NAME,
+        path="/",
+        secure=settings.COOKIE_SECURE,
+        httponly=True,
+        samesite="strict",
+    )
+    return {"status": "password_changed", "sessions_revoked": True}

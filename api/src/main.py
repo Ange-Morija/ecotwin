@@ -6,6 +6,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from .core.config import settings
 from .core.database import initialize
+from .routers.business import router as business_router
+from .routers.assistant import router as assistant_router
 from .routers.auth import router as auth_router
 from .routers.dashboard import router as dashboard_router
 from .routers.operations import router as operations_router
@@ -44,6 +46,8 @@ def health():
 
 
 app.include_router(auth_router)
+app.include_router(business_router)
+app.include_router(assistant_router)
 app.include_router(dashboard_router)
 app.include_router(operations_router)
 app.include_router(telemetry_router, prefix="/api/telemetry")
@@ -59,6 +63,8 @@ if WEB_ROOT.is_dir():
     @app.get("/", include_in_schema=False)
     @app.get("/login", include_in_schema=False)
     @app.get("/register", include_in_schema=False)
+    @app.get("/business", include_in_schema=False)
+    @app.get("/account", include_in_schema=False)
     @app.get("/dashboard", include_in_schema=False)
     def platform():
         return FileResponse(WEB_ROOT / "index.html")

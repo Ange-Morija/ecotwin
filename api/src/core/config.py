@@ -5,6 +5,16 @@ from dataclasses import dataclass
 
 @dataclass
 class Settings:
+    APP_URL: str = os.getenv("APP_URL", "http://localhost:8000").rstrip("/")
+    OPENAI_API_KEY: str = os.getenv(
+        "ECOTWIN_OPENAI_API_KEY", os.getenv("OPENAI_API_KEY", "")
+    )
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "")
+    STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY", "")
+    STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+    STRIPE_PRICE_ID: str = os.getenv("STRIPE_PRICE_ID", "")
+    STRIPE_MODE: str = os.getenv("STRIPE_MODE", "test")
+    STRIPE_ALLOW_LIVE: bool = os.getenv("STRIPE_ALLOW_LIVE", "false").lower() == "true"
     API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
     API_PORT: int = int(os.getenv("API_PORT", "8000"))
     API_KEY: str | None = os.getenv("API_KEY")

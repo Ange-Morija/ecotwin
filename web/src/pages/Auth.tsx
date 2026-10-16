@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
 import {
   Brand,
@@ -12,6 +12,14 @@ import {
 type Field = "name" | "email" | "password";
 export default function Auth({ register = false }: { register?: boolean }) {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const destination = params.get("next");
+  const nextPath =
+    destination === "business"
+      ? "/business"
+      : destination === "account"
+        ? "/account"
+        : "/dashboard";
   const [values, setValues] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [error, setError] = useState("");
@@ -78,7 +86,7 @@ export default function Auth({ register = false }: { register?: boolean }) {
         method: "POST",
         body: JSON.stringify(payload),
       });
-      if (mounted.current) navigate("/dashboard", { replace: true });
+      if (mounted.current) navigate(nextPath, { replace: true });
     } catch (e) {
       if (mounted.current) {
         setError(
@@ -180,6 +188,12 @@ export default function Auth({ register = false }: { register?: boolean }) {
           <h1>
             {register ? "Créer votre compte" : "Accédez à votre bâtiment."}
           </h1>
+          {params.get("password") === "changed" && (
+            <p role="status" className="notice">
+              Mot de passe modifié. Toutes vos sessions ont été fermées.
+              Reconnectez-vous.
+            </p>
+          )}
           <p className="auth-intro">
             {register
               ? "Rejoignez le site pilote partagé EcoTwin."
@@ -219,7 +233,9 @@ export default function Auth({ register = false }: { register?: boolean }) {
             {register
               ? "Vous avez déjà un compte ? "
               : "Vous découvrez EcoTwin ? "}
-            <Link to={register ? "/login" : "/register"}>
+            <Link
+              to={`${register ? "/login" : "/register"}${destination === "business" || destination === "account" ? `?next=${destination}` : ""}`}
+            >
               {register ? "Se connecter" : "Créer un compte pilote"}
             </Link>
           </p>

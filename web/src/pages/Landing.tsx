@@ -87,7 +87,7 @@ export default function Landing() {
               ],
               [
                 "Des décisions éclairées",
-                "Repérez les dépassements de seuil et préparez l’intégration de vos futurs outils d’IA.",
+                "Repérez les dépassements de seuil et posez vos questions à un assistant IA configurable.",
               ],
             ].map(([title, description]) => (
               <article key={title} className="feature">
@@ -123,7 +123,7 @@ export default function Landing() {
               ],
               [
                 "Anticiper",
-                "Préparer des analyses traçables avec vos futurs moteurs IA.",
+                "Interroger un assistant configurable et choisir les observations à lui transmettre.",
               ],
             ].map(([title, text]) => (
               <article key={title}>

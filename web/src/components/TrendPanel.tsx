@@ -73,7 +73,7 @@ function TrendChart({
                 x={43}
                 y={y(value) + 4}
                 textAnchor="end"
-                fill="#5b6e7d"
+                fill="var(--muted)"
                 fontSize={11}
               >
                 {valueText(value)}
@@ -81,7 +81,7 @@ function TrendChart({
             </g>
           );
         })}
-        <text x="52" y="14" fill="#5b6e7d" fontSize="11">
+        <text x="52" y="14" fill="var(--muted)" fontSize="11">
           {sensor.unit}
         </text>
         <line
@@ -109,7 +109,10 @@ function TrendChart({
             )
             .join(" ")}
           fill="none"
-          stroke="#167d88"
+          stroke="var(--primary)"
+          className="animated-curve"
+          pathLength="1"
+          key={`${sensor.id}-${points.length}`}
           strokeWidth="2.5"
         />
         {points.map((point, index) => (
@@ -118,7 +121,7 @@ function TrendChart({
             cx={x(index)}
             cy={y(point.value)}
             r="2"
-            fill="#167d88"
+            fill="var(--primary)"
           />
         ))}
         <line
@@ -126,14 +129,14 @@ function TrendChart({
           x2={x(selected)}
           y1={25}
           y2={175}
-          stroke="#234e70"
+          stroke="var(--ink)"
           strokeDasharray="2 4"
         />
         <circle
           cx={x(selected)}
           cy={y(points[selected].value)}
           r="4"
-          fill="#234e70"
+          fill="var(--ink)"
           stroke="white"
           strokeWidth="2"
         />
@@ -144,7 +147,7 @@ function TrendChart({
               x={x(index)}
               y="200"
               textAnchor={i === 0 ? "start" : i === 2 ? "end" : "middle"}
-              fill="#5b6e7d"
+              fill="var(--muted)"
               fontSize="11"
             >
               {time.format(new Date(points[index].time))}

@@ -1,6 +1,6 @@
 # Documentation EcoTwin
 
-EcoTwin est un pilote de plateforme de jumeaux numériques **mono-site partagé**. L'interface relie une vue BIM XKT, un catalogue de huit métriques et des observations datées. Les correspondances objet-capteur et l'IA sont des extensions planifiées.
+EcoTwin est un pilote de plateforme de jumeaux numériques **mono-site partagé**. L'interface relie une vue BIM XKT, un catalogue de huit métriques et des observations datées. Les correspondances objet-capteur restent planifiées; le chatbot OpenAI et les abonnements Stripe sont configurables.
 
 ## Commencer
 - [Présentation et installation](../README.md)
@@ -10,7 +10,9 @@ EcoTwin est un pilote de plateforme de jumeaux numériques **mono-site partagé*
 - [Sécurité et limites du pilote](security.md)
 - [Tests exécutés et limites de validation](verification.md)
 - [Nettoyage et mesures d’optimisation](../specs/001-digital-twin-platform/optimization.md)
-- [Intégration IA future](ai-integration.md)
+- [Assistant IA](ai-integration.md)
+- [Abonnements et configuration Stripe](billing.md)
+- [Comptes, IA et Business](../specs/008-auth-ai-business/spec.md) et [contrats HTTP](../specs/008-auth-ai-business/contracts.md)
 
 - [Migration du frontend React](../specs/007-react-frontend/spec.md) et [plan technique](../specs/007-react-frontend/plan.md)
 

@@ -4,8 +4,8 @@
 */
 
 /* Thème */
-:root{--bg:#0f172a;--surface:#111827;--panel:#0b1220;--text:#e5e7eb;--muted:#9aa4b2;--primary:#14b8a6;--secondary:#6366f1;--border:#1f2937;--shadow:0 10px 30px rgba(0,0,0,.25)}
-:root.light{--bg:#f8fafc;--surface:#fff;--panel:#f1f5f9;--text:#0f172a;--muted:#475569;--border:#e2e8f0;--shadow:0 10px 30px rgba(0,0,0,.08)}
+:root{--bg:#302924;--surface:#3d332e;--panel:#29221f;--text:#e5e7eb;--muted:#9aa4b2;--primary:#8ac1bd;--secondary:#a35c8a;--border:#1f2937;--shadow:0 10px 30px rgba(0,0,0,.25)}
+:root.light{--bg:#faf7f4;--surface:#fff;--panel:#f1f5f9;--text:#3d332e;--muted:#475569;--border:#e2e8f0;--shadow:0 10px 30px rgba(0,0,0,.08)}
 
 /* Base */
 *{box-sizing:border-box}
@@ -177,3 +177,8 @@ sensor-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr
   .btn{--h:36px}
   .tree{max-height:180px}
 }
+
+/* Palette EcoTwin : contrôles lisibles dans les deux thèmes. */
+:root.light{--primary:#386d69;--secondary:#85456f;--muted:#6b5d56;--border:#e4dcd7}
+.fab.primary,.btn.primary,.tab-btn.active{background:#85456f;color:#fff;border-color:#85456f}
+.loader .fill{background:var(--primary)}

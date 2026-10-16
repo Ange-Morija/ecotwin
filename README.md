@@ -1,14 +1,14 @@
 # EcoTwin
 Une plateforme de jumeaux numériques pour relier le contexte BIM aux observations du bâtiment et aux décisions d'exploitation.
 
-Le frontend React et TypeScript propose une présentation produit, une connexion réelle et un dashboard responsive avec modèle XKT, huit métriques environnementales, historique, export CSV et insights par règles. Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
+Le frontend React et TypeScript propose une présentation produit, une connexion réelle, un espace compte, un chatbot OpenAI configurable, une page Business reliée à Stripe et un dashboard responsive avec modèle XKT, huit métriques environnementales, historique, export CSV et insights par règles. Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
 
 ## Aperçu
 ![Dashboard EcoTwin — démonstration BIM et données](docs/images/dashboard-desktop.png)
 
 [Présentation, connexion et captures mobiles](docs/product.md) · [Documentation complète](docs/README.md) · [Architecture](docs/architecture.md) · [Déploiement](docs/deployment.md)
 
-Le pilote et ses lots de maintenance livrent 36 tâches. La [migration React](specs/007-react-frontend/spec.md) modernise les interfaces; 7 lots métier restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le moteur IA n’est pas connecté. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
+Le pilote et ses lots de maintenance livrent 36 tâches. La [migration React](specs/007-react-frontend/spec.md) modernise les interfaces; 7 lots métier restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le chatbot OpenAI est configurable mais non activé sans clé et modèle. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
 
 ## Démarrage
 Python 3.11+ (3.12 testé), Node.js 22.12+ et uv.
@@ -20,7 +20,7 @@ npm ci
 npm run build
 .venv/bin/python -m uvicorn api.src.main:app --host 0.0.0.0 --port 8000
 ```
-Routes: `/` présentation, `/login` connexion, `/register` création de compte local, `/dashboard` espace connecté, `/dashboard?mode=demo` découverte publique. Le serveur fournit la distribution `web/dist` et l’API sur la même origine. Exécutez `npm run build` avant de démarrer FastAPI. Aucun compte par défaut: créez explicitement votre compte local.
+Routes: `/business` offre et abonnement Stripe, `/account` compte et mot de passe, `/` présentation, `/login` connexion, `/register` création de compte local, `/dashboard` espace connecté, `/dashboard?mode=demo` découverte publique. Le serveur fournit la distribution `web/dist` et l’API sur la même origine. Exécutez `npm run build` avant de démarrer FastAPI. Aucun compte par défaut: créez explicitement votre compte local.
 
 Le nettoyage et ses mesures sont décrits dans [le lot d’optimisation](specs/001-digital-twin-platform/optimization.md). Les outils historiques se limitent désormais aux fonctions disponibles : BIM, capteurs, maintenance et actions; les panneaux de prédiction et iframes non raccordés ont été retirés.
 
@@ -92,7 +92,7 @@ Dans Codex, les compétences locales `$speckit-specify`, `$speckit-plan`, `$spec
 ```bash
 .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
 ```
-Les prochains lots couvrent multi-sites/RBAC/SSO, import et mapping IFC-capteur, connecteurs IoT, IA avec preuves et validation humaine, puis notifications et exploitation. Aucun moteur IA n'est connecté: les insights actuels expliquent des règles de seuil, pas des prédictions.
+Les prochains lots couvrent multi-sites/RBAC/SSO, import et mapping IFC-capteur, connecteurs IoT, IA avec preuves et validation humaine, puis notifications et exploitation. Le chatbot OpenAI configurable complète les règles de seuil; ces règles ne deviennent pas des prédictions IA.
 
 ## Structure
 - `api/src/`: FastAPI, sécurité, stockage et données.
@@ -110,3 +110,13 @@ Voir [CONTRIBUTING.md](CONTRIBUTING.md) et [CHANGELOG.md](CHANGELOG.md). Les cha
 Méthode UI : [huit méthodes de conception et de validation](docs/design-workflow.md).
 
 Méthodes fournies : [références et application du ZIP codex-skills](docs/references/codex-skills/README.md). Le dashboard dispose désormais d’une recherche rapide (`/`), d’une pause de l’actualisation automatique et d’une réinitialisation des filtres.
+
+## Comptes, assistant et Business
+
+Connexion et inscription locales réelles, espace compte et changement de mot de passe avec révocation de toutes les sessions. Le chatbot OpenAI utilise un modèle choisi côté serveur, un accord explicite avant envoi des mesures et des quotas persistés. La page Business lit un prix récurrent Stripe, ouvre Checkout et le portail de facturation; les événements webhook sont signés et le statut est relu chez Stripe.
+
+Aucun tarif ni modèle n’est choisi à votre place. Sans configuration, l’assistant et les abonnements affichent leur indisponibilité. Aucune carte ne passe par EcoTwin. L’abonnement n’étend pas les droits du pilote mono-site.
+
+Configuration : `ECOTWIN_OPENAI_API_KEY`, `OPENAI_MODEL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`, `APP_URL`; mode test par défaut. Voir [assistant IA](docs/ai-integration.md), [paiements et activation](docs/billing.md), [spécification](specs/008-auth-ai-business/spec.md) et [tâches](specs/008-auth-ai-business/tasks.md). Exemples sans secrets dans infra/.env.example.
+
+Palette terracotta/turquoise/prune fournie par l’utilisateur, couleurs de texte adaptées au contraste, courbes animées, dialogue avec réduction des mouvements et chronologie synchronisée aux observations. Aucun modèle Figma n’a été importé.

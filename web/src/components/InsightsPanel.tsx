@@ -77,7 +77,7 @@ export default function InsightsPanel({
       )}
       <p className="panel-note">
         <Icon name="help" size={14} />
-        Analyse par seuils · IA non connectée. {data.threshold_note}
+        Analyse par seuils · règles explicables. {data.threshold_note}
       </p>
     </section>
   );

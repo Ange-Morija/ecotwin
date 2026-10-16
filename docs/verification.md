@@ -108,3 +108,20 @@ Validation finale : **17/17 parcours Playwright réussis** sur le build statique
 Manrope est verrouillée en 5.3.0; ses fichiers WOFF2 sont intégrés par Vite, sans dépendance à une URL Google Fonts à l’exécution. La licence SIL OFL est conservée dans web/assets/manrope-OFL.txt et copiée dans la distribution. Les captures docs/images/dashboard-desktop.png et dashboard-mobile.png montrent l’état initial avec aperçu schématique explicitement nommé; le XKT réel a été vérifié par les parcours.
 
 Limites : Chromium uniquement; pas de nouvelle reconstruction Docker, de test Python/Influx, de mesure FPS/latence ou de validation CI distante. Les limitations métier et le suivi des dépendances Xeokit restent inchangés.
+
+## 2026-10-16 — Comptes, assistant IA, Business et palette
+
+Périmètre et décisions : [lot 008](../specs/008-auth-ai-business/spec.md). Authentification réelle conservée et complétée; intégrations configurables, sans activation externe implicite.
+
+Vérifications réellement exécutées :
+- `uv pip compile` puis synchronisation avec hashes du lock Python incluant Stripe 16.0.0 réussies.
+- API : **25 tests réussis, 1 ignoré**. Le test ignoré exige une instance InfluxDB jetable. Les tests nouveaux couvrent changement du mot de passe/révocation globale/limitation, accès/CSRF, consentement IA et absence de fallback, requête fournisseur bornée, quotas compte/global, prix et client Stripe possédés par le serveur, statut, portail, signature brute (falsification/expiration/mode), doublons, réponse Checkout perdue et appels concurrents réutilisant la même tentative. Les appels aux fournisseurs sont simulés; la vérification de signature du SDK est réelle.
+- Build React/TypeScript, `npm run check`, `npm run format:check`, Ruff lint/format et **4 tests Node réussis**.
+- **24 scénarios Playwright réussis** sur la distribution servie par FastAPI; puis **24 réussis via Nginx + API Docker**, après les évolutions compte/IA/Stripe/navigation mobile et chronologie. Parcours historiques, chargement du vrai XKT, réessai SDK, conservation de scène et filtres inclus.
+- Axe : pages publiques/dashboard/catalogue à 390/1440 px; Business, Compte et dialogue assistant à 320/768/1440 px, sans violation WCAG A/AA détectée. Débordements, clavier/Échap/retour de focus, réduction des mouvements, consentement décoché par défaut et texte externe sans injection couverts. Les états actifs du chatbot et les erreurs Stripe côté navigateur utilisent des routes de test simulées, explicitement nommées dans les tests.
+- Images API et Nginx reconstruites avec le bundle CA de build monté en secret et vérification TLS conservée; Compose validé avec `.env.example`. Les contrôles colorés du viewer historique ont reçu une dernière correction CSS de contraste sans dégradé, suivie d’une reconstruction et d’un rejeu ciblé des deux parcours historiques.
+- DESIGN.md : 0 erreur et 0 avertissement. Prérequis Spec Kit du lot 008 valides; liens relatifs des documents modifiés contrôlés. Captures produit/connexion/dashboard/Business/assistant sur ordinateur et mobile actualisées et inspectées.
+
+Limites : Chromium uniquement. Aucun appel OpenAI réel, aucun Checkout/Portal/webhook externe Stripe et aucun paiement réel exécutés, faute de configuration du propriétaire. Le modèle, le prix, le secret brut de signature et les politiques de données/commercialisation restent à configurer/valider. Les écrans désactivés sont intentionnels dans cet état, pas des réponses IA ou paiements simulés présentés comme réels. Le test Influx réel n’a pas été exécuté ici. Les risques de dépendances Xeokit déjà suivis en R007 restent ouverts; aucun audit npm supplémentaire n’est revendiqué pour ce lot.
+
+Le brouillon cloud a enregistré les besoins non secrets et les bindings sortants `ECOTWIN_OPENAI_API_KEY`/`STRIPE_SECRET_KEY`, ajoutant `api.openai.com` et `api.stripe.com`. Cela ne configure pas le secret brut de webhook, n’applique pas les clés au processus en cours et ne publie pas l’environnement. Revoir/enregistrer les valeurs dans les paramètres, puis publier l’environnement avant une validation externe. Aucune mise en production applicative n’a été effectuée.

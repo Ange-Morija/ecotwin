@@ -1,11 +1,11 @@
 /* EcoTwin workspace: light navigation, an asymmetric BIM/data composition. */
 .dashboard-layout {
-  --workspace-bg: #f5f7f9;
-  --workspace-text: #1a2a38;
-  --workspace-muted: #526777;
-  --workspace-line: #e3e8ee;
-  --workspace-accent: #1d6f68;
-  --workspace-selected: #e8f4f0;
+  --workspace-bg: #faf7f4;
+  --workspace-text: #3d332e;
+  --workspace-muted: #6b5d56;
+  --workspace-line: #e7dcd6;
+  --workspace-accent: #386d69;
+  --workspace-selected: #dcefed;
   --font: "Manrope Variable", "Segoe UI", system-ui, sans-serif;
   --radius: 16px;
   font-family: var(--font);
@@ -31,7 +31,7 @@
   margin-bottom: 32px;
 }
 .dashboard-layout .workspace-icon {
-  background: #e4eeed;
+  background: #dcefed;
   color: var(--workspace-accent);
 }
 .dashboard-layout .workspace strong {
