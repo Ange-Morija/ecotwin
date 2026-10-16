@@ -150,6 +150,37 @@ function Dashboard({ mode }: { mode: Mode }) {
   const [authError, setAuthError] = useState("");
   const [logoutError, setLogoutError] = useState("");
   const [leaving, setLeaving] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [searchRequested, setSearchRequested] = useState(false);
+  const hasFilters = Boolean(
+    query ||
+      params.get("state") ||
+      params.get("sort") ||
+      params.get("dir") ||
+      period !== "24h" ||
+      metric !== "CAP_TEMP",
+  );
+  function search() {
+    change({ view: "sensors" });
+    setSearchRequested(true);
+  }
+  useEffect(() => {
+    const shortcut = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        event.key !== "/" ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey ||
+        target?.closest("input,textarea,select,[contenteditable='true']")
+      )
+        return;
+      event.preventDefault();
+      search();
+    };
+    window.addEventListener("keydown", shortcut);
+    return () => window.removeEventListener("keydown", shortcut);
+  }, [setParams]);
   function change(patch: Record<string, string>, replace = false) {
     setParams(
       (current) => {
@@ -168,7 +199,17 @@ function Dashboard({ mode }: { mode: Mode }) {
     period,
     mode === "demo" || Boolean(user),
     (p) => change({ period: p }, true),
+    autoRefresh,
   );
+  useEffect(() => {
+    if (!searchRequested || view !== "sensors" || !data) return;
+    const frame = requestAnimationFrame(() => {
+      document.querySelector<HTMLInputElement>("#sensor-query")?.focus();
+      setSearchRequested(false);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [searchRequested, view, data]);
+
   useEffect(() => {
     if (mode === "demo") return;
     const current = new AbortController();
@@ -320,6 +361,15 @@ function Dashboard({ mode }: { mode: Mode }) {
             <strong>{data?.site.name || "Atelier EcoTwin"}</strong>
           </div>
           <div className="header-right">
+            <Button
+              className="workspace-search"
+              symbol="search"
+              onClick={search}
+              aria-label="Rechercher une métrique"
+            >
+              <span>Rechercher</span>
+              <kbd>/</kbd>
+            </Button>
             <Pill tone={mode === "demo" ? "demo" : ""}>
               {mode === "demo" ? "Démonstration" : "Source réelle"}
             </Pill>
@@ -367,12 +417,63 @@ function Dashboard({ mode }: { mode: Mode }) {
                     ? data
                       ? "Dernières données conservées · état périmé"
                       : "Source indisponible"
-                    : mode === "demo"
-                      ? "Données illustratives · pas horaire"
-                      : "Actualisation toutes les 30 s"}
+                    : !autoRefresh
+                      ? "Actualisation automatique en pause"
+                      : mode === "demo"
+                        ? "Données illustratives · pas horaire"
+                        : "Actualisation toutes les 30 s"}
               </p>
             </div>
           </div>
+          {data && (
+            <div
+              className="workspace-toolbar"
+              aria-label="Contrôles du tableau de bord"
+            >
+              <span className="workspace-source">
+                Source : {mode === "demo" ? "démonstration" : "InfluxDB"}
+              </span>
+              {view !== "overview" && (
+                <div className="workspace-period">
+                  <label htmlFor="workspace-period">Période</label>
+                  <select
+                    id="workspace-period"
+                    value={period}
+                    onChange={(event) => change({ period: event.target.value })}
+                  >
+                    <option value="24h">Dernières 24 heures</option>
+                    <option value="7d">7 derniers jours</option>
+                  </select>
+                </div>
+              )}
+              <label className="auto-refresh">
+                <input
+                  type="checkbox"
+                  checked={autoRefresh}
+                  onChange={(event) => setAutoRefresh(event.target.checked)}
+                />
+                Actualisation automatique
+              </label>
+              {hasFilters && (
+                <Button
+                  className="text-button"
+                  symbol="refresh"
+                  onClick={() =>
+                    change({
+                      q: "",
+                      state: "",
+                      sort: "",
+                      dir: "",
+                      period: "24h",
+                      metric: "CAP_TEMP",
+                    })
+                  }
+                >
+                  Réinitialiser les filtres
+                </Button>
+              )}
+            </div>
+          )}
           <div className="data-feedback" aria-live="polite">
             {error && (
               <ErrorBanner

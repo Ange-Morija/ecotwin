@@ -20,9 +20,9 @@ export default function Landing() {
             <h1>
               Votre bâtiment.
               <br />
-              Une nouvelle
+              Des données
               <br />
-              <span className="accent-text">dimension.</span>
+              <span className="accent-text">pour agir.</span>
             </h1>
             <p className="hero-description">
               Réunissez vos maquettes BIM et vos données dans un même espace.

@@ -85,3 +85,16 @@ Résumé de trois informations réellement calculées, accès direct aux huit m�
 Vérifications exécutées : `npm run check` (TypeScript strict), `npm run format:check`, 4 tests Node et **15/15 parcours Playwright réussis** sur le build statique servi par FastAPI. La suite comprend axe à 390/1440 px, 320/768 px avec texte long et mouvement réduit, connexion, erreurs réseau, tri/export, XKT et nouvelle tentative après erreur SDK. Le nouveau scénario vérifie que les boutons de métrique synchronisent URL, graphique et select sans requête supplémentaire. Captures ordinateur/mobile inspectées puis actualisées dans docs/images; elles montrent l’aperçu schématique avant chargement. Le chargement du véritable XKT a aussi été exécuté.
 
 Limites : Chromium, sans appareil physique ni lecteur d’écran réel. Pas de nouvelle validation Docker, Python/Influx ou audit premium pour cette passe UI; les résultats précédents restent datés dans les sections ci-dessus. La charte conserve les tokens existants; le lanceur de contexte Impeccable est absent et les documents du projet ont été lus directement.
+
+## Application de codex-skills.zip — 16 octobre 2026
+
+Les huit références originales sont conservées avec empreintes SHA-256 et périmètre d’application dans `docs/references/codex-skills/README.md`. Les installateurs du ZIP n’ont pas été exécutés. Les méthodes remove-ai-slop, impeccable-design, design-checklist et playwright-testing ont guidé la réalisation : texte produit plus concret, recherche `/` avec focus, filtres de détail, réinitialisation, pause/reprise réelle de l’actualisation automatique et saisie mobile à 16 px.
+
+Vérifications réellement exécutées :
+- Build Vite avec TypeScript strict et `npm run check` réussis; `npm run format:check` et les 4 tests Node réussis.
+- Suite navigateur : 16 scénarios réussis lors de l’exécution complète; le dernier avait un sélecteur de test ambigu (`status` désignait plusieurs régions). Après ciblage du texte de pause, les deux nouveaux scénarios « commandes » et « actualisation » ont été rejoués et réussis. Au total, les 17 scénarios distincts ont été validés; pas de revendication d’une exécution finale unique à 17/17.
+- La pause est vérifiée avec une horloge Playwright contrôlée : absence de nouvelles requêtes pendant 60 secondes simulées, lecture manuelle possible, reprise périodique après réactivation. Aucun sleep artificiel.
+- Axe sur les pages principales à 390/1440 px et scénario responsive à 320/768 px, connexion réelle, modèle XKT et reprise SDK couverts par la suite. Captures ordinateur/mobile inspectées et actualisées.
+- DESIGN.md lint : aucune erreur ni avertissement. Huit empreintes des références originales vérifiées, liens de documentation contrôlés et prérequis Spec Kit du lot 007 valides.
+
+Limites : Chromium; pas de nouveau test Python/Influx, de reconstruction Docker ou d’audit npm pour cette évolution du frontend. Les constats de dépendances Xeokit restent suivis séparément en R007. Aucune référence Godly ni documentation Aceternity n’a été présentée comme consultée. La plateforme connectée n’est pas remplacée par le modèle HTML autonome présent dans l’archive.

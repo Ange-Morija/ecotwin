@@ -58,3 +58,9 @@ Mapping BIM-capteurs, multi-sites/IAM/SSO, import IFC, connecteurs IoT, moteurs 
 - Accès direct aux huit métriques avec valeurs/unités et sélection synchronisée au graphique et à l’URL.
 - Espace BIM agrandi, aperçu schématique explicitement identifié, filtres du graphique libellés et points à examiner mis en évidence.
 - Styles du dashboard isolés dans une feuille chargée avec la route; adaptation aux écrans intermédiaires et mobiles.
+
+## Méthodes de l’archive utilisateur
+- Références des huit skills conservées avec empreintes, sans exécution des installateurs fournis.
+- Recherche accessible au clavier (`/`), focus sur le catalogue et raccourci ignoré pendant la saisie.
+- Pause/reprise de l’actualisation automatique, commande manuelle conservée et période accessible depuis les vues de détail.
+- Réinitialisation des filtres, saisie mobile à 16 px et textes d’accueil/connexion simplifiés.

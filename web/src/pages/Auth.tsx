@@ -161,9 +161,9 @@ export default function Auth({ register = false }: { register?: boolean }) {
         <Brand />
         <div>
           <h2>
-            Le contexte fait
+            BIM et mesures,
             <br />
-            toute la différence.
+            dans le même espace.
           </h2>
           <BuildingDrawing />
         </div>
@@ -178,7 +178,7 @@ export default function Auth({ register = false }: { register?: boolean }) {
             <Icon name="lock" size={24} />
           </div>
           <h1>
-            {register ? "Créer votre compte" : "Heureux de vous retrouver."}
+            {register ? "Créer votre compte" : "Accédez à votre bâtiment."}
           </h1>
           <p className="auth-intro">
             {register

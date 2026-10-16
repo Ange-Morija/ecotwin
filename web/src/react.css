@@ -101,3 +101,11 @@
     flex-wrap: wrap;
   }
 }
+/* Mobile text entry stays readable without browser zoom. */
+@media (max-width: 800px) {
+  .auth-main input,
+  .dashboard-layout input[type="search"],
+  .dashboard-layout select {
+    font-size: 16px;
+  }
+}

@@ -86,3 +86,9 @@ React possède les interfaces déclaratives, les contrôles, les états et les t
 Le dashboard adopte un rail de navigation bleu encre (`--ink`), sur un espace de travail clair inchangé. Les seuls tokens propres au rail sont `--nav-text: #d4e3eb` et `--nav-active: #2c5169`, définis dans `web/src/dashboard.css`; la palette métier reste issue de platform.css. La feuille dashboard est chargée avec la route React et ne modifie pas les pages publiques.
 
 Le résumé est un bandeau de trois informations : mesures disponibles, dépassements observés et date de dernière acquisition réellement reçue. L’absence de mesure affiche un tiret, jamais l’heure de consultation. Les huit métriques sont des boutons de sélection avec valeur/unité, état sélectionné et accès au catalogue; leur défilement horizontal reste accessible au clavier. Les panneaux BIM et historique sont alignés sur ordinateur et passent en colonne sous 1200 px; sur mobile les points à examiner précèdent le graphique puis le BIM. Le modèle est chargé à la demande; le dessin préalable est explicitement marqué « Aperçu schématique ». Les filtres du graphique disposent de libellés visibles.
+
+## Commandes de travail
+
+La barre de recherche du dashboard ouvre le catalogue et place le focus dans le champ; le raccourci `/` est affiché sur ordinateur et ignoré pendant une saisie. Une barre de commandes rend visibles la source, la période des vues de détail et l’actualisation automatique. Elle utilise les tokens existants et des contrôles natifs. Les champs de saisie et selects passent à 16 px sur mobile, afin de faciliter la lecture et d’éviter le zoom automatique du navigateur.
+
+Les méthodes originales du ZIP utilisateur sont référencées dans `docs/references/codex-skills/README.md`; leur application privilégie des actions utiles plutôt que des animations décoratives ou un changement de marque.

@@ -584,3 +584,62 @@ test("dashboard : sélection rapide des mesures et résumé fondé sur les acqui
     page.getByRole("heading", { name: "Capteurs & données", exact: true }),
   ).toBeVisible();
 });
+
+test("commandes : recherche clavier, période du catalogue et réinitialisation", async ({
+  page,
+}) => {
+  await page.goto("/dashboard?mode=demo");
+  await expect(page.locator(".summary-grid")).toBeVisible();
+  await page.keyboard.press("/");
+  await expect(page.getByRole("searchbox")).toBeFocused();
+  await page.getByRole("searchbox").fill("CAP_TEMP/");
+  await expect(page.getByRole("searchbox")).toHaveValue("CAP_TEMP/");
+  await page.getByRole("button", { name: "Effacer la recherche" }).click();
+  await page.locator("#workspace-period").selectOption("7d");
+  await expect(page).toHaveURL(/period=7d/);
+  await page.getByRole("searchbox").fill("CAP_TEMP");
+  await page.getByRole("button", { name: "Réinitialiser les filtres" }).click();
+  await expect(page.getByRole("searchbox")).toHaveValue("");
+  await expect(page.getByText("8 métriques sur 8")).toBeVisible();
+  await expect(page).not.toHaveURL(/period=7d|q=/);
+  await page.getByRole("link", { name: "Vue d’ensemble", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Rechercher une métrique", exact: true })
+    .click();
+  await expect(page.getByRole("searchbox")).toBeFocused();
+});
+
+test("actualisation : pause réelle, commande manuelle et reprise", async ({
+  page,
+}) => {
+  await page.clock.install();
+  let calls = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/api/dashboard?")) calls++;
+  });
+  await page.goto("/dashboard?mode=demo");
+  await expect(page.locator(".summary-grid")).toBeVisible();
+  const automatic = page.getByRole("checkbox", {
+    name: "Actualisation automatique",
+  });
+  await automatic.uncheck();
+  await expect(
+    page.getByText("Actualisation automatique en pause", { exact: true }),
+  ).toBeVisible();
+  const paused = calls;
+  await page.clock.fastForward(60_000);
+  expect(calls).toBe(paused);
+  const response = page.waitForResponse((response) =>
+    response.url().includes("/api/dashboard?"),
+  );
+  await page.getByRole("button", { name: "Actualiser les données" }).click();
+  await response;
+  await expect(
+    page.getByRole("button", { name: "Actualiser les données" }),
+  ).toBeEnabled();
+  expect(calls).toBe(paused + 1);
+  await expect(automatic).not.toBeChecked();
+  await automatic.check();
+  await page.clock.fastForward(31_000);
+  await expect.poll(() => calls).toBeGreaterThan(paused + 1);
+});

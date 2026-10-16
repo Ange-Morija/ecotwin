@@ -8,3 +8,4 @@
 - [x] R006 Valider navigateur/typages/API/images, mettre à jour les preuves et publier la migration.
 - [ ] R007 Analyser et corriger la chaîne de dépendances Xeokit signalée par npm audit sans rétrogradation incompatible du viewer (suivi avant production, hors migration des pages).
 - [x] R008 Affiner le poste de surveillance : navigation contrastée, résumé de trois observations, sélection rapide des métriques, filtres libellés, aperçu BIM explicite et captures mobile/ordinateur.
+- [x] R009 Appliquer les méthodes fournies dans codex-skills.zip : références traçables, recherche au clavier, contrôle réel du polling, filtres de détail et textes plus concrets.

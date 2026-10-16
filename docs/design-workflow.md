@@ -16,3 +16,7 @@ Ces huit méthodes s’appliquent aux évolutions d’EcoTwin, une plateforme de
 `npm run check`, `npm run format:check`, `npm run test:unit` et `npm run test:e2e` couvrent les contrôles automatisés du frontend. Playwright produit les captures et traces dans `test-results/` (ignoré par Git). Les résultats datés sont consignés dans [verification.md](verification.md).
 
 Cette procédure complète la [spécification](../specs/001-digital-twin-platform/spec.md), le [design](../DESIGN.md) et le [contrat UX](../UX-CONTRACT.md). Elle ne transforme pas les fonctionnalités planifiées — association objet-capteur et IA — en fonctionnalités disponibles.
+
+## Références jointes
+
+L’archive `codex-skills.zip` fournie par l’utilisateur est conservée dans [references/codex-skills](references/codex-skills/README.md), avec le périmètre d’application de chaque méthode et les empreintes des fichiers originaux. Utiliser les méthodes pertinentes dans le cadre des contrats EcoTwin; les modèles et commandes d’une référence ne constituent pas une demande de remplacer la stack ou d’exécuter un installateur.

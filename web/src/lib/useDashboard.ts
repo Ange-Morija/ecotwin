@@ -7,6 +7,7 @@ export function useDashboard(
   period: Period,
   enabled: boolean,
   rollback: (period: Period) => void,
+  autoRefresh = true,
 ) {
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
@@ -62,6 +63,10 @@ export function useDashboard(
   }, [mode, period, enabled, navigate]);
   useEffect(() => {
     void refresh();
+    return () => controller.current?.abort();
+  }, [refresh]);
+  useEffect(() => {
+    if (!autoRefresh || !enabled) return;
     const timer = setInterval(() => {
       if (!document.hidden) void refresh();
     }, 30000);
@@ -69,11 +74,12 @@ export function useDashboard(
       if (!document.hidden) void refresh();
     };
     window.addEventListener("online", online);
+    document.addEventListener("visibilitychange", online);
     return () => {
-      controller.current?.abort();
       clearInterval(timer);
       window.removeEventListener("online", online);
+      document.removeEventListener("visibilitychange", online);
     };
-  }, [refresh]);
+  }, [refresh, autoRefresh, enabled]);
   return { data, loading, error, refresh };
 }

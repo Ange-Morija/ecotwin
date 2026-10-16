@@ -1,0 +1,13 @@
+{
+  "source": "Archive codex-skills.zip fournie par l\u2019utilisateur",
+  "skills_sha256": {
+    "aceternity-ui": "25eaf3b995e7cc757df1add5ad1f88eea66b65a2cb9a01eabf467c21155d25c6",
+    "build-dashboard": "a3bc6a573edb5920aac6b65100723d3be97d8f0f812702bb32c338ddd19d1d10",
+    "design-checklist": "51c7ed010c6453f769f87dc8a5b49c510de324637182f2e44a7efa8535b089fd",
+    "design-md-references": "1354ad3fdbc081a4cfd2db8403c82d5d129b85040342038079d08408c226c9b4",
+    "godly-inspiration": "874bdd46caa0f8e3b17fab19f1de665137b7c4b7ad999ffb625ae98eceb16fdb",
+    "impeccable-design": "4a6157982844eb389366d8fe45929ca285e368aa36ae6151ff033ec563822e73",
+    "playwright-testing": "ad32ef84e9c87a50978cd685b77122cb006bfe9ad4491a664e04c96b4925ba95",
+    "remove-ai-slop": "0077f802b36462e77124db56ac46467bcbad6db8576c41258d268fdc64ab0403"
+  }
+}

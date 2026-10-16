@@ -108,3 +108,5 @@ Les fichiers secrets et les anciens fichiers internes InfluxDB sont retirés du 
 Voir [CONTRIBUTING.md](CONTRIBUTING.md) et [CHANGELOG.md](CHANGELOG.md). Les changements de ce pilote sont publiés via Git; aucune mise en production automatique n’est configurée.
 
 Méthode UI : [huit méthodes de conception et de validation](docs/design-workflow.md).
+
+Méthodes fournies : [références et application du ZIP codex-skills](docs/references/codex-skills/README.md). Le dashboard dispose désormais d’une recherche rapide (`/`), d’une pause de l’actualisation automatique et d’une réinitialisation des filtres.

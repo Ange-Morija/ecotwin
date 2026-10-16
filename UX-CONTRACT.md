@@ -33,3 +33,7 @@ Identité: [DESIGN.md](DESIGN.md). Locale fr-FR; dates Europe/Paris. Route / pub
 
 - La sélection rapide d’une métrique met à jour le graphique, le select et l’URL sans nouvelle lecture réseau; `aria-pressed` expose la sélection. La dernière acquisition du résumé provient du maximum des dates reçues, distinct de l’heure de consultation.
 - Les filtres métrique/période ont des labels visibles. L’aperçu BIM indique son caractère schématique jusqu’au chargement du modèle réel; les boutons de navigation 3D restent désactivés avant ce chargement.
+
+- Recherche : le bouton « Rechercher » et `/` ouvrent le catalogue et focalisent la recherche. Le raccourci est inactif dans les champs et zones éditables; il n’intercepte pas les combinaisons Ctrl/Meta/Alt.
+- Le contrôle « Actualisation automatique » suspend les lectures périodiques et la reprise automatique au retour réseau/onglet. La lecture en cours peut finir; l’actualisation manuelle et un changement de période restent possibles. Ce choix est éphémère, ne modifie ni données ni session, et reste en place entre vues du dashboard.
+- La période est accessible dans le catalogue, le BIM et les insights; elle partage le paramètre URL `period` du graphique. Réinitialiser les filtres remet métrique/période/recherche/état/tri à leurs valeurs initiales en conservant la vue et le mode réel/démo.

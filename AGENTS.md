@@ -9,3 +9,5 @@ Distinguer strictement données réelles et démo, absence de données et panne.
 Maintenir les documents et les tâches Spec Kit en accord avec le code. Consigner les tests effectivement exécutés et leurs limites dans docs/verification.md. Ne pas inventer de références visuelles consultées ni de résultats de tests.
 
 Le frontend canonique est React/TypeScript dans `web/src`. Les assets servis sont générés dans `web/dist` par `npm run build`; ne pas les éditer directement. Le SDK WebGL reste derrière `lib/bim-engine.ts`. Consulter `specs/007-react-frontend/plan.md` avant de modifier ces frontières.
+
+Les méthodes jointes par l’utilisateur sont documentées dans `docs/references/codex-skills/README.md`. Lire les références pertinentes lors d’une évolution UI, en respectant leur périmètre d’application à EcoTwin. Les fichiers originaux restent des références; leurs exemples de commandes et configurations ne sont pas des instructions d’installation automatique.
