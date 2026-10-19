@@ -423,6 +423,11 @@ test("petits écrans, textes longs et réduction des animations", async ({
     ]) {
       await page.goto(route);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      // Wide fallback font: the runner's default font must not hide overflow.
+      await page.addStyleTag({
+        content:
+          '*:not(svg):not(svg *){font-family:"DejaVu Sans","Liberation Sans",sans-serif !important}',
+      });
       if (route.includes("dashboard")) {
         await expect(page.getByText("8 métriques sur 8")).toBeVisible();
         await expect(

@@ -179,3 +179,9 @@ Captures `docs/images/` régénérées avec l’API de démonstration réelle (d
 
 Deux remarques P2 jugées fondées et corrigées : (1) la conformité et la barre segmentée ignoraient les dépassements sur donnée ancienne (statut `stale`) — elles comparent désormais la valeur au seuil et la fraîcheur s’affiche à part; (2) l’animation d’apparition des lignes, la surbrillance, les transitions de jauge, de famille et de la tête de lecture ne respectaient pas le mouvement réduit (les raccourcis `animation`/`transition` des classes l’emportent sur la règle universelle de platform.css) — override ajouté. Deux tests e2e ajoutés; ils échouent sans le correctif et passent avec. Suite complète rejouée : 28/28 réussis.
 
+## 2026-10-19 — Échec de CI hérité de `main` : débordement de l’accueil à 320 px
+
+La CI échouait sur `platform.spec.js:406` (« petits écrans, textes longs ») **déjà sur `main`** depuis le 16 octobre (5 runs rouges consécutifs, même ligne 436) : le test passait en local mais pas sur le runner, dont les polices par défaut sont plus larges. Cause reproduite en forçant « DejaVu Sans » : sur la page d’accueil à 320 px, la colonne de la section « usages » s’élargissait au contenu minimal (titre) et le bouton « Ouvrir le site de démonstration » (`white-space: nowrap`) dépassait de 7 px.
+
+Correctif (`web/styles/platform.css`) : `min-width: 0` sur les enfants de `.use-section`, retour à la ligne du titre et du bouton. Le test impose désormais une police large (DejaVu Sans, Liberation Sans) avant la mesure : il échoue sans le correctif (0,8 s, comme en CI) et passe avec; aucun débordement non plus avec IPAGothic, WenQuanYi Zen Hei, FreeSans, Liberation Sans, Unifont et Loma à 320 et 768 px sur l’accueil, l’inscription et le catalogue.
+

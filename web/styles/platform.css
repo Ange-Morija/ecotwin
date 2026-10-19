@@ -571,6 +571,17 @@ textarea {
   grid-template-columns: 1.2fr 1fr;
   gap: 70px;
 }
+.use-section > * {
+  min-width: 0;
+}
+.use-section h2 {
+  overflow-wrap: anywhere;
+}
+.use-section .button {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
 .use-section .eyebrow {
   margin-bottom: 16px;
 }
