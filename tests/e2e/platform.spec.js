@@ -645,3 +645,19 @@ test("actualisation : pause réelle, commande manuelle et reprise", async ({
   await page.clock.fastForward(31_000);
   await expect.poll(() => calls).toBeGreaterThan(paused + 1);
 });
+
+test("thème clair/sombre : suit le système, bascule et se souvient du choix", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/dashboard?mode=demo");
+  const layout = page.locator(".dashboard-layout");
+  await expect(layout).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Passer au thème clair" }).click();
+  await expect(layout).toHaveAttribute("data-theme", "light");
+  await page.reload();
+  await expect(layout).toHaveAttribute("data-theme", "light");
+  await expect(
+    page.getByRole("button", { name: "Passer au thème sombre" }),
+  ).toBeVisible();
+});

@@ -1,11 +1,13 @@
 import "@fontsource-variable/manrope";
 import "../dashboard.css";
+import "../theme.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { DashboardData, Mode, Period, User, View } from "../lib/types";
 import { api, date, time, valueText } from "../lib/api";
 import { useDashboard } from "../lib/useDashboard";
 import { useChanged, useCountUp } from "../lib/motion";
+import { useTheme } from "../lib/theme";
 import {
   ActionLink,
   Brand,
@@ -227,6 +229,7 @@ function Dashboard({ mode }: { mode: Mode }) {
   const [logoutError, setLogoutError] = useState("");
   const [leaving, setLeaving] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const { theme, toggle: toggleTheme } = useTheme();
   const [searchRequested, setSearchRequested] = useState(false);
   const hasFilters = Boolean(
     query ||
@@ -355,7 +358,7 @@ function Dashboard({ mode }: { mode: Mode }) {
     return `/dashboard?${nextParams}`;
   };
   return (
-    <div className="dashboard-layout">
+    <div className="dashboard-layout" data-theme={theme}>
       <aside className="sidebar">
         <Brand />
         <div className="workspace">
@@ -457,6 +460,15 @@ function Dashboard({ mode }: { mode: Mode }) {
             <Pill tone={mode === "demo" ? "demo" : ""}>
               {mode === "demo" ? "Démonstration" : "Source réelle"}
             </Pill>
+            <IconButton
+              label={
+                theme === "dark"
+                  ? "Passer au thème clair"
+                  : "Passer au thème sombre"
+              }
+              symbol={theme === "dark" ? "sun" : "moon"}
+              onClick={toggleTheme}
+            />
             <IconButton
               label="Actualiser les données"
               symbol="refresh"
@@ -622,34 +634,36 @@ function Dashboard({ mode }: { mode: Mode }) {
                 <div className="overview-intro" hidden={view !== "overview"}>
                   <Summary data={data} change={change} />
                 </div>
-                <div
-                  className={`primary-grid ${view === "bim" ? "bim-workspace" : ""}`}
-                  hidden={view !== "overview" && view !== "bim"}
-                >
-                  <BimPanel />
-                  <div className="trend-slot" hidden={view !== "overview"}>
-                    <TrendPanel
-                      data={data}
-                      metric={metric}
-                      period={period}
-                      change={change}
-                    />
+                <div className="stage">
+                  <div
+                    className={`primary-grid ${view === "bim" ? "bim-workspace" : ""}`}
+                    hidden={view !== "overview" && view !== "bim"}
+                  >
+                    <BimPanel />
+                    <div className="trend-slot" hidden={view !== "overview"}>
+                      <TrendPanel
+                        data={data}
+                        metric={metric}
+                        period={period}
+                        change={change}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="metrics-slot" hidden={view !== "overview"}>
-                  <MetricStrip data={data} metric={metric} change={change} />
+                  <div className="metrics-slot" hidden={view !== "overview"}>
+                    <MetricStrip data={data} metric={metric} change={change} />
+                  </div>
+                  <InsightsPanel
+                    data={data}
+                    expanded={view === "insights"}
+                    hidden={view !== "overview" && view !== "insights"}
+                    change={change}
+                  />
                 </div>
                 <SensorTable
                   data={data}
                   query={query}
                   change={change}
                   hidden={view !== "sensors"}
-                />
-                <InsightsPanel
-                  data={data}
-                  expanded={view === "insights"}
-                  hidden={view !== "overview" && view !== "insights"}
-                  change={change}
                 />
                 {view === "overview" && (
                   <ObservationTimeline data={data} metric={metric} />

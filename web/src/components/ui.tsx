@@ -21,6 +21,8 @@ const paths = {
   minus: "M5 12h14",
   fit: "M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5",
   building: "M4 21V7l8-4v18m0-11h8v11M2 21h20M7 8v2m0 3v2m0 3v1m9-5v2m0 2v1",
+  sun: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4",
+  moon: "M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10Z",
   help: "M9 8a3 3 0 0 1 6 1c0 2-3 2-3 5m0 3v1M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20",
 };
 export type IconName = keyof typeof paths;

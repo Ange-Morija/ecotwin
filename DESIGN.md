@@ -135,3 +135,11 @@ Pages Godly réellement récupérées : https://godly.design/ (accueil), https:/
 Principes retenus : libellés techniques en capitales monospace et filets verticaux entre indicateurs (Superpower, Paradigm); étiquettes d’état en pastille avec point, y compris pour « sans mesure » (Paradigm); mise en évidence brève d’une valeur qui change (état « en cours de mise à jour » de Paradigm). Principes écartés : fond sombre, photographie plein cadre, titres capitales ultra-condensées (Reevo, Superpower) — contraires à l’identité et aux consignes ci-dessus.
 
 Mouvement ajouté, tous supprimés par `prefers-reduced-motion` : compteur 650 ms de la conformité à l’affichage, apparition échelonnée (380 ms, 40 ms par ligne) des métriques au montage, surbrillance de 900 ms d’une valeur modifiée par une actualisation. Aucun mouvement permanent.
+
+## Thèmes clair et sombre du dashboard (2026-10-19)
+
+L’espace connecté et la démonstration proposent un thème clair (identité ci-dessus) et un thème sombre. Le thème sombre est un brun chaud (`#1d1815` fond, `#27201c` surfaces, `#f1e9e2` texte), pas un noir; verre marin `#8ac1bd` pour les sélections et le focus, ambre `#e3b36a` pour la vigilance, prune éclaircie `#e3b0cc` pour les textes et contours d’actions secondaires. Les jetons vivent dans `web/src/theme.css` sous `.dashboard-layout[data-theme="dark"]`; les jetons clairs restent dans dashboard.css et platform.css. Les pages publiques, le compte et Business gardent leur thème clair.
+
+Le thème suit `prefers-color-scheme` tant que le visiteur n’a pas choisi; le bouton de l’en-tête alterne ensuite clair/sombre et mémorise le choix dans `localStorage` (convenance par visiteur, sans donnée sensible; indisponible = le choix vaut pour la visite).
+
+Composition de la vue d’ensemble sur écran large : le jumeau occupe la largeur et la colonne de droite flotte sur la vue 3D (mesures suivies, puis points à examiner, translucides); l’historique se place sous la vue. Sous 1150 px les panneaux se réempilent comme auparavant. Références : exemples APS `aps-iot-extensions-demo` et `aps-digital-twin` (vignettes et README consultés le 2026-10-19, voir plus haut) pour les panneaux flottants sur la vue 3D; non repris faute de données : sélecteur de niveaux, cartes thermiques et barre temporelle, qui supposent l’association objet-capteur et un modèle avec niveaux exploitables.
