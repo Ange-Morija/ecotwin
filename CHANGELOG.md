@@ -1,5 +1,9 @@
 # Journal des changements
 
+## 2026-10-19 — Dashboard : conformité aux seuils
+- Quatrième indicateur « Conformité aux seuils » : part des mesures disponibles sous leur seuil illustratif, avec une barre segmentée (une cellule par métrique) et un résumé textuel.
+- Jauge fine par métrique : valeur rapportée au seuil illustratif, avec alternative textuelle; aucune donnée absente n’est tracée.
+
 ## 2026-10-16 — Comptes, assistant et Business
 - Espace compte, changement du mot de passe et révocation de toutes les sessions.
 - Chatbot OpenAI configurable avec consentement, contexte borné et quotas persistés; pas d’activation sans clé/modèle.

@@ -47,11 +47,42 @@ function Summary({
   const latest = acquisitions.length
     ? new Date(Math.max(...acquisitions))
     : null;
+  const measured = data.sensors.filter((sensor) => sensor.value !== null);
+  const over = measured.filter((sensor) => sensor.status === "warning").length;
+  const within = measured.length - over;
   return (
     <section
       className="summary-grid site-summary"
       aria-label="Indicateurs du site"
     >
+      <div className="summary-item compliance-summary">
+        <span>Conformité aux seuils</span>
+        <strong>
+          {measured.length ? Math.round((within / measured.length) * 100) : "—"}
+          {measured.length > 0 && <small> %</small>}
+        </strong>
+        <div
+          className="compliance-bar"
+          role="img"
+          aria-label={`${within} métriques sous le seuil, ${over} au-dessus, ${data.sensors.length - measured.length} sans mesure`}
+        >
+          {data.sensors.map((sensor) => (
+            <i
+              key={sensor.id}
+              className={
+                sensor.value === null
+                  ? "none"
+                  : sensor.status === "warning"
+                    ? "over"
+                    : "ok"
+              }
+            />
+          ))}
+        </div>
+        <span>
+          {within} sous · {over} au-dessus du seuil
+        </span>
+      </div>
       <div className="summary-item">
         <span>Mesures disponibles</span>
         <strong>
@@ -129,6 +160,19 @@ function MetricStrip({
             <span className="metric-reading">
               {valueText(sensor.value)} <small>{sensor.unit}</small>
             </span>
+            {sensor.value !== null && sensor.threshold > 0 && (
+              <span
+                className="metric-gauge"
+                role="img"
+                aria-label={`${Math.round((sensor.value / sensor.threshold) * 100)} % du seuil illustratif`}
+              >
+                <i
+                  style={{
+                    width: `${Math.min(100, Math.max(0, (sensor.value / sensor.threshold) * 100))}%`,
+                  }}
+                />
+              </span>
+            )}
             {sensor.status === "warning" && (
               <span className="metric-state">À surveiller</span>
             )}

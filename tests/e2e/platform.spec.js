@@ -565,7 +565,7 @@ test("dashboard : sélection rapide des mesures et résumé fondé sur les acqui
   await expect(
     page.getByRole("region", { name: "Indicateurs du site" }),
   ).toContainText("Dernière acquisition");
-  await expect(page.locator(".summary-item")).toHaveCount(3);
+  await expect(page.locator(".summary-item")).toHaveCount(4);
   const initial = calls;
   const pm25 = page
     .locator(".metric-options")

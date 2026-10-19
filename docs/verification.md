@@ -125,3 +125,11 @@ Vérifications réellement exécutées :
 Limites : Chromium uniquement. Aucun appel OpenAI réel, aucun Checkout/Portal/webhook externe Stripe et aucun paiement réel exécutés, faute de configuration du propriétaire. Le modèle, le prix, le secret brut de signature et les politiques de données/commercialisation restent à configurer/valider. Les écrans désactivés sont intentionnels dans cet état, pas des réponses IA ou paiements simulés présentés comme réels. Le test Influx réel n’a pas été exécuté ici. Les risques de dépendances Xeokit déjà suivis en R007 restent ouverts; aucun audit npm supplémentaire n’est revendiqué pour ce lot.
 
 Le brouillon cloud a enregistré les besoins non secrets et les bindings sortants `ECOTWIN_OPENAI_API_KEY`/`STRIPE_SECRET_KEY`, ajoutant `api.openai.com` et `api.stripe.com`. Cela ne configure pas le secret brut de webhook, n’applique pas les clés au processus en cours et ne publie pas l’environnement. Revoir/enregistrer les valeurs dans les paramètres, puis publier l’environnement avant une validation externe. Aucune mise en production applicative n’a été effectuée.
+
+## 2026-10-19 — Indicateur de conformité et jauges de métriques
+
+Changement : quatrième indicateur du résumé et jauges par métrique (`Dashboard.tsx`, `dashboard.css`); test e2e du nombre d’indicateurs passé de 3 à 4.
+
+Vérifications réellement exécutées : build React/TypeScript (`npm run build`) réussi; captures Chromium à 1440 et 390 px sur la distribution statique avec une API simulée (quatre capteurs dont un sans mesure et un au-dessus du seuil), inspectées.
+
+Non exécutés : le backend Python n’a pas pu être installé dans cet environnement (échec de compilation de pydantic-core), donc ni tests API ni scénarios Playwright, y compris le test modifié. Aucun contrôle axe sur la nouvelle zone. À rejouer : `npm run test:e2e`.
