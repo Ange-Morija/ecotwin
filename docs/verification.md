@@ -160,3 +160,18 @@ Vérifications réellement exécutées : `check-prerequisites.sh --require-spec 
 
 Limites : tâches W010 à W014 ouvertes, en particulier la suite Playwright et les tests API du dépôt jamais rejoués depuis la refonte; captures de `docs/images/` toujours à régénérer; la constitution n’a pas été modifiée (aucun principe ne change).
 
+## 2026-10-19 — Rejeu des suites du dépôt après la refonte (W010)
+
+Débloqué : le backend ne s’installait pas sous Python 3.13 (pydantic-core 2.16.3 n’a pas de binaire); avec Python 3.12 (`uv venv .venv --python 3.12`) l’installation avec hashes réussit.
+
+Exécuté : `pytest api/tests` → **25 réussis, 1 ignoré** (test InfluxDB jetable); `ruff check` et `ruff format --check` OK; `npm run test:e2e` (Chromium, WebGL logiciel, serveur FastAPI isolé) → **26/26 réussis** après corrections. Premier passage : 18 réussis, 8 échecs, tous dus à la refonte :
+- titre h1 en double (barre supérieure et titre de page) → un seul h1 par page (sr-only sur l’atelier, visible sur les pages);
+- nom de l’utilisateur disparu avec le rail → affiché dans la barre supérieure en mode connecté;
+- Points à examiner monté en double dans le DOM (onglet masqué) → monté seulement quand l’onglet est actif;
+- contraste mesuré pendant l’apparition en fondu des lignes de capteurs → animation limitée au déplacement, sans opacité;
+- navigation de la barre supérieure débordant à 320 px → retour à la ligne;
+- tests adaptés à la nouvelle interface : chronologie → barre temporelle, navigation mobile compte/facturation → liens de la barre supérieure.
+Le nouveau test « atelier » (familles, onglets, lecture, niveaux du vrai modèle) et le test de thème passent.
+
+Captures `docs/images/` régénérées avec l’API de démonstration réelle (dashboard clair, sombre, mobile; assistant bureau et mobile). Tâches W010 et W013 closes; W014 reste ouverte (WebGL en sombre, 7 jours, autres modèles, thème sombre dans la suite).
+

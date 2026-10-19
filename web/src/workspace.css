@@ -602,3 +602,20 @@
   font-size: 20px;
   line-height: 1.2;
 }
+.user-name {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--workspace-muted);
+  font-size: 13px;
+}
+@media (max-width: 800px) {
+  .topnav {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+  }
+  .top-link {
+    padding: 0 8px;
+  }
+}

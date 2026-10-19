@@ -7,6 +7,9 @@
 - Vue d’ensemble refondue en atelier 3D plein écran : barre supérieure à la place du rail latéral, panneaux flottants (niveaux lus dans le modèle, cartes thermiques inactives, capteurs groupés par famille, points à examiner, historique), barre temporelle de lecture. Suppression de la chronologie de quatre observations et du CSS du rail.
 - Jauge fine par métrique : valeur rapportée au seuil illustratif, avec alternative textuelle; aucune donnée absente n’est tracée.
 
+## 2026-10-19 — Rejeu des suites
+- Suites API (25 réussis) et Playwright (26/26) exécutées; 8 échecs dus à la refonte corrigés (h1 unique, nom d’utilisateur, onglets, contraste pendant l’animation, navigation à 320 px); captures de la documentation régénérées.
+
 ## 2026-10-19 — Nettoyage
 - Suppression du CSS et de composants devenus inutiles; `data.csv` déplacé de `web/assets/` vers `data-model/samples/` (il n’est plus servi publiquement).
 

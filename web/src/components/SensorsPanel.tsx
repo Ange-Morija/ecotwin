@@ -264,12 +264,14 @@ export default function SensorsPanel({
         aria-labelledby="tab-insights"
         hidden={tab !== "insights"}
       >
-        <InsightsPanel
-          data={data}
-          expanded={false}
-          hidden={false}
-          change={change}
-        />
+        {tab === "insights" && (
+          <InsightsPanel
+            data={data}
+            expanded={false}
+            hidden={false}
+            change={change}
+          />
+        )}
       </div>
     </section>
   );

@@ -30,7 +30,7 @@ Les captures montrent la démonstration, avec des valeurs illustratives.
 ### Dashboard
 ![Dashboard EcoTwin avec modèle, historique et point de vigilance](images/dashboard-desktop.png)
 
-> Cette capture montre l’ancienne vue d’ensemble; elle sera régénérée avec l’API de démonstration réelle (tâche W013 de la spec 009).
+![Dashboard EcoTwin, thème sombre](images/dashboard-desktop-dark.png)
 
 ### Mobile
 [Présentation mobile](images/produit-mobile.png) · [Dashboard mobile](images/dashboard-mobile.png)

@@ -190,7 +190,7 @@ function Dashboard({ mode }: { mode: Mode }) {
     >
       <header className="topbar">
         <Brand />
-        <h1 className="topbar-title">{current[1]}</h1>
+        {workspace && <h1 className="topbar-title">{current[1]}</h1>}
         <nav aria-label="Navigation du dashboard" className="topnav">
           {views.map(([key, label, symbol]) => (
             <Link
@@ -237,6 +237,9 @@ function Dashboard({ mode }: { mode: Mode }) {
             disabled={loading}
             onClick={() => void refresh()}
           />
+          {mode === "live" && user && (
+            <span className="user-name">{user.name}</span>
+          )}
           <Link to="/account" className="top-link plain">
             Compte
           </Link>
@@ -348,7 +351,7 @@ function Dashboard({ mode }: { mode: Mode }) {
               <div className="page-body">
                 <div className="page-heading">
                   <div>
-                    <h2 className="page-title">{current[1]}</h2>
+                    <h1 className="page-title">{current[1]}</h1>
                     <p>{subtitles[view]}</p>
                   </div>
                   <div className="update-block">
