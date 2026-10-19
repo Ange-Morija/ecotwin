@@ -151,3 +151,12 @@ Supprimé : ~140 règles CSS sans aucune utilisation (rail latéral, ancienne gr
 Vérifications réellement exécutées : `tsc --noUnusedLocals`, build, format, tests Node; comparaison pixel à pixel de 32 captures (8 routes × 1440/390 px × clair/sombre) entre l’état précédent et l’état nettoyé, avec mesure du bruit en comparant l’ancien build à lui-même : écarts de 0 à 7 pixels, identiques au bruit. Cette comparaison a révélé une régression (règle de couleur des liens en thème sombre supprimée à tort), corrigée avant le commit.
 
 Non fait / limites : captures de `docs/images/` non régénérées (elles montrent l’ancienne interface et exigent l’API de démonstration réelle, indisponible ici); `premium-ui.json` conservé (aucune référence dans le dépôt, probablement lu par un outil externe); tests API et Playwright du dépôt non exécutés; Ruff non exécuté (environnement Python non installable ici).
+
+## 2026-10-19 — Mise à jour des documents et de Spec Kit
+
+Ajouté `specs/009-workspace-themes/` (spec, plan, tâches W001–W014) pour l’atelier 3D et les thèmes; mis à jour specs 001 (FR-011, plan mobile), 007 (spec, plan, tâches : R011/R012 déplacées vers 009), 008 (chronologie remplacée), README, docs/README, product, architecture, security (préférence de thème en `localStorage`) et AGENTS.md.
+
+Vérifications réellement exécutées : `check-prerequisites.sh --require-spec --include-tasks` valide pour 001, 007, 008 et 009 (avec `SPECIFY_FEATURE_DIRECTORY`, la branche de travail n’étant pas numérotée Spec Kit); liens relatifs des fichiers modifiés contrôlés par script.
+
+Limites : tâches W010 à W014 ouvertes, en particulier la suite Playwright et les tests API du dépôt jamais rejoués depuis la refonte; captures de `docs/images/` toujours à régénérer; la constitution n’a pas été modifiée (aucun principe ne change).
+

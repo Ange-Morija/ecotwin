@@ -28,7 +28,7 @@ Source de démo visible, règles distinctes de l'IA, autorisations serveur, pas 
 ## Visualisation et interactions
 Job: surveillance/anomalies et évolution temporelle. Route principale: dashboards-and-real-time-visualization. Historique SVG à axes et unité explicites; fallback table accessible et CSV. Une scène WebGL pour l'orientation BIM; aucun capteur n'est placé sur un objet sans mapping vérifié. Pas de particules décoratives.
 URL: mode, view, metric, period, q. Aucune information sensible dans l'URL. Polling 30 s seulement lorsque l'onglet est visible; un seul appel en cours, annulation au changement de filtres. Données conservées lors d'une panne et statut périmé. Démo déterministe, sans badge «en direct».
-Mobile: résumé/alerte puis métrique, graphique puis BIM; navigation compacte, contrôles >=44 px, aucune interaction essentielle au survol.
+Mobile: vue 3D, outils, puis panneaux capteurs/alertes/historique et barre temporelle (voir specs/009-workspace-themes); navigation compacte, contrôles >=44 px, aucune interaction essentielle au survol.
 Budget: une série <=168 points et une scène; SDK local lazy, pas d'animation continue de graphiques; fallback WebGL explicite. Rendu BIM dépendant du GPU et de la taille du modèle.
 
 ## Delivery boundaries

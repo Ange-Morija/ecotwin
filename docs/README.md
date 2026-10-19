@@ -15,6 +15,7 @@ EcoTwin est un pilote de plateforme de jumeaux numériques **mono-site partagé*
 - [Comptes, IA et Business](../specs/008-auth-ai-business/spec.md) et [contrats HTTP](../specs/008-auth-ai-business/contracts.md)
 
 - [Migration du frontend React](../specs/007-react-frontend/spec.md) et [plan technique](../specs/007-react-frontend/plan.md)
+- [Atelier 3D et thèmes clair/sombre](../specs/009-workspace-themes/spec.md), [plan](../specs/009-workspace-themes/plan.md) et [tâches](../specs/009-workspace-themes/tasks.md)
 
 ## Concevoir et contribuer
 - [Constitution](../.specify/memory/constitution.md)

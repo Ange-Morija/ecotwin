@@ -48,6 +48,7 @@ Session expirée, email invalide, double clic connexion, identifiants erronés, 
 - **FR-008**: Données de démo déterministes séparées; aucune substitution silencieuse aux données réelles.
 - **FR-009**: UI responsive, focus visible, erreurs explicites, contraste AA et alternative textuelle aux visualisations.
 - **FR-010**: Aucun secret ni état interne de base de données dans les nouveaux fichiers suivis.
+- **FR-011**: Le dashboard propose un atelier 3D et des thèmes clair/sombre sans changer les contrats de données ni présenter de lien BIM-capteur non vérifié (voir `specs/009-workspace-themes/`).
 
 ### Key Entities
 Utilisateur, Session, Site, Modèle BIM, Objet BIM, Capteur, Observation, Insight, Maintenance, Action. Le pilote possède un site partagé; les actions appartiennent à leur auteur. La multi-location et le RBAC sont des extensions planifiées.

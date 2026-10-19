@@ -30,6 +30,8 @@ Les captures montrent la démonstration, avec des valeurs illustratives.
 ### Dashboard
 ![Dashboard EcoTwin avec modèle, historique et point de vigilance](images/dashboard-desktop.png)
 
+> Cette capture montre l’ancienne vue d’ensemble; elle sera régénérée avec l’API de démonstration réelle (tâche W013 de la spec 009).
+
 ### Mobile
 [Présentation mobile](images/produit-mobile.png) · [Dashboard mobile](images/dashboard-mobile.png)
 
@@ -42,6 +44,10 @@ Les captures montrent la démonstration, avec des valeurs illustratives.
 | Sessions serveur et données réelles via InfluxDB | Livré pour un pilote mono-site |
 | Maintenance et actions persistées | Livré dans les outils historiques |
 | Insights par seuils explicables | Livré; seuils illustratifs |
+| Atelier 3D plein écran, niveaux du modèle, barre temporelle | Livré (voir [spec 009](../specs/009-workspace-themes/spec.md)) |
+| Thèmes clair et sombre du dashboard | Livré |
+| Familles de capteurs au-delà de l’environnement | Planifié (champ `family` à ajouter à l’API) |
+| Cartes thermiques sur le modèle | Planifié (dépend de l’association objet-capteur) |
 | Liaison vérifiée objet BIM-capteur et import IFC | Planifié |
 | Multi-sites, RBAC et SSO | Planifié |
 | Chatbot OpenAI | Intégré, configurable; non activé sans clé/modèle |

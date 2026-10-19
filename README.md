@@ -8,7 +8,7 @@ Le frontend React et TypeScript propose une présentation produit, une connexion
 
 [Présentation, connexion et captures mobiles](docs/product.md) · [Documentation complète](docs/README.md) · [Architecture](docs/architecture.md) · [Déploiement](docs/deployment.md)
 
-Le pilote et ses lots de maintenance livrent 36 tâches. La [migration React](specs/007-react-frontend/spec.md) modernise les interfaces; 7 lots métier restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le chatbot OpenAI est configurable mais non activé sans clé et modèle. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
+Le pilote et ses lots de maintenance livrent 36 tâches. La [migration React](specs/007-react-frontend/spec.md) modernise les interfaces et l’[atelier 3D avec thèmes clair/sombre](specs/009-workspace-themes/spec.md) recompose le dashboard; 7 lots métier restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le chatbot OpenAI est configurable mais non activé sans clé et modèle. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
 
 ## Démarrage
 Python 3.11+ (3.12 testé), Node.js 22.12+ et uv.
@@ -119,4 +119,4 @@ Aucun tarif ni modèle n’est choisi à votre place. Sans configuration, l’as
 
 Configuration : `ECOTWIN_OPENAI_API_KEY`, `OPENAI_MODEL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`, `APP_URL`; mode test par défaut. Voir [assistant IA](docs/ai-integration.md), [paiements et activation](docs/billing.md), [spécification](specs/008-auth-ai-business/spec.md) et [tâches](specs/008-auth-ai-business/tasks.md). Exemples sans secrets dans infra/.env.example.
 
-Palette terracotta/turquoise/prune fournie par l’utilisateur, couleurs de texte adaptées au contraste, courbes animées, dialogue avec réduction des mouvements et chronologie synchronisée aux observations. Aucun modèle Figma n’a été importé.
+Palette terracotta/turquoise/prune fournie par l’utilisateur, couleurs de texte adaptées au contraste, courbes animées, dialogue avec réduction des mouvements et barre temporelle synchronisée au graphique. Le dashboard propose un thème clair et un thème sombre (choix mémorisé dans le navigateur). Aucun modèle Figma n’a été importé.
