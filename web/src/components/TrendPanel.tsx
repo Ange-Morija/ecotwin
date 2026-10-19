@@ -1,6 +1,13 @@
 import { useId, useState } from "react";
 import { date, downloadCsv, time, valueText } from "../lib/api";
-import type { DashboardData, Period, Point, Sensor } from "../lib/types";
+import { resolveIndex } from "../lib/types";
+import type {
+  DashboardData,
+  Period,
+  Point,
+  Selection,
+  Sensor,
+} from "../lib/types";
 import { Button, Icon } from "./ui";
 const emptyPoints: Point[] = [];
 function TrendChart({
@@ -67,7 +74,7 @@ function TrendChart({
                 x2={538}
                 y1={y(value)}
                 y2={y(value)}
-                stroke="#dce5eb"
+                stroke="var(--workspace-line)"
               />
               <text
                 x={43}
@@ -89,14 +96,14 @@ function TrendChart({
           x2={538}
           y1={y(sensor.threshold)}
           y2={y(sensor.threshold)}
-          stroke="#9a5b10"
+          stroke="var(--warning)"
           strokeDasharray="4 5"
         />
         <text
           x={538}
           y={y(sensor.threshold) - 7}
           textAnchor="end"
-          fill="#9a5b10"
+          fill="var(--warning)"
           fontSize="10"
         >
           Seuil illustratif {valueText(sensor.threshold)}
@@ -137,7 +144,7 @@ function TrendChart({
           cy={y(points[selected].value)}
           r="4"
           fill="var(--ink)"
-          stroke="white"
+          stroke="var(--surface)"
           strokeWidth="2"
         />
         {[0, Math.floor((points.length - 1) / 2), points.length - 1].map(
@@ -183,23 +190,20 @@ export default function TrendPanel({
   metric,
   period,
   change,
+  selection,
+  onSelection,
 }: {
   data: DashboardData;
   metric: string;
   period: Period;
   change: (patch: Record<string, string>) => void;
+  selection: Selection;
+  onSelection: (selection: Selection) => void;
 }) {
   const sensor = data.sensors.find((s) => s.id === metric) || data.sensors[0];
   const points = data.history[sensor.id] || emptyPoints;
   const [open, setOpen] = useState(false);
-  const [selection, setSelection] = useState<{
-    sensor: string;
-    index: number;
-  } | null>(null);
-  const selected =
-    selection?.sensor === sensor.id
-      ? Math.min(selection.index, Math.max(0, points.length - 1))
-      : Math.max(0, points.length - 1);
+  const selected = resolveIndex(selection, sensor.id, points.length);
   return (
     <section className="panel trend-panel">
       <div className="panel-heading">
@@ -219,7 +223,7 @@ export default function TrendPanel({
             id="trend-metric"
             value={sensor.id}
             onChange={(event) => {
-              setSelection(null);
+              onSelection(null);
               change({ metric: event.target.value });
             }}
           >
@@ -237,7 +241,7 @@ export default function TrendPanel({
             id="trend-period"
             value={period}
             onChange={(e) => {
-              setSelection(null);
+              onSelection(null);
               change({ period: e.target.value });
             }}
           >
@@ -259,7 +263,7 @@ export default function TrendPanel({
         points={points}
         sensor={sensor}
         selected={selected}
-        onSelect={(index) => setSelection({ sensor: sensor.id, index })}
+        onSelect={(index) => onSelection({ sensor: sensor.id, index })}
       />
       <div className="chart-caption">
         <span>Pas horaire · dernière valeur reçue</span>

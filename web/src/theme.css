@@ -25,7 +25,7 @@
 }
 .dashboard-layout {
   --warning-bg: #f8ecd9;
-  --viewport-bg: #eef3f5;
+  --viewport-bg: #f1ebe5;
   --on-selected: #145a55;
   background: var(--workspace-bg);
 }
@@ -150,4 +150,23 @@
 }
 .dashboard-layout[data-theme="dark"] .button.primary {
   color: #1d1815;
+}
+.dashboard-layout .twin-grid {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+.dashboard-layout {
+  --grid-line: #e4dad2;
+}
+.dashboard-layout[data-theme="dark"] {
+  --grid-line: #2d2521;
+}
+.dashboard-layout .model-tag {
+  background: var(--surface);
+  color: var(--workspace-muted);
+}
+.dashboard-layout[data-theme="dark"] .model-tag {
+  background: var(--surface);
 }

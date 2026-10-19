@@ -3,7 +3,8 @@
 ## 2026-10-19 — Dashboard : conformité aux seuils
 - Quatrième indicateur « Conformité aux seuils » : part des mesures disponibles sous leur seuil illustratif, avec une barre segmentée (une cellule par métrique) et un résumé textuel.
 - Références Godly consultées et principes retenus (DESIGN.md) : libellés monospace, pastilles d’état, compteur de conformité, apparition échelonnée et surbrillance des valeurs modifiées, sans mouvement permanent.
-- Thèmes clair et sombre du dashboard (suivi du système, bouton, mémorisation) et vue d’ensemble avec mesures et points à examiner flottant sur la vue 3D.
+- Thèmes clair et sombre du dashboard (suivi du système, bouton, mémorisation).
+- Vue d’ensemble refondue en atelier 3D plein écran : barre supérieure à la place du rail latéral, panneaux flottants (niveaux lus dans le modèle, cartes thermiques inactives, capteurs groupés par famille, points à examiner, historique), barre temporelle de lecture. Suppression de la chronologie de quatre observations et du CSS du rail.
 - Jauge fine par métrique : valeur rapportée au seuil illustratif, avec alternative textuelle; aucune donnée absente n’est tracée.
 
 ## 2026-10-16 — Comptes, assistant et Business

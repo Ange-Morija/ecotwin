@@ -458,13 +458,13 @@ test("React : navigation sans rechargement, scène conservée et filtres restaur
     window.reactCanvas = document.querySelector("#twin-canvas");
   });
   await page.getByRole("link", { name: "Capteurs & données" }).click();
-  await expect(page.locator(".primary-grid")).toBeHidden();
+  await expect(page.locator(".workspace-stage")).toBeHidden();
   await page.getByLabel("État des métriques").selectOption("warning");
   await expect(page.getByText("1 métrique sur 8")).toBeVisible();
   await expect(page).toHaveURL(/state=warning/);
   await page.getByRole("button", { name: /Trier par Métrique/ }).click();
   await expect(page).toHaveURL(/dir=desc/);
-  await page.getByRole("link", { name: "Jumeau BIM", exact: true }).click();
+  await page.getByRole("link", { name: "Vue d’ensemble", exact: true }).click();
   await expect(page.locator(".sensors-panel")).toBeHidden();
   expect(
     await page
@@ -524,6 +524,7 @@ test("React : graphique au clavier, images chargées et état vide honnête", as
     page.getByRole("heading", { name: "Aucune observation sur cette période" }),
   ).toBeVisible();
   await expect(page.locator(".chart-value strong")).toHaveText("—");
+  await page.getByRole("tab", { name: /Points à examiner/ }).click();
   await expect(
     page.getByRole("heading", { name: "Aucun dépassement observé" }),
   ).toBeVisible();
@@ -660,4 +661,48 @@ test("thème clair/sombre : suit le système, bascule et se souvient du choix", 
   await expect(
     page.getByRole("button", { name: "Passer au thème sombre" }),
   ).toBeVisible();
+});
+
+test("atelier : onglets, familles, lecture de l’historique et niveaux du modèle", async ({
+  page,
+}) => {
+  await page.goto("/dashboard?mode=demo");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Vue d’ensemble" }),
+  ).toBeVisible();
+  const group = page.getByRole("button", { name: /Environnement/ });
+  await expect(group).toHaveAttribute("aria-expanded", "true");
+  await group.click();
+  await expect(page.locator(".metric-option")).toHaveCount(0);
+  await group.click();
+  await expect(page.locator(".metric-option")).toHaveCount(8);
+  await page.getByRole("tab", { name: /Points à examiner/ }).click();
+  await expect(page.locator("#tabpanel-insights")).toBeVisible();
+  await page.getByRole("tab", { name: "Capteurs" }).click();
+  const slider = page.getByRole("slider", { name: "Observation sélectionnée" });
+  await slider.focus();
+  await page.keyboard.press("Home");
+  await page.getByRole("button", { name: "Observation suivante" }).click();
+  await expect(slider).toHaveValue("1");
+  await page.getByRole("button", { name: "Lire l’historique" }).click();
+  await expect
+    .poll(async () => Number(await slider.inputValue()))
+    .toBeGreaterThan(2);
+  await page
+    .getByRole("button", { name: /Mettre la lecture en pause/ })
+    .click();
+  await expect(page.locator(".levels-panel")).toContainText(
+    "Disponible après le chargement du modèle 3D.",
+  );
+  await expect(page.getByLabel("Canal")).toBeDisabled();
+  await page.getByRole("button", { name: "Charger le modèle 3D" }).click();
+  await expect(page.locator(".twin-viewport")).toHaveAttribute(
+    "data-ready",
+    "true",
+    { timeout: 45000 },
+  );
+  const levels = page.locator(".levels-panel").getByRole("button");
+  await expect(levels).toHaveCount(3);
+  await levels.nth(1).click();
+  await expect(levels.nth(1)).toHaveAttribute("aria-pressed", "true");
 });

@@ -9,7 +9,7 @@ React 19 + TypeScript strict + Vite 8 + React Router 7, versions exactes dans pa
 - `components/ui.tsx` : boutons, navigation, icônes, messages et indicateurs.
 - `components/TrendPanel.tsx` : graphique SVG déclaratif, sélection d’observation, table et CSV; une série de 24 ou 168 points.
 - `components/SensorTable.tsx` : catalogue borné, recherche/filtre/tri et export cohérent.
-- `components/BimPanel.tsx` : cycle de vie React, textes et commandes; `lib/bim-engine.ts` : objets GPU et SDK chargé à la demande, callbacks, destruction. Une seule scène.
+- `components/BimPanel.tsx` : cycle de vie React, textes et commandes; `lib/bim-engine.ts` : objets GPU et SDK chargé à la demande, callbacks, destruction. Une seule scène. `BimPanel` lit aussi les niveaux du modèle chargé et les isole (`levels`, `isolate`).
 - `lib/useDashboard.ts` : appels groupés, annulation et délai de réponse, rafraîchissement toutes les 30 secondes si onglet visible, reprise réseau, état périmé et retour à la période de la dernière réponse exploitable après échec.
 - `lib/types.ts` et `lib/api.ts` : contrats TypeScript et client même origine; aucun secret stocké dans le navigateur.
 - `platform.css` : tokens; `react.css` : agencement des composants React. Le build Vite produit CSS et JS minifiés par route dans `web/dist/app-assets`.

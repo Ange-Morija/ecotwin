@@ -77,7 +77,7 @@ Les variables de web/styles/platform.css sont la source d'exécution canonique (
 Familles système sur les pages publiques; Manrope variable auto-hébergée sur le dashboard (paquet @fontsource-variable/manrope 5.3.0, SIL OFL). La police est chargée avec la route et possède un repli système; aucune requête à Google Fonts. Titres marketing grands et légèrement resserrés, titres produit sobres, mesures en chiffres tabulaires et légendes techniques monospace. Français fr-FR; dates Europe/Paris. Aucune police décorative dans les tableaux.
 
 ## Layout
-Rythme 4 px, panneaux 24 px. Accueil asymétrique texte/axonométrie; dashboard rail blanc 224 px et grille asymétrique : BIM/historique dans la colonne principale, métriques/points à examiner dans une colonne de 304 px (340 px au-delà de 1600 px). Sous 1150 px les panneaux passent en colonne; sous 800 px la navigation est horizontale et les alertes précèdent les mesures puis graphique/BIM. Le document reste scrollable.
+Rythme 4 px, panneaux 24 px. Accueil asymétrique texte/axonométrie; dashboard : barre supérieure (marque, navigation, source, actions) puis, en vue d’ensemble sur écran large, un atelier plein cadre où le jumeau 3D occupe tout l’espace et des panneaux flottants (niveaux et cartes thermiques à gauche; capteurs et historique à droite) le recouvrent, avec une barre temporelle en bas. Sous 1151 px les éléments s’empilent : vue, outils, panneaux, barre temporelle. Les pages Capteurs et Insights restent des pages centrées. Le document reste scrollable sauf l’atelier plein écran.
 
 ## Elevation & Depth
 Surfaces blanches et bordures gris bleu; ombre légère pour la vue axonométrique et panneaux flottants seulement. La profondeur 3D encode l'orientation du bâtiment.
@@ -107,7 +107,7 @@ Méthode de référence : [les huit méthodes de conception](docs/design-workflo
 
 React possède les interfaces déclaratives, les contrôles, les états et les textes; Xeokit possède la géométrie et la sélection GPU. React Router conserve les filtres dans l’URL et la scène reste montée entre vues du dashboard. Les pages publiques partagent la palette demandée et conservent leurs familles système; le dashboard utilise les variantes documentées ci-dessous. La réduction des animations reste respectée. Le graphique propose une observation sélectionnée au pointeur ou avec un curseur natif au clavier; aucune information ne dépend uniquement du survol. Les boutons, messages et champs restent partagés, sans nouvelle bibliothèque de style concurrente.
 
-## Poste de surveillance — affinement du dashboard
+## Poste de surveillance — affinement du dashboard (partiellement remplacé par « Atelier 3D » ci-dessous)
 
 Le dashboard adopte un rail blanc, un espace ivoire chaud et une sélection verre marin. Il s’agit d’une création originale répondant à la demande d’une composition de dashboard de type kit UI; aucun fichier ni modèle Figma n’a été consulté (connecteur absent de la session). Aucun élément n’est présenté comme importé de Figma.
 
@@ -142,4 +142,16 @@ L’espace connecté et la démonstration proposent un thème clair (identité c
 
 Le thème suit `prefers-color-scheme` tant que le visiteur n’a pas choisi; le bouton de l’en-tête alterne ensuite clair/sombre et mémorise le choix dans `localStorage` (convenance par visiteur, sans donnée sensible; indisponible = le choix vaut pour la visite).
 
-Composition de la vue d’ensemble sur écran large : le jumeau occupe la largeur et la colonne de droite flotte sur la vue 3D (mesures suivies, puis points à examiner, translucides); l’historique se place sous la vue. Sous 1150 px les panneaux se réempilent comme auparavant. Références : exemples APS `aps-iot-extensions-demo` et `aps-digital-twin` (vignettes et README consultés le 2026-10-19, voir plus haut) pour les panneaux flottants sur la vue 3D; non repris faute de données : sélecteur de niveaux, cartes thermiques et barre temporelle, qui supposent l’association objet-capteur et un modèle avec niveaux exploitables.
+La composition de la vue d’ensemble est décrite dans « Atelier 3D » ci-dessous.
+
+## Atelier 3D (2026-10-19, remplace le rail latéral et la grille de la vue d’ensemble)
+
+Le rail latéral, le résumé en bandeau et la chronologie de quatre observations de la vue d’ensemble sont remplacés par la composition de la maquette validée (inspirée de Tandem et des exemples APS `aps-iot-extensions-demo` / `aps-digital-twin`, voir « Références consultées »). Les autres descriptions de ce fichier restent valables pour les pages Capteurs, Insights, Compte et Business.
+
+- **Barre supérieure** : marque, navigation (Vue d’ensemble, Capteurs & données, Insights), site et étiquette Démonstration/Source réelle, assistant, recherche (`/`), thème, actualisation, compte, Business, connexion ou déconnexion. Le titre h1 est présent pour les lecteurs d’écran; la page courante est signalée par `aria-current`.
+- **Niveaux** : lus dans le modèle XKT chargé (`IfcBuildingStorey`, noms IFC non traduits). Isoler un niveau met les autres en transparence; « Tous les niveaux » restaure. Avant chargement, le panneau l’indique.
+- **Cartes thermiques** : panneau présent mais inactif (« Aucun capteur relié ») tant que l’association objet-capteur n’existe pas. Aucune couleur illustrative n’est appliquée au vrai modèle.
+- **Capteurs** (onglet) : quatre indicateurs calculés, liste groupée par famille (`sensor.family`, « Environnement » par défaut tant que l’API ne la fournit pas), lignes sélectionnables avec jauge de seuil. **Points à examiner** (onglet) : règles explicables avec compteur. Les outils BIM, maintenance et actions restent dans l’ancien viewer, lié depuis le pied du panneau.
+- **Historique** : même composant que précédemment, compact; la sélection d’observation est partagée avec la **barre temporelle** (précédent, lecture, suivant; lecture 700 ms par observation, interrompue par un changement de métrique). Le curseur natif « Observation sélectionnée » reste le contrôle clavier; la piste de la barre est décorative.
+- **Outils 3D** : barre horizontale en bas du jumeau (ajuster, tourner, zoomer, transparence, télécharger le XKT).
+- Les tailles de cible des lignes de panneaux (36 à 40 px) sont inférieures aux 44 px des boutons principaux : écart assumé pour la densité, au-dessus du minimum WCAG 2.2 de 24 px.

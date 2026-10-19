@@ -8,6 +8,6 @@
 - `/api/billing/status` relit Stripe à chaque demande : événements désordonnés sans effet sur les droits. `billing_events` conserve uniquement identifiant et date de réception. Le webhook n’active aucun droit local; sa signature vérifiée ne remplace pas la source de vérité Stripe.
 - Schéma additif : billing(user_id, customer, checkout_id, checkout_url, checkout_expires), billing_checkout_attempts(user_id, attempt), billing_events(id, received), usage_limits(user_id, bucket, count). Aucun effacement des comptes existants.
 - `pages/Business.tsx`, `pages/Account.tsx` sont des routes paresseuses; `services.css` porte leurs styles et les accents de la palette. Tokens canoniques dans platform.css, variantes du poste dans dashboard.css. La scène Xeokit et ses frontières restent inchangées.
-- `ObservationTimeline` dérive quatre points de la série sélectionnée; `TrendPanel` anime le tracé à l’entrée/changement de métrique ou taille de série, pas à chaque survol ni rafraîchissement identique.
+- `TimelineBar` (barre temporelle de l’atelier) remplace `ObservationTimeline` et partage la sélection d’observation de `TrendPanel`; `TrendPanel` anime le tracé à l’entrée/changement de métrique ou taille de série, pas à chaque survol ni rafraîchissement identique.
 
 Validation : tests API avec SDK/fournisseur simulés, vraie vérification cryptographique de signature; parcours navigateur sur distribution compilée; axe et écrans étroits; aucun paiement réel ou appel IA déclaré testé sans clés.
