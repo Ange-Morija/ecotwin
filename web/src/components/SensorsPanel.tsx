@@ -5,6 +5,9 @@ import { useChanged, useCountUp } from "../lib/motion";
 import { Icon } from "./ui";
 import InsightsPanel from "./InsightsPanel";
 const FALLBACK_FAMILY = "Environnement";
+/** Threshold exceedance does not depend on freshness: a stale reading still counts. */
+const exceeds = (sensor: Sensor) =>
+  sensor.value !== null && sensor.value > sensor.threshold;
 function Summary({
   data,
   onInsights,
@@ -19,7 +22,7 @@ function Summary({
     ? new Date(Math.max(...acquisitions))
     : null;
   const measured = data.sensors.filter((sensor) => sensor.value !== null);
-  const over = measured.filter((sensor) => sensor.status === "warning").length;
+  const over = measured.filter(exceeds).length;
   const within = measured.length - over;
   const rate = useCountUp(
     measured.length ? Math.round((within / measured.length) * 100) : null,
@@ -44,11 +47,7 @@ function Summary({
             <i
               key={sensor.id}
               className={
-                sensor.value === null
-                  ? "none"
-                  : sensor.status === "warning"
-                    ? "over"
-                    : "ok"
+                sensor.value === null ? "none" : exceeds(sensor) ? "over" : "ok"
               }
             />
           ))}
@@ -110,7 +109,7 @@ function SensorRow({
   return (
     <button
       type="button"
-      className={`metric-option ${sensor.status === "warning" ? "metric-warning" : ""}`}
+      className={`metric-option ${exceeds(sensor) ? "metric-warning" : ""}`}
       style={{ animationDelay: `${index * 40}ms` }}
       aria-pressed={selected}
       onClick={onSelect}
@@ -128,8 +127,11 @@ function SensorRow({
           <i style={{ width: `${Math.min(100, Math.max(0, ratio))}%` }} />
         </span>
       )}
-      {sensor.status === "warning" && (
+      {exceeds(sensor) && (
         <span className="metric-state tag-warning">À surveiller</span>
+      )}
+      {sensor.status === "stale" && (
+        <span className="metric-state tag-missing">Donnée ancienne</span>
       )}
       {sensor.value === null && (
         <span className="metric-state tag-missing">Sans mesure</span>
@@ -149,7 +151,7 @@ function FamilyGroup({
   change: (patch: Record<string, string>) => void;
 }) {
   const [open, setOpen] = useState(true);
-  const warnings = sensors.filter((sensor) => sensor.status === "warning");
+  const warnings = sensors.filter(exceeds);
   return (
     <div className="family-group">
       <button

@@ -175,3 +175,7 @@ Le nouveau test « atelier » (familles, onglets, lecture, niveaux du vrai modè
 
 Captures `docs/images/` régénérées avec l’API de démonstration réelle (dashboard clair, sombre, mobile; assistant bureau et mobile). Tâches W010 et W013 closes; W014 reste ouverte (WebGL en sombre, 7 jours, autres modèles, thème sombre dans la suite).
 
+## 2026-10-19 — Revue automatisée de la PR (Codex)
+
+Deux remarques P2 jugées fondées et corrigées : (1) la conformité et la barre segmentée ignoraient les dépassements sur donnée ancienne (statut `stale`) — elles comparent désormais la valeur au seuil et la fraîcheur s’affiche à part; (2) l’animation d’apparition des lignes, la surbrillance, les transitions de jauge, de famille et de la tête de lecture ne respectaient pas le mouvement réduit (les raccourcis `animation`/`transition` des classes l’emportent sur la règle universelle de platform.css) — override ajouté. Deux tests e2e ajoutés; ils échouent sans le correctif et passent avec. Suite complète rejouée : 28/28 réussis.
+

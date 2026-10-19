@@ -663,6 +663,40 @@ test("thème clair/sombre : suit le système, bascule et se souvient du choix", 
   ).toBeVisible();
 });
 
+test("conformité : un dépassement sur donnée ancienne reste compté au-dessus du seuil", async ({
+  page,
+}) => {
+  await page.route("**/api/dashboard?*", async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    data.sensors = data.sensors.map((sensor) =>
+      sensor.id === "CAP_TEMP"
+        ? { ...sensor, value: sensor.threshold + 5, status: "stale" }
+        : { ...sensor, value: sensor.threshold - 1, status: "normal" },
+    );
+    await route.fulfill({ response, json: data });
+  });
+  await page.goto("/dashboard?mode=demo");
+  await expect(page.locator(".compliance-bar i.over")).toHaveCount(1);
+  const temperature = page
+    .locator(".metric-option")
+    .filter({ hasText: /^Température/ });
+  await expect(temperature).toContainText("À surveiller");
+  await expect(temperature).toContainText("Donnée ancienne");
+});
+
+test("mouvement réduit : lignes de capteurs et surbrillance sans animation", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/dashboard?mode=demo");
+  const row = page.locator(".metric-option").first();
+  await expect(row).toBeVisible();
+  expect(await row.evaluate((el) => getComputedStyle(el).animationName)).toBe(
+    "none",
+  );
+});
+
 test("atelier : onglets, familles, lecture de l’historique et niveaux du modèle", async ({
   page,
 }) => {

@@ -619,3 +619,15 @@
     padding: 0 8px;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  /* Class selectors set the animation/transition shorthands, which beat the universal rule in platform.css. */
+  .metric-option,
+  .value-changed {
+    animation: none;
+  }
+  .metric-gauge i,
+  .family-heading svg,
+  .timeline-track .head {
+    transition: none;
+  }
+}
