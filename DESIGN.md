@@ -101,7 +101,7 @@ Le tri natif du catalogue expose `aria-sort` sur la colonne active, avec boutons
 
 Mouvement : transitions de couleur de 150 ms pour confirmer un état; tracé des courbes 650 ms pour matérialiser une sélection, ouverture du dialogue 180 ms; aucun mouvement permanent. Le défilement doux est désactivé avec `prefers-reduced-motion`. Les pages publiques conservent leurs polices système; le dashboard charge sa police locale avec la route.
 
-Méthode de référence : [les huit méthodes de conception](docs/design-workflow.md). Aucune nouvelle référence externe consultée pendant cette passe; l’inspiration métier Tandem n’implique aucune affiliation Autodesk.
+Méthode de référence : [les huit méthodes de conception](docs/design-workflow.md). L’inspiration métier Tandem n’implique aucune affiliation Autodesk. Références Godly de la passe du 2026-10-19 : voir la section « Références consultées » ci-dessous.
 
 ## Frontend React
 
@@ -127,3 +127,11 @@ Palette explicitement fournie dans l’URL Figma Color Palette Generator : #AB6C
 Page de connexion : panneau verre marin et illustration schématique; formulaire lisible sur blanc. Business : offre avec prix Stripe réel et parcours de facturation en trois étapes, sans faux tarif ou témoignage. Compte : identité et une tâche de sécurité explicite. Assistant : bouton dans l’en-tête, dialogue natif avec consentement et provenance; aucun élément flottant ne masque les mesures. Chronologie : quatre dernières observations, synchronisées à la métrique, sans événements d’exploitation inventés.
 
 `services.css` possède ces compositions. Le tracé SVG n’est animé qu’au montage/changement de métrique ou taille de série; aucun redémarrage au survol. La préférence de réduction des mouvements supprime les animations. Les informations restent visibles indépendamment de l’animation.
+
+## Références consultées (2026-10-19)
+
+Pages Godly réellement récupérées : https://godly.design/ (accueil), https://godly.design/apps (liste, sans examen des fiches), https://godly.design/website/reevo, /website/superpower, /website/paradigmai et /website/cloaked. Les captures d’en-tête de Reevo, Superpower et Paradigm ont été regardées; celles de Cloaked n’ont pas été examinées (texte de la fiche seulement). Les sites eux-mêmes n’ont pas été visités et aucune animation n’a été observée en situation : seules des images fixes ont été vues. Aucune interface n’est copiée.
+
+Principes retenus : libellés techniques en capitales monospace et filets verticaux entre indicateurs (Superpower, Paradigm); étiquettes d’état en pastille avec point, y compris pour « sans mesure » (Paradigm); mise en évidence brève d’une valeur qui change (état « en cours de mise à jour » de Paradigm). Principes écartés : fond sombre, photographie plein cadre, titres capitales ultra-condensées (Reevo, Superpower) — contraires à l’identité et aux consignes ci-dessus.
+
+Mouvement ajouté, tous supprimés par `prefers-reduced-motion` : compteur 650 ms de la conformité à l’affichage, apparition échelonnée (380 ms, 40 ms par ligne) des métriques au montage, surbrillance de 900 ms d’une valeur modifiée par une actualisation. Aucun mouvement permanent.

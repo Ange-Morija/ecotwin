@@ -20,3 +20,5 @@ Cette procédure complète la [spécification](../specs/001-digital-twin-platfor
 ## Références jointes
 
 L’archive `codex-skills.zip` fournie par l’utilisateur est conservée dans [references/codex-skills](references/codex-skills/README.md), avec le périmètre d’application de chaque méthode et les empreintes des fichiers originaux. Utiliser les méthodes pertinentes dans le cadre des contrats EcoTwin; les modèles et commandes d’une référence ne constituent pas une demande de remplacer la stack ou d’exécuter un installateur.
+
+État au 2026-10-19 : une recherche Godly a été effectuée (méthode 5). Les URL réellement consultées et les principes retenus sont listés dans DESIGN.md, « Références consultées ». L’outil WebFetch ne résolvait pas godly.design dans l’environnement cloud; les pages ont été obtenues avec curl via le proxy.

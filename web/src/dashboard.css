@@ -498,9 +498,53 @@
   font-weight: 500;
 }
 .metric-state {
-  font-size: 11px;
-  color: var(--warning);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
   grid-column: 1 / -1;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.metric-state::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.tag-warning {
+  color: var(--warning);
+  background: #f8ecd9;
+}
+.tag-missing {
+  color: var(--workspace-muted);
+  background: var(--workspace-line);
+}
+.metric-option {
+  animation: metric-in 380ms both;
+}
+@keyframes metric-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.value-changed {
+  animation: value-flash 900ms;
+  border-radius: 6px;
+}
+@keyframes value-flash {
+  from {
+    background: var(--workspace-selected);
+  }
+}
+.summary-item > span:first-child {
+  font: 500 12px var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .metric-options:focus-visible {
   outline: 3px solid var(--accent);

@@ -5,6 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { DashboardData, Mode, Period, User, View } from "../lib/types";
 import { api, date, time, valueText } from "../lib/api";
 import { useDashboard } from "../lib/useDashboard";
+import { useChanged, useCountUp } from "../lib/motion";
 import {
   ActionLink,
   Brand,
@@ -50,6 +51,9 @@ function Summary({
   const measured = data.sensors.filter((sensor) => sensor.value !== null);
   const over = measured.filter((sensor) => sensor.status === "warning").length;
   const within = measured.length - over;
+  const rate = useCountUp(
+    measured.length ? Math.round((within / measured.length) * 100) : null,
+  );
   return (
     <section
       className="summary-grid site-summary"
@@ -58,7 +62,7 @@ function Summary({
       <div className="summary-item compliance-summary">
         <span>Conformité aux seuils</span>
         <strong>
-          {measured.length ? Math.round((within / measured.length) * 100) : "—"}
+          {rate ?? "—"}
           {measured.length > 0 && <small> %</small>}
         </strong>
         <div
@@ -120,6 +124,51 @@ function Summary({
     </section>
   );
 }
+function MetricOption({
+  sensor,
+  selected,
+  index,
+  onSelect,
+}: {
+  sensor: DashboardData["sensors"][number];
+  selected: boolean;
+  index: number;
+  onSelect: () => void;
+}) {
+  const changed = useChanged(sensor.value);
+  const ratio =
+    sensor.value !== null && sensor.threshold > 0
+      ? (sensor.value / sensor.threshold) * 100
+      : null;
+  return (
+    <Button
+      className={`metric-option ${sensor.status === "warning" ? "metric-warning" : ""}`}
+      style={{ animationDelay: `${index * 40}ms` }}
+      aria-pressed={selected}
+      onClick={onSelect}
+    >
+      <span className="metric-name">{sensor.name}</span>
+      <span className={`metric-reading ${changed ? "value-changed" : ""}`}>
+        {valueText(sensor.value)} <small>{sensor.unit}</small>
+      </span>
+      {ratio !== null && (
+        <span
+          className="metric-gauge"
+          role="img"
+          aria-label={`${Math.round(ratio)} % du seuil illustratif`}
+        >
+          <i style={{ width: `${Math.min(100, Math.max(0, ratio))}%` }} />
+        </span>
+      )}
+      {sensor.status === "warning" && (
+        <span className="metric-state tag-warning">À surveiller</span>
+      )}
+      {sensor.value === null && (
+        <span className="metric-state tag-missing">Sans mesure</span>
+      )}
+    </Button>
+  );
+}
 function MetricStrip({
   data,
   metric,
@@ -149,34 +198,14 @@ function MetricStrip({
         role="region"
         aria-label="Métriques disponibles"
       >
-        {data.sensors.map((sensor) => (
-          <Button
+        {data.sensors.map((sensor, index) => (
+          <MetricOption
             key={sensor.id}
-            className={`metric-option ${sensor.status === "warning" ? "metric-warning" : ""}`}
-            aria-pressed={sensor.id === metric}
-            onClick={() => change({ metric: sensor.id })}
-          >
-            <span className="metric-name">{sensor.name}</span>
-            <span className="metric-reading">
-              {valueText(sensor.value)} <small>{sensor.unit}</small>
-            </span>
-            {sensor.value !== null && sensor.threshold > 0 && (
-              <span
-                className="metric-gauge"
-                role="img"
-                aria-label={`${Math.round((sensor.value / sensor.threshold) * 100)} % du seuil illustratif`}
-              >
-                <i
-                  style={{
-                    width: `${Math.min(100, Math.max(0, (sensor.value / sensor.threshold) * 100))}%`,
-                  }}
-                />
-              </span>
-            )}
-            {sensor.status === "warning" && (
-              <span className="metric-state">À surveiller</span>
-            )}
-          </Button>
+            sensor={sensor}
+            index={index}
+            selected={sensor.id === metric}
+            onSelect={() => change({ metric: sensor.id })}
+          />
         ))}
       </div>
     </section>

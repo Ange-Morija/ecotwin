@@ -133,3 +133,5 @@ Changement : quatrième indicateur du résumé et jauges par métrique (`Dashboa
 Vérifications réellement exécutées : build React/TypeScript (`npm run build`) réussi; captures Chromium à 1440 et 390 px sur la distribution statique avec une API simulée (quatre capteurs dont un sans mesure et un au-dessus du seuil), inspectées.
 
 Non exécutés : le backend Python n’a pas pu être installé dans cet environnement (échec de compilation de pydantic-core), donc ni tests API ni scénarios Playwright, y compris le test modifié. Aucun contrôle axe sur la nouvelle zone. À rejouer : `npm run test:e2e`.
+
+Complément du 2026-10-19 (mouvement et références) : `npm run build`, `npm run check`, `npm run format:check` et `npm run test:unit` exécutés; captures ordinateur inspectées après ajout des pastilles d’état et du compteur. Les animations ne sont pas validées en mouvement réduit par un test automatisé, et la surbrillance d’une valeur modifiée n’a pas été observée en situation réelle (aucun rafraîchissement simulé). Mêmes limites que ci-dessus : ni API ni Playwright.
