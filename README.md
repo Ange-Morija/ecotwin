@@ -1,7 +1,7 @@
 # EcoTwin
 Une plateforme de jumeaux numériques pour relier le contexte BIM aux observations du bâtiment et aux décisions d'exploitation.
 
-Le frontend React et TypeScript propose une présentation produit, une connexion réelle, un espace compte, un chatbot OpenAI configurable, une page Business reliée à Stripe et un dashboard responsive avec modèle XKT, huit métriques environnementales, historique, export CSV et insights par règles. Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
+Le frontend React et TypeScript propose une présentation produit, une connexion réelle, un espace compte, un chatbot OpenAI configurable, une page Business reliée à Stripe et un dashboard responsive clair/sombre (atelier 3D avec niveaux du modèle XKT, huit métriques environnementales, historique avec lecture, export CSV et insights par règles). Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
 
 ## Aperçu
 ![Dashboard EcoTwin — démonstration BIM et données](docs/images/dashboard-desktop.png)
@@ -45,7 +45,7 @@ Le pilote est **mono-site partagé**; les actions sont personnelles, les donnée
 
 Télémétrie: `POST /api/telemetry/ingest`, `GET /api/telemetry/latest?sensor=CAP_TEMP`. Les alias `/ingest` et `/latest` restent disponibles avec les mêmes contrôles d'accès. Les écritures sont synchrones et les requêtes Flux paramétrées. Contrat interactif à `/docs`.
 
-Le script `scripts/replay_csv_every_3min_per_metric_no_time.py` utilise uniquement la bibliothèque standard Python. Définissez `CSV_PATH`, `API_KEY`, éventuellement `API_BASE_URL`, `SLEEP_SEC`, `START_INDEX` et `LOOP`. Les identifiants ne sont jamais codés en dur. Sans LOOP, il s'arrête à la dernière ligne.
+Le script `scripts/replay_csv_every_3min_per_metric_no_time.py` utilise uniquement la bibliothèque standard Python. Un échantillon de mesures réelles de 2023 est fourni dans `data-model/samples/data.csv` (non servi par le site). Définissez `CSV_PATH`, `API_KEY`, éventuellement `API_BASE_URL`, `SLEEP_SEC`, `START_INDEX` et `LOOP`. Les identifiants ne sont jamais codés en dur. Sans LOOP, il s'arrête à la dernière ligne.
 
 ## Docker
 Les deux images se construisent depuis la **racine**:

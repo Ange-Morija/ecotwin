@@ -30,12 +30,6 @@
   background: var(--workspace-bg);
 }
 /* Surfaces that carried literal light colors */
-.dashboard-layout .workspace-icon,
-.dashboard-layout .avatar {
-  background: var(--workspace-selected);
-}
-.dashboard-layout .side-link.active,
-.dashboard-layout .avatar,
 .dashboard-layout .metric-option[aria-pressed="true"] {
   color: var(--on-selected);
 }
@@ -53,25 +47,10 @@
   border-color: var(--workspace-line);
 }
 /* Floating panels over the 3D view */
-.dashboard-content[data-view="overview"] .stage .metrics-slot,
-.dashboard-content[data-view="overview"] .stage .insights-panel {
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  box-shadow: 0 12px 28px -18px rgb(0 0 0 / 45%);
-}
 .dashboard-layout[data-theme="dark"] .demo-banner {
   background: #2c3b38;
   border-color: #3f5651;
   color: var(--ink);
-}
-.dashboard-layout[data-theme="dark"]
-  :is(
-    .text-button,
-    .panel-note a,
-    .chart-table > summary,
-    .demo-banner > a,
-    .bim-notice a
-  ) {
-  color: var(--workspace-accent);
 }
 .dashboard-layout[data-theme="dark"] .pill {
   background: #342b26;
@@ -141,13 +120,6 @@
   color: var(--ink);
   border-color: #5a4d46;
 }
-.dashboard-layout[data-theme="dark"] .mobile-services {
-  background: var(--surface);
-  border-color: var(--workspace-line);
-}
-.dashboard-layout[data-theme="dark"] .mobile-services a {
-  color: var(--workspace-text);
-}
 .dashboard-layout[data-theme="dark"] .button.primary {
   color: #1d1815;
 }
@@ -169,4 +141,8 @@
 }
 .dashboard-layout[data-theme="dark"] .model-tag {
   background: var(--surface);
+}
+.dashboard-layout[data-theme="dark"]
+  :is(.text-button, .chart-table > summary, .demo-banner > a) {
+  color: var(--workspace-accent);
 }

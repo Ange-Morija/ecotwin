@@ -21,18 +21,6 @@
 #main:focus {
   outline: none;
 }
-.trend-slot {
-  min-width: 0;
-}
-.trend-slot > .trend-panel {
-  height: 100%;
-}
-.bim-workspace {
-  grid-template-columns: minmax(0, 1fr);
-}
-.bim-workspace .twin-viewport {
-  height: 560px;
-}
 .observation-picker {
   padding: 0 22px 16px;
   display: grid;
@@ -77,19 +65,7 @@
   outline: 3px solid var(--accent);
   outline-offset: -3px;
 }
-.profile strong {
-  overflow-wrap: anywhere;
-}
 @media (max-width: 800px) {
-  .dashboard-content[data-view="overview"] > div:first-child {
-    order: 0;
-  }
-  .primary-grid > .trend-slot {
-    order: -1;
-  }
-  .bim-workspace .twin-viewport {
-    height: 420px;
-  }
   .product-strip {
     flex-wrap: wrap;
   }
