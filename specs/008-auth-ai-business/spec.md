@@ -13,7 +13,7 @@ Compléter l’authentification et proposer un chatbot, un abonnement Stripe, la
 - A005 : prix récurrent Business lu depuis Stripe; aucun montant commercial inventé. Checkout hébergé et portail de facturation, client Stripe lié au compte côté serveur, abonnement existant protégé contre une seconde souscription.
 - A006 : protection CSRF sauf webhook signé sur corps brut, tolérance de signature du SDK; livraison répétée dédupliquée. État d’abonnement relu directement chez Stripe, jamais décidé par le retour du navigateur ou l’ordre des événements.
 - A007 : mode test par défaut. Paiements réels nécessitent mode live explicite, autorisation live, prix et clé du même mode, URL HTTPS canonique et configuration du webhook.
-- A008 : palette #AB6C63/#8AC1BD/#3D332E/#A35C8A; variantes de texte accessibles. Chronologie issue des observations réellement affichées, synchronisée à la métrique. Animation du tracé et du dialogue respectant prefers-reduced-motion.
+- A008 : palette #AB6C63/#8AC1BD/#3D332E/#A35C8A; variantes de texte accessibles. Chronologie issue des observations réellement affichées, synchronisée à la métrique (depuis le 2026-10-19, la liste de quatre observations est remplacée par la barre temporelle de l’atelier, voir 009). Animation du tracé et du dialogue respectant prefers-reduced-motion.
 - A009 : mobile, clavier, focus du dialogue restauré, texte externe rendu sans HTML, erreurs et états indisponibles testés.
 
 ## Décisions et limites

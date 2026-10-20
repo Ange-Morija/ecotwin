@@ -26,10 +26,11 @@ flowchart LR
 ## Frontend
 - `web/index.html` et `web/src/main.tsx` sont les entrées Vite; `App.tsx` charge les pages React à la demande avec React Router.
 - `web/src/components/ui.tsx` possède les primitives; `pages/Auth.tsx` possède la validation des formulaires.
-- `components/TrendPanel.tsx`, `SensorTable.tsx` et `InsightsPanel.tsx` possèdent leur interaction; le SVG est déclaratif et propose une sélection d’observation accessible au clavier.
-- `components/BimPanel.tsx` possède les états et commandes React; `lib/bim-engine.ts` possède les objets GPU, les événements et leur destruction. Le SDK reste chargé à la demande.
+- `components/TrendPanel.tsx`, `SensorTable.tsx`, `InsightsPanel.tsx`, `SensorsPanel.tsx` (capteurs par famille, onglets) et `TimelineBar.tsx` (lecture de l’historique, sélection partagée avec le graphique) possèdent leur interaction; le SVG est déclaratif et propose une sélection d’observation accessible au clavier.
+- `components/BimPanel.tsx` possède les états et commandes React, dont les niveaux du modèle (`levels`, `isolate`); `lib/bim-engine.ts` possède les objets GPU, les événements et leur destruction. Le SDK reste chargé à la demande.
+- `lib/theme.ts` gère le thème clair/sombre (système, choix mémorisé), `lib/motion.ts` les animations de données désactivées en mouvement réduit.
 - `lib/useDashboard.ts` gère les requêtes annulables, le polling et les pannes. `types.ts` décrit les contrats; `api.ts` conserve cookies et header CSRF.
-- `web/styles/platform.css` possède les tokens; `web/src/react.css` adapte la composition aux composants; `web/src/dashboard.css`, chargé avec la route, possède le poste de surveillance et les tokens du rail de navigation.
+- `web/styles/platform.css` possède les tokens; `web/src/react.css` adapte la composition aux composants; `web/src/dashboard.css`, `web/src/theme.css` (thèmes clair/sombre) et `web/src/workspace.css` (barre supérieure, atelier 3D, barre temporelle), chargés avec la route, possèdent le poste de surveillance et les tokens du rail de navigation.
 - `web/public/index.html` conserve les outils historiques de mesure et les éditeurs maintenance/actions.
 - `npm run build` vérifie TypeScript puis construit `web/dist` : routes en chunks JS minifiés, CSS, assets utiles, SDK local et sa version gzip. Le fichier IFC source n’est pas copié. `web/dist` et `web/vendor` sont générés et ignorés.
 - FastAPI et Nginx servent cette même distribution; Node est nécessaire au build et au développement, pas à l’exécution en production.

@@ -1,10 +1,13 @@
 import "@fontsource-variable/manrope";
 import "../dashboard.css";
+import "../theme.css";
+import "../workspace.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import type { DashboardData, Mode, Period, User, View } from "../lib/types";
-import { api, date, time, valueText } from "../lib/api";
+import type { Mode, Period, Selection, User, View } from "../lib/types";
+import { api, time } from "../lib/api";
 import { useDashboard } from "../lib/useDashboard";
+import { useTheme } from "../lib/theme";
 import {
   ActionLink,
   Brand,
@@ -20,125 +23,19 @@ import BimPanel from "../components/BimPanel";
 import TrendPanel from "../components/TrendPanel";
 import SensorTable from "../components/SensorTable";
 import Assistant from "../components/Assistant";
-import ObservationTimeline from "../components/ObservationTimeline";
 import InsightsPanel from "../components/InsightsPanel";
+import SensorsPanel from "../components/SensorsPanel";
+import TimelineBar from "../components/TimelineBar";
 const views: [View, string, IconName][] = [
   ["overview", "Vue d’ensemble", "grid"],
-  ["bim", "Jumeau BIM", "cube"],
   ["sensors", "Capteurs & données", "sensor"],
   ["insights", "Insights", "spark"],
 ];
 const subtitles: Record<View, string> = {
   overview: "Votre bâtiment, en un regard.",
-  bim: "Explorez le contexte de vos espaces.",
   sensors: "Les mesures, leur provenance et leur état.",
   insights: "Des signaux à comprendre, des actions à prioriser.",
 };
-function Summary({
-  data,
-  change,
-}: {
-  data: DashboardData;
-  change: (patch: Record<string, string>) => void;
-}) {
-  const acquisitions = data.sensors.flatMap((sensor) =>
-    sensor.time ? [new Date(sensor.time).getTime()] : [],
-  );
-  const latest = acquisitions.length
-    ? new Date(Math.max(...acquisitions))
-    : null;
-  return (
-    <section
-      className="summary-grid site-summary"
-      aria-label="Indicateurs du site"
-    >
-      <div className="summary-item">
-        <span>Mesures disponibles</span>
-        <strong>
-          {data.sensors.filter((sensor) => sensor.value !== null).length}
-          <small> / {data.sensors.length}</small>
-        </strong>
-        <span>métriques sur la période</span>
-      </div>
-      <div className="summary-item">
-        <span>Points de vigilance</span>
-        <strong className={data.insights.length ? "vigilance-value" : ""}>
-          {data.insights.length}
-          <small>
-            {" "}
-            seuil{data.insights.length > 1 ? "s" : ""} dépassé
-            {data.insights.length > 1 ? "s" : ""}
-          </small>
-        </strong>
-        <Button
-          className="text-button"
-          onClick={() => change({ view: "insights" })}
-        >
-          Consulter les insights <Icon name="arrow" size={14} />
-        </Button>
-      </div>
-      <div className="summary-item acquisition-summary">
-        <span>Dernière acquisition</span>
-        <strong>{latest ? time.format(latest) : "—"}</strong>
-        <span>
-          {latest
-            ? date.format(latest) + " · Europe/Paris"
-            : "Aucune mesure reçue"}
-        </span>
-      </div>
-    </section>
-  );
-}
-function MetricStrip({
-  data,
-  metric,
-  change,
-}: {
-  data: DashboardData;
-  metric: string;
-  change: (patch: Record<string, string>) => void;
-}) {
-  return (
-    <section
-      className="metric-strip"
-      aria-label="Sélection rapide des métriques"
-    >
-      <div className="metric-strip-heading">
-        <h2>Mesures suivies</h2>
-        <Button
-          className="text-button"
-          onClick={() => change({ view: "sensors" })}
-        >
-          Ouvrir le catalogue <Icon name="arrow" size={16} />
-        </Button>
-      </div>
-      <div
-        className="metric-options"
-        tabIndex={0}
-        role="region"
-        aria-label="Métriques disponibles"
-      >
-        {data.sensors.map((sensor) => (
-          <Button
-            key={sensor.id}
-            className={`metric-option ${sensor.status === "warning" ? "metric-warning" : ""}`}
-            aria-pressed={sensor.id === metric}
-            onClick={() => change({ metric: sensor.id })}
-          >
-            <span className="metric-name">{sensor.name}</span>
-            <span className="metric-reading">
-              {valueText(sensor.value)} <small>{sensor.unit}</small>
-            </span>
-            {sensor.status === "warning" && (
-              <span className="metric-state">À surveiller</span>
-            )}
-          </Button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function Dashboard({ mode }: { mode: Mode }) {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -154,6 +51,8 @@ function Dashboard({ mode }: { mode: Mode }) {
   const [logoutError, setLogoutError] = useState("");
   const [leaving, setLeaving] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const { theme, toggle: toggleTheme } = useTheme();
+  const [selection, setSelection] = useState<Selection>(null);
   const [searchRequested, setSearchRequested] = useState(false);
   const hasFilters = Boolean(
     query ||
@@ -281,290 +180,243 @@ function Dashboard({ mode }: { mode: Mode }) {
     nextParams.set("view", next);
     return `/dashboard?${nextParams}`;
   };
+  const current = views.find(([key]) => key === view)!;
+  const workspace = view === "overview";
   return (
-    <div className="dashboard-layout">
-      <aside className="sidebar">
+    <div
+      className="dashboard-layout app-shell"
+      data-theme={theme}
+      data-view={view}
+    >
+      <header className="topbar">
         <Brand />
-        <div className="workspace">
-          <span className="workspace-icon">
-            <Icon name="building" size={21} />
-          </span>
-          <div>
-            <strong>{data?.site.name || "Atelier EcoTwin"}</strong>
-            <span>
-              {mode === "demo"
-                ? "Site de démonstration"
-                : "Site pilote partagé"}
-            </span>
-          </div>
-        </div>
-        <span className="nav-label">ESPACE DE TRAVAIL</span>
-        <nav aria-label="Navigation du dashboard">
+        {workspace && <h1 className="topbar-title">{current[1]}</h1>}
+        <nav aria-label="Navigation du dashboard" className="topnav">
           {views.map(([key, label, symbol]) => (
             <Link
               key={key}
               to={linkFor(key)}
-              className={`side-link ${key === view ? "active" : ""}`}
+              className={`top-link ${key === view ? "active" : ""}`}
               aria-current={view === key ? "page" : undefined}
             >
-              <Icon name={symbol} />
+              <Icon name={symbol} size={16} />
               {label}
             </Link>
           ))}
         </nav>
-        <div className="sidebar-bottom">
-          <Link to="/account" className="side-link">
-            Mon compte
+        <div className="site-chip">
+          <Icon name="building" size={16} />
+          <span>{data?.site.name || "Atelier EcoTwin"}</span>
+          <Pill tone={mode === "demo" ? "demo" : ""}>
+            {mode === "demo" ? "Démonstration" : "Source réelle"}
+          </Pill>
+        </div>
+        <div className="topbar-right">
+          <Assistant mode={mode} />
+          <Button
+            className="workspace-search"
+            symbol="search"
+            onClick={search}
+            aria-label="Rechercher une métrique"
+          >
+            <span>Rechercher</span>
+            <kbd>/</kbd>
+          </Button>
+          <IconButton
+            label={
+              theme === "dark"
+                ? "Passer au thème clair"
+                : "Passer au thème sombre"
+            }
+            symbol={theme === "dark" ? "sun" : "moon"}
+            onClick={toggleTheme}
+          />
+          <IconButton
+            label="Actualiser les données"
+            symbol="refresh"
+            disabled={loading}
+            onClick={() => void refresh()}
+          />
+          {mode === "live" && user && (
+            <span className="user-name">{user.name}</span>
+          )}
+          <Link to="/account" className="top-link plain">
+            Compte
           </Link>
-          <Link to="/business" className="side-link">
-            Business et facturation
-          </Link>
-          <div className="ai-status">
-            <Icon name="spark" size={18} />
-            <div>
-              <strong>Analyse par seuils</strong>
-              <span>Règles explicables</span>
-            </div>
-          </div>
-          <Link to="/" className="side-link">
-            <Icon name="help" />À propos d’EcoTwin
+          <Link to="/business" className="top-link plain">
+            Business
           </Link>
           {mode === "demo" ? (
             <ActionLink
               to="/login"
-              className="button secondary full"
+              className="button secondary small"
               symbol={null}
             >
               Se connecter
             </ActionLink>
           ) : (
             <Button
-              className="button ghost full"
-              symbol="logout"
+              className="button ghost small"
               onClick={logout}
               disabled={leaving}
             >
               {leaving ? "Déconnexion…" : "Se déconnecter"}
             </Button>
           )}
-          <div className="profile">
-            <span className="avatar">
-              {mode === "demo" ? "D" : user?.name.slice(0, 1).toUpperCase()}
-            </span>
-            <div>
-              <strong>
-                {mode === "demo" ? "Espace découverte" : user?.name}
-              </strong>
-              <span>
-                {mode === "demo" ? "Accès en lecture seule" : "Compte pilote"}
-              </span>
-            </div>
-          </div>
         </div>
-      </aside>
-      <div className="dashboard-shell">
-        <header className="app-header">
-          <div className="breadcrumb">
-            <Icon name="building" size={17} />
-            <span>Mon site</span>
-            <Icon name="chevron" size={13} />
-            <strong>{data?.site.name || "Atelier EcoTwin"}</strong>
-          </div>
-          <div className="header-right">
-            <Assistant mode={mode} />
-            <Button
-              className="workspace-search"
-              symbol="search"
-              onClick={search}
-              aria-label="Rechercher une métrique"
-            >
-              <span>Rechercher</span>
-              <kbd>/</kbd>
-            </Button>
-            <Pill tone={mode === "demo" ? "demo" : ""}>
-              {mode === "demo" ? "Démonstration" : "Source réelle"}
-            </Pill>
-            <IconButton
-              label="Actualiser les données"
-              symbol="refresh"
-              disabled={loading}
-              onClick={() => void refresh()}
-            />
-            {mode === "demo" ? (
-              <ActionLink
-                to="/login"
-                className="button ghost mobile-account"
-                symbol={null}
-              >
-                Connexion
-              </ActionLink>
-            ) : (
-              <Button
-                className="button ghost mobile-account"
-                onClick={logout}
-                disabled={leaving}
-              >
-                Se déconnecter
-              </Button>
-            )}
-          </div>
-        </header>
-        <nav className="mobile-services" aria-label="Compte et facturation">
-          <Link to="/account">Mon compte</Link>
-          <Link to="/business">Business et facturation</Link>
-        </nav>
-        <main id="main" className="dashboard-main">
-          <div className="page-heading">
-            <div>
-              <h1>{views.find(([key]) => key === view)?.[1]}</h1>
-              <p>{subtitles[view]}</p>
-            </div>
-            <div className="update-block">
-              <span>
-                {data
-                  ? `Consulté à ${time.format(new Date(data.generated_at))}`
-                  : ""}
-              </span>
-              <p className="connection-status" role="status">
-                {loading
-                  ? "Actualisation des observations…"
-                  : error
-                    ? data
-                      ? "Dernières données conservées · état périmé"
-                      : "Source indisponible"
-                    : !autoRefresh
-                      ? "Actualisation automatique en pause"
-                      : mode === "demo"
-                        ? "Données illustratives · pas horaire"
-                        : "Actualisation toutes les 30 s"}
-              </p>
-            </div>
-          </div>
-          {data && (
-            <div
-              className="workspace-toolbar"
-              aria-label="Contrôles du tableau de bord"
-            >
-              <span className="workspace-source">
-                Source : {mode === "demo" ? "démonstration" : "InfluxDB"}
-              </span>
-              {view !== "overview" && (
-                <div className="workspace-period">
-                  <label htmlFor="workspace-period">Période</label>
-                  <select
-                    id="workspace-period"
-                    value={period}
-                    onChange={(event) => change({ period: event.target.value })}
-                  >
-                    <option value="24h">Dernières 24 heures</option>
-                    <option value="7d">7 derniers jours</option>
-                  </select>
-                </div>
-              )}
-              <label className="auto-refresh">
-                <input
-                  type="checkbox"
-                  checked={autoRefresh}
-                  onChange={(event) => setAutoRefresh(event.target.checked)}
-                />
-                Actualisation automatique
-              </label>
-              {hasFilters && (
-                <Button
-                  className="text-button"
-                  symbol="refresh"
-                  onClick={() =>
-                    change({
-                      q: "",
-                      state: "",
-                      sort: "",
-                      dir: "",
-                      period: "24h",
-                      metric: "CAP_TEMP",
-                    })
-                  }
-                >
-                  Réinitialiser les filtres
-                </Button>
-              )}
-            </div>
-          )}
-          <div className="data-feedback" aria-live="polite">
-            {error && (
-              <ErrorBanner
-                title={
-                  data
-                    ? "Les observations ne sont plus à jour."
-                    : "La source ne répond pas."
-                }
-                message={error}
-                retry={() => void refresh()}
-              />
-            )}
-            {logoutError && (
-              <ErrorBanner
-                title="Votre session reste ouverte."
-                message={logoutError}
-              />
-            )}
-          </div>
-          {mode === "demo" && (
-            <div className="demo-banner">
-              <Icon name="cube" size={18} />
+      </header>
+      {mode === "demo" && (
+        <div className="demo-banner">
+          <Icon name="cube" size={18} />
+          <p>
+            <strong>Vous explorez un site de démonstration.</strong> Les mesures
+            sont illustratives ; le modèle BIM est consultable.
+          </p>
+          <Link to="/login">
+            Mon espace <Icon name="arrow" size={16} />
+          </Link>
+        </div>
+      )}
+      <div className="data-feedback" aria-live="polite">
+        {error && (
+          <ErrorBanner
+            title={
+              data
+                ? "Les observations ne sont plus à jour."
+                : "La source ne répond pas."
+            }
+            message={error}
+            retry={() => void refresh()}
+          />
+        )}
+        {logoutError && (
+          <ErrorBanner
+            title="Votre session reste ouverte."
+            message={logoutError}
+          />
+        )}
+      </div>
+      <main
+        id="main"
+        className={`app-main ${workspace ? "is-workspace" : "is-page"}`}
+        aria-busy={loading && !data}
+      >
+        {!data ? (
+          loading ? (
+            <Loading />
+          ) : (
+            <div className="empty no-source">
+              <Icon name="sensor" size={32} />
+              <h2>En attente de vos données</h2>
               <p>
-                <strong>Vous explorez un site de démonstration.</strong> Les
-                mesures sont illustratives ; le modèle BIM est consultable.
+                La connexion à InfluxDB doit être configurée pour consulter les
+                observations du site.
               </p>
-              <Link to="/login">
-                Mon espace <Icon name="arrow" size={16} />
-              </Link>
+              <ActionLink
+                to="/dashboard?mode=demo"
+                className="button secondary"
+              >
+                Explorer le dashboard de démonstration
+              </ActionLink>
             </div>
-          )}
-          <div
-            className="dashboard-content"
-            data-view={view}
-            aria-busy={loading && !data}
-          >
-            {!data ? (
-              loading ? (
-                <Loading />
-              ) : (
-                <div className="empty no-source">
-                  <Icon name="sensor" size={32} />
-                  <h2>En attente de vos données</h2>
-                  <p>
-                    La connexion à InfluxDB doit être configurée pour consulter
-                    les observations du site.
-                  </p>
-                  <ActionLink
-                    to="/dashboard?mode=demo"
-                    className="button secondary"
-                  >
-                    Explorer le dashboard de démonstration
-                  </ActionLink>
-                </div>
-              )
-            ) : (
-              <>
-                <div className="overview-intro" hidden={view !== "overview"}>
-                  <Summary data={data} change={change} />
-                </div>
-                <div
-                  className={`primary-grid ${view === "bim" ? "bim-workspace" : ""}`}
-                  hidden={view !== "overview" && view !== "bim"}
-                >
-                  <BimPanel />
-                  <div className="trend-slot" hidden={view !== "overview"}>
-                    <TrendPanel
-                      data={data}
-                      metric={metric}
-                      period={period}
-                      change={change}
-                    />
+          )
+        ) : (
+          <>
+            <div className="workspace-stage" hidden={!workspace}>
+              <BimPanel />
+              <aside className="float-right" aria-label="Mesures et historique">
+                <SensorsPanel data={data} metric={metric} change={change} />
+                <TrendPanel
+                  data={data}
+                  metric={metric}
+                  period={period}
+                  change={change}
+                  selection={selection}
+                  onSelection={setSelection}
+                />
+              </aside>
+              <TimelineBar
+                data={data}
+                metric={metric}
+                mode={mode}
+                selection={selection}
+                onSelection={setSelection}
+                autoRefresh={autoRefresh}
+                onAutoRefresh={setAutoRefresh}
+                loading={loading}
+                failed={Boolean(error)}
+              />
+            </div>
+            {!workspace && (
+              <div className="page-body">
+                <div className="page-heading">
+                  <div>
+                    <h1 className="page-title">{current[1]}</h1>
+                    <p>{subtitles[view]}</p>
+                  </div>
+                  <div className="update-block">
+                    <span>
+                      Consulté à {time.format(new Date(data.generated_at))}
+                    </span>
+                    <p className="connection-status" role="status">
+                      {loading
+                        ? "Actualisation des observations…"
+                        : error
+                          ? "Dernières données conservées · état périmé"
+                          : !autoRefresh
+                            ? "Actualisation automatique en pause"
+                            : mode === "demo"
+                              ? "Données illustratives · pas horaire"
+                              : "Actualisation toutes les 30 s"}
+                    </p>
                   </div>
                 </div>
-                <div className="metrics-slot" hidden={view !== "overview"}>
-                  <MetricStrip data={data} metric={metric} change={change} />
+                <div
+                  className="workspace-toolbar"
+                  aria-label="Contrôles du tableau de bord"
+                >
+                  <span className="workspace-source">
+                    Source : {mode === "demo" ? "démonstration" : "InfluxDB"}
+                  </span>
+                  <div className="workspace-period">
+                    <label htmlFor="workspace-period">Période</label>
+                    <select
+                      id="workspace-period"
+                      value={period}
+                      onChange={(event) =>
+                        change({ period: event.target.value })
+                      }
+                    >
+                      <option value="24h">Dernières 24 heures</option>
+                      <option value="7d">7 derniers jours</option>
+                    </select>
+                  </div>
+                  <label className="auto-refresh">
+                    <input
+                      type="checkbox"
+                      checked={autoRefresh}
+                      onChange={(event) => setAutoRefresh(event.target.checked)}
+                    />
+                    Actualisation automatique
+                  </label>
+                  {hasFilters && (
+                    <Button
+                      className="text-button"
+                      symbol="refresh"
+                      onClick={() =>
+                        change({
+                          q: "",
+                          state: "",
+                          sort: "",
+                          dir: "",
+                          period: "24h",
+                          metric: "CAP_TEMP",
+                        })
+                      }
+                    >
+                      Réinitialiser les filtres
+                    </Button>
+                  )}
                 </div>
                 <SensorTable
                   data={data}
@@ -572,44 +424,39 @@ function Dashboard({ mode }: { mode: Mode }) {
                   change={change}
                   hidden={view !== "sensors"}
                 />
-                <InsightsPanel
-                  data={data}
-                  expanded={view === "insights"}
-                  hidden={view !== "overview" && view !== "insights"}
-                  change={change}
-                />
-                {view === "overview" && (
-                  <ObservationTimeline data={data} metric={metric} />
-                )}
                 {view === "insights" && (
-                  <section className="panel integration-panel">
-                    <Icon name="spark" size={26} />
-                    <div>
-                      <h2>Compléter vos analyses avec l’assistant</h2>
-                      <p>
-                        Ouvrez « Assistant IA » pour poser une question. L’envoi
-                        d’observations demande votre accord. Les alertes
-                        ci-dessus restent calculées par des règles,
-                        indépendamment du chatbot.
-                      </p>
-                    </div>
-                  </section>
+                  <>
+                    <InsightsPanel
+                      data={data}
+                      expanded
+                      hidden={false}
+                      change={change}
+                    />
+                    <section className="panel integration-panel">
+                      <Icon name="spark" size={26} />
+                      <div>
+                        <h2>Compléter vos analyses avec l’assistant</h2>
+                        <p>
+                          Ouvrez « Assistant IA » pour poser une question.
+                          L’envoi d’observations demande votre accord. Les
+                          alertes ci-dessus restent calculées par des règles,
+                          indépendamment du chatbot.
+                        </p>
+                      </div>
+                    </section>
+                  </>
                 )}
-                {view === "bim" && (
-                  <p className="bim-notice">
-                    Le modèle est réel; la correspondance entre objets et
-                    mesures reste à configurer.
-                  </p>
-                )}
-              </>
+              </div>
             )}
-          </div>
-        </main>
+          </>
+        )}
+      </main>
+      {!workspace && (
         <footer className="app-footer">
           <span>EcoTwin · BIM + données</span>
           <span>Affichage des dates : Europe/Paris</span>
         </footer>
-      </div>
+      )}
     </div>
   );
 }

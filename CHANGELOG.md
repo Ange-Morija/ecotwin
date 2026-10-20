@@ -1,5 +1,21 @@
 # Journal des changements
 
+## 2026-10-19 — Dashboard : conformité aux seuils
+- Quatrième indicateur « Conformité aux seuils » : part des mesures disponibles sous leur seuil illustratif, avec une barre segmentée (une cellule par métrique) et un résumé textuel.
+- Références Godly consultées et principes retenus (DESIGN.md) : libellés monospace, pastilles d’état, compteur de conformité, apparition échelonnée et surbrillance des valeurs modifiées, sans mouvement permanent.
+- Thèmes clair et sombre du dashboard (suivi du système, bouton, mémorisation).
+- Vue d’ensemble refondue en atelier 3D plein écran : barre supérieure à la place du rail latéral, panneaux flottants (niveaux lus dans le modèle, cartes thermiques inactives, capteurs groupés par famille, points à examiner, historique), barre temporelle de lecture. Suppression de la chronologie de quatre observations et du CSS du rail.
+- Jauge fine par métrique : valeur rapportée au seuil illustratif, avec alternative textuelle; aucune donnée absente n’est tracée.
+
+## 2026-10-19 — Correctif d’accueil
+- Débordement horizontal de la page d’accueil à 320 px avec des polices larges (échec de CI hérité de `main`) corrigé; le test impose désormais une police large.
+
+## 2026-10-19 — Rejeu des suites
+- Suites API (25 réussis) et Playwright (26/26) exécutées; 8 échecs dus à la refonte corrigés (h1 unique, nom d’utilisateur, onglets, contraste pendant l’animation, navigation à 320 px); captures de la documentation régénérées.
+
+## 2026-10-19 — Nettoyage
+- Suppression du CSS et de composants devenus inutiles; `data.csv` déplacé de `web/assets/` vers `data-model/samples/` (il n’est plus servi publiquement).
+
 ## 2026-10-16 — Comptes, assistant et Business
 - Espace compte, changement du mot de passe et révocation de toutes les sessions.
 - Chatbot OpenAI configurable avec consentement, contexte borné et quotas persistés; pas d’activation sans clé/modèle.

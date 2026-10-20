@@ -110,5 +110,32 @@ export function mountBim({
     zoom: (direction: number) => viewer?.camera.zoom(direction * 3),
     xray: (enabled: boolean) =>
       viewer?.scene.setObjectsXRayed(viewer.scene.objectIds, enabled),
+    /** Storeys declared by the loaded model (IFC names, not translated). */
+    levels: (): { id: string; name: string }[] =>
+      viewer
+        ? Object.values<{ id: string; name?: string; type: string }>(
+            viewer.metaScene.metaObjects,
+          )
+            .filter((object) => object.type === "IfcBuildingStorey")
+            .map((object) => ({
+              id: object.id,
+              name: object.name || object.id,
+            }))
+        : [],
+    /** Shows one storey and x-rays the rest; null restores the whole model. */
+    isolate: (levelId: string | null) => {
+      if (!viewer) return;
+      const scene = viewer.scene;
+      scene.setObjectsXRayed(scene.objectIds, levelId !== null);
+      const meta = levelId ? viewer.metaScene.metaObjects[levelId] : null;
+      const ids: string[] = meta
+        ? meta.getObjectIDsInSubtree().filter((id: string) => scene.objects[id])
+        : [];
+      if (levelId && ids.length) scene.setObjectsXRayed(ids, false);
+      const target = ids.length ? { aabb: scene.getAABB(ids) } : scene;
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches)
+        viewer.cameraFlight.jumpTo(target);
+      else viewer.cameraFlight.flyTo(target);
+    },
   };
 }

@@ -423,6 +423,11 @@ test("petits écrans, textes longs et réduction des animations", async ({
     ]) {
       await page.goto(route);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      // Wide fallback font: the runner's default font must not hide overflow.
+      await page.addStyleTag({
+        content:
+          '*:not(svg):not(svg *){font-family:"DejaVu Sans","Liberation Sans",sans-serif !important}',
+      });
       if (route.includes("dashboard")) {
         await expect(page.getByText("8 métriques sur 8")).toBeVisible();
         await expect(
@@ -458,13 +463,13 @@ test("React : navigation sans rechargement, scène conservée et filtres restaur
     window.reactCanvas = document.querySelector("#twin-canvas");
   });
   await page.getByRole("link", { name: "Capteurs & données" }).click();
-  await expect(page.locator(".primary-grid")).toBeHidden();
+  await expect(page.locator(".workspace-stage")).toBeHidden();
   await page.getByLabel("État des métriques").selectOption("warning");
   await expect(page.getByText("1 métrique sur 8")).toBeVisible();
   await expect(page).toHaveURL(/state=warning/);
   await page.getByRole("button", { name: /Trier par Métrique/ }).click();
   await expect(page).toHaveURL(/dir=desc/);
-  await page.getByRole("link", { name: "Jumeau BIM", exact: true }).click();
+  await page.getByRole("link", { name: "Vue d’ensemble", exact: true }).click();
   await expect(page.locator(".sensors-panel")).toBeHidden();
   expect(
     await page
@@ -524,6 +529,7 @@ test("React : graphique au clavier, images chargées et état vide honnête", as
     page.getByRole("heading", { name: "Aucune observation sur cette période" }),
   ).toBeVisible();
   await expect(page.locator(".chart-value strong")).toHaveText("—");
+  await page.getByRole("tab", { name: /Points à examiner/ }).click();
   await expect(
     page.getByRole("heading", { name: "Aucun dépassement observé" }),
   ).toBeVisible();
@@ -565,7 +571,7 @@ test("dashboard : sélection rapide des mesures et résumé fondé sur les acqui
   await expect(
     page.getByRole("region", { name: "Indicateurs du site" }),
   ).toContainText("Dernière acquisition");
-  await expect(page.locator(".summary-item")).toHaveCount(3);
+  await expect(page.locator(".summary-item")).toHaveCount(4);
   const initial = calls;
   const pm25 = page
     .locator(".metric-options")
@@ -644,4 +650,134 @@ test("actualisation : pause réelle, commande manuelle et reprise", async ({
   await automatic.check();
   await page.clock.fastForward(31_000);
   await expect.poll(() => calls).toBeGreaterThan(paused + 1);
+});
+
+test("thème clair/sombre : suit le système, bascule et se souvient du choix", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/dashboard?mode=demo");
+  const layout = page.locator(".dashboard-layout");
+  await expect(layout).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Passer au thème clair" }).click();
+  await expect(layout).toHaveAttribute("data-theme", "light");
+  await page.reload();
+  await expect(layout).toHaveAttribute("data-theme", "light");
+  await expect(
+    page.getByRole("button", { name: "Passer au thème sombre" }),
+  ).toBeVisible();
+});
+
+for (const width of [320, 768, 1440]) {
+  test(`thème sombre ${width}px : sans débordement ni violation axe`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of [
+      "/dashboard?mode=demo",
+      "/dashboard?mode=demo&view=sensors",
+      "/dashboard?mode=demo&view=insights",
+    ]) {
+      await page.goto(path);
+      await expect(page.locator(".dashboard-layout")).toHaveAttribute(
+        "data-theme",
+        "dark",
+      );
+      await expect(page.getByRole("heading", { level: 1 })).toBeAttached();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        ),
+      ).toBe(true);
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(
+        results.violations.map((v) => ({
+          id: v.id,
+          nodes: v.nodes.map((n) => n.target),
+        })),
+        path,
+      ).toEqual([]);
+    }
+  });
+}
+
+test("conformité : un dépassement sur donnée ancienne reste compté au-dessus du seuil", async ({
+  page,
+}) => {
+  await page.route("**/api/dashboard?*", async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    data.sensors = data.sensors.map((sensor) =>
+      sensor.id === "CAP_TEMP"
+        ? { ...sensor, value: sensor.threshold + 5, status: "stale" }
+        : { ...sensor, value: sensor.threshold - 1, status: "normal" },
+    );
+    await route.fulfill({ response, json: data });
+  });
+  await page.goto("/dashboard?mode=demo");
+  await expect(page.locator(".compliance-bar i.over")).toHaveCount(1);
+  const temperature = page
+    .locator(".metric-option")
+    .filter({ hasText: /^Température/ });
+  await expect(temperature).toContainText("À surveiller");
+  await expect(temperature).toContainText("Donnée ancienne");
+});
+
+test("mouvement réduit : lignes de capteurs et surbrillance sans animation", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/dashboard?mode=demo");
+  const row = page.locator(".metric-option").first();
+  await expect(row).toBeVisible();
+  expect(await row.evaluate((el) => getComputedStyle(el).animationName)).toBe(
+    "none",
+  );
+});
+
+test("atelier : onglets, familles, lecture de l’historique et niveaux du modèle", async ({
+  page,
+}) => {
+  await page.goto("/dashboard?mode=demo");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Vue d’ensemble" }),
+  ).toBeVisible();
+  const group = page.getByRole("button", { name: /Environnement/ });
+  await expect(group).toHaveAttribute("aria-expanded", "true");
+  await group.click();
+  await expect(page.locator(".metric-option")).toHaveCount(0);
+  await group.click();
+  await expect(page.locator(".metric-option")).toHaveCount(8);
+  await page.getByRole("tab", { name: /Points à examiner/ }).click();
+  await expect(page.locator("#tabpanel-insights")).toBeVisible();
+  await page.getByRole("tab", { name: "Capteurs" }).click();
+  const slider = page.getByRole("slider", { name: "Observation sélectionnée" });
+  await slider.focus();
+  await page.keyboard.press("Home");
+  await page.getByRole("button", { name: "Observation suivante" }).click();
+  await expect(slider).toHaveValue("1");
+  await page.getByRole("button", { name: "Lire l’historique" }).click();
+  await expect
+    .poll(async () => Number(await slider.inputValue()))
+    .toBeGreaterThan(2);
+  await page
+    .getByRole("button", { name: /Mettre la lecture en pause/ })
+    .click();
+  await expect(page.locator(".levels-panel")).toContainText(
+    "Disponible après le chargement du modèle 3D.",
+  );
+  await expect(page.getByLabel("Canal")).toBeDisabled();
+  await page.getByRole("button", { name: "Charger le modèle 3D" }).click();
+  await expect(page.locator(".twin-viewport")).toHaveAttribute(
+    "data-ready",
+    "true",
+    { timeout: 45000 },
+  );
+  const levels = page.locator(".levels-panel").getByRole("button");
+  await expect(levels).toHaveCount(3);
+  await levels.nth(1).click();
+  await expect(levels.nth(1)).toHaveAttribute("aria-pressed", "true");
 });

@@ -1,14 +1,27 @@
 # EcoTwin
 Une plateforme de jumeaux numériques pour relier le contexte BIM aux observations du bâtiment et aux décisions d'exploitation.
 
-Le frontend React et TypeScript propose une présentation produit, une connexion réelle, un espace compte, un chatbot OpenAI configurable, une page Business reliée à Stripe et un dashboard responsive avec modèle XKT, huit métriques environnementales, historique, export CSV et insights par règles. Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
+Le frontend React et TypeScript propose une présentation produit, une connexion réelle, un espace compte, un chatbot OpenAI configurable, une page Business reliée à Stripe et un dashboard responsive clair/sombre (atelier 3D avec niveaux du modèle XKT, huit métriques environnementales, historique avec lecture, export CSV et insights par règles). Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
 
 ## Aperçu
-![Dashboard EcoTwin — démonstration BIM et données](docs/images/dashboard-desktop.png)
+Le dashboard est un atelier 3D plein écran, en thème clair ou sombre.
+
+![Atelier 3D EcoTwin, thème clair — démonstration BIM et données](docs/images/dashboard-desktop.png)
+![Atelier 3D EcoTwin, thème sombre](docs/images/dashboard-desktop-dark.png)
 
 [Présentation, connexion et captures mobiles](docs/product.md) · [Documentation complète](docs/README.md) · [Architecture](docs/architecture.md) · [Déploiement](docs/deployment.md)
 
-Le pilote et ses lots de maintenance livrent 36 tâches. La [migration React](specs/007-react-frontend/spec.md) modernise les interfaces; 7 lots métier restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le chatbot OpenAI est configurable mais non activé sans clé et modèle. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
+Le pilote et ses lots de maintenance livrent 36 tâches. La [migration React](specs/007-react-frontend/spec.md) modernise les interfaces et l’[atelier 3D avec thèmes clair/sombre](specs/009-workspace-themes/spec.md) recompose le dashboard; 7 lots métier restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le chatbot OpenAI est configurable mais non activé sans clé et modèle. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
+
+## Interface du dashboard
+- **Barre supérieure**: navigation Vue d’ensemble / Capteurs & données / Insights, recherche (`/`), assistant, bouton de thème clair/sombre, actualisation, compte.
+- **Atelier 3D** (≥ 1151 px, sans défilement de page): jumeau numérique plein cadre, panneau **Niveaux** (lus dans le modèle XKT chargé, avec isolation), **Cartes thermiques** inactives tant que l’association objet-capteur n’existe pas, outils de navigation 3D en bas.
+- **Capteurs** groupés par famille (aujourd’hui « Environnement » seulement), indicateurs de conformité aux seuils, jauges et états textuels; onglet **Points à examiner** pour les insights par règles.
+- **Historique** avec table de valeurs et export CSV; **barre temporelle** (précédent, lecture, pause, suivant) synchronisée avec la sélection du graphique.
+- **Thèmes**: suit `prefers-color-scheme`, bascule par bouton, choix mémorisé dans le navigateur; animations réduites si le système le demande. Sous 1151 px, les panneaux s’empilent.
+- Ce qui n’est pas livré: familles de capteurs multiples dans l’API, cartes thermiques et association objet-capteur, IA prédictive. Compte et Business ne sont pas thématisés.
+
+Spécification: [specs/009-workspace-themes](specs/009-workspace-themes/spec.md); comportements: [UX-CONTRACT.md](UX-CONTRACT.md).
 
 ## Démarrage
 Python 3.11+ (3.12 testé), Node.js 22.12+ et uv.
@@ -45,7 +58,7 @@ Le pilote est **mono-site partagé**; les actions sont personnelles, les donnée
 
 Télémétrie: `POST /api/telemetry/ingest`, `GET /api/telemetry/latest?sensor=CAP_TEMP`. Les alias `/ingest` et `/latest` restent disponibles avec les mêmes contrôles d'accès. Les écritures sont synchrones et les requêtes Flux paramétrées. Contrat interactif à `/docs`.
 
-Le script `scripts/replay_csv_every_3min_per_metric_no_time.py` utilise uniquement la bibliothèque standard Python. Définissez `CSV_PATH`, `API_KEY`, éventuellement `API_BASE_URL`, `SLEEP_SEC`, `START_INDEX` et `LOOP`. Les identifiants ne sont jamais codés en dur. Sans LOOP, il s'arrête à la dernière ligne.
+Le script `scripts/replay_csv_every_3min_per_metric_no_time.py` utilise uniquement la bibliothèque standard Python. Un échantillon de mesures réelles de 2023 est fourni dans `data-model/samples/data.csv` (non servi par le site). Définissez `CSV_PATH`, `API_KEY`, éventuellement `API_BASE_URL`, `SLEEP_SEC`, `START_INDEX` et `LOOP`. Les identifiants ne sont jamais codés en dur. Sans LOOP, il s'arrête à la dernière ligne.
 
 ## Docker
 Les deux images se construisent depuis la **racine**:
@@ -119,4 +132,4 @@ Aucun tarif ni modèle n’est choisi à votre place. Sans configuration, l’as
 
 Configuration : `ECOTWIN_OPENAI_API_KEY`, `OPENAI_MODEL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`, `APP_URL`; mode test par défaut. Voir [assistant IA](docs/ai-integration.md), [paiements et activation](docs/billing.md), [spécification](specs/008-auth-ai-business/spec.md) et [tâches](specs/008-auth-ai-business/tasks.md). Exemples sans secrets dans infra/.env.example.
 
-Palette terracotta/turquoise/prune fournie par l’utilisateur, couleurs de texte adaptées au contraste, courbes animées, dialogue avec réduction des mouvements et chronologie synchronisée aux observations. Aucun modèle Figma n’a été importé.
+Palette terracotta/turquoise/prune fournie par l’utilisateur, couleurs de texte adaptées au contraste, courbes animées, dialogue avec réduction des mouvements et barre temporelle synchronisée au graphique. Le dashboard propose un thème clair et un thème sombre (choix mémorisé dans le navigateur). Aucun modèle Figma n’a été importé.

@@ -19,21 +19,6 @@
 .marketing-nav {
   border-bottom: 3px solid var(--terracotta);
 }
-.dashboard-layout .workspace {
-  border-left: 4px solid var(--terracotta);
-}
-.dashboard-layout .metric-mini.selected {
-  background: #f3e6ed;
-}
-.dashboard-layout .summary-item:first-child {
-  border-top: 3px solid var(--sea-glass);
-}
-.dashboard-layout .summary-item:nth-child(2) {
-  border-top: 3px solid var(--terracotta);
-}
-.dashboard-layout .summary-item:nth-child(3) {
-  border-top: 3px solid var(--orchid);
-}
 .service-page {
   width: min(1120px, 100%);
   margin: auto;
@@ -259,52 +244,6 @@
   cursor: pointer;
   padding: 12px 0;
 }
-.observation-timeline {
-  grid-column: 1 / -1;
-  padding: 24px;
-  min-width: 0;
-}
-.observation-timeline header h2 {
-  margin: 0;
-  font-size: 17px;
-}
-.observation-timeline ol {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  list-style: none;
-  margin: 28px 0 0;
-  padding: 0;
-}
-.observation-timeline li {
-  position: relative;
-  padding: 20px 16px 8px 0;
-  border-top: 2px solid var(--sea-glass);
-  display: grid;
-  gap: 8px;
-}
-.observation-timeline li::before {
-  content: "";
-  position: absolute;
-  top: -6px;
-  left: 0;
-  width: 10px;
-  height: 10px;
-  background: var(--accent);
-  border-radius: 50%;
-}
-.observation-timeline time,
-.observation-timeline li > span {
-  font-size: 12px;
-  color: var(--muted);
-}
-.observation-timeline strong {
-  font-size: 22px;
-  font-variant-numeric: tabular-nums;
-}
-.observation-timeline strong span {
-  font-size: 13px;
-  font-weight: 400;
-}
 .animated-curve {
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
@@ -332,8 +271,6 @@
   animation: dialog-enter 180ms ease-out;
 }
 .button,
-.side-link,
-.metric-mini,
 .assistant-launch {
   transition:
     background-color 150ms,
@@ -374,10 +311,6 @@
   .account-security input {
     font-size: 16px;
   }
-  .observation-timeline ol {
-    grid-template-columns: 1fr 1fr;
-    gap: 16px 0;
-  }
 }
 @media (max-height: 650px) {
   .assistant-dialog textarea {
@@ -390,8 +323,6 @@
     animation: none;
   }
   .button,
-  .side-link,
-  .metric-mini,
   .assistant-launch {
     transition: none;
   }
@@ -402,14 +333,6 @@
     display: none;
   }
 }
-
-.observation-timeline .eyebrow {
-  color: var(--orchid);
-}
-
-.mobile-services {
-  display: none;
-}
 @media (max-width: 800px) {
   .marketing-nav nav {
     display: flex;
@@ -417,26 +340,5 @@
     flex-basis: 100%;
     justify-content: flex-start;
     gap: 24px;
-  }
-  .mobile-services {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 24px;
-    padding: 0 16px;
-    background: white;
-    border-bottom: 1px solid var(--border);
-  }
-  .mobile-services a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    font-size: 13px;
-    font-weight: 600;
-  }
-}
-@media (max-width: 800px) {
-  .dashboard-layout .dashboard-content > .observation-timeline {
-    order: 4;
-    width: 100%;
   }
 }

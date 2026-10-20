@@ -1,0 +1,148 @@
+/* Dashboard themes. Light tokens live in dashboard.css; dark restates them with the warm ink palette. */
+.dashboard-layout[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1d1815;
+  --surface: #27201c;
+  --ink: #f1e9e2;
+  --muted: #b3a59b;
+  --border: #43372f;
+  --soft: #2f2722;
+  --accent: #8ac1bd;
+  --warning: #e3b36a;
+  --danger: #f0848b;
+  --workspace-bg: #1d1815;
+  --workspace-text: #f1e9e2;
+  --workspace-muted: #b3a59b;
+  --workspace-line: #43372f;
+  --workspace-accent: #8ac1bd;
+  --workspace-selected: #34403d;
+  --scroll-thumb: #5a4d46;
+  --scroll-track: #27201c;
+  --scroll-hover: #8ac1bd;
+  --warning-bg: #4b3a22;
+  --viewport-bg: #241d1a;
+  --on-selected: #b7e0dc;
+}
+.dashboard-layout {
+  --warning-bg: #f8ecd9;
+  --viewport-bg: #f1ebe5;
+  --on-selected: #145a55;
+  background: var(--workspace-bg);
+}
+/* Surfaces that carried literal light colors */
+.dashboard-layout .metric-option[aria-pressed="true"] {
+  color: var(--on-selected);
+}
+.dashboard-layout .twin-viewport,
+.dashboard-layout .bim-launch {
+  background: var(--viewport-bg);
+}
+.dashboard-layout .tag-warning {
+  background: var(--warning-bg);
+}
+.dashboard-layout[data-theme="dark"] .metric-option[aria-pressed="true"] {
+  border-color: #4d6a65;
+}
+.dashboard-layout[data-theme="dark"] .workspace-search kbd {
+  border-color: var(--workspace-line);
+}
+/* Floating panels over the 3D view */
+.dashboard-layout[data-theme="dark"] .demo-banner {
+  background: #2c3b38;
+  border-color: #3f5651;
+  color: var(--ink);
+}
+.dashboard-layout[data-theme="dark"] .pill {
+  background: #342b26;
+  border-color: var(--workspace-line);
+  color: var(--workspace-muted);
+}
+.dashboard-layout[data-theme="dark"] .pill.demo {
+  background: #3d2b36;
+  color: #e3b0cc;
+  border-color: #5b3f50;
+}
+.dashboard-layout[data-theme="dark"] .pill.warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-color: #6a5330;
+}
+.dashboard-layout[data-theme="dark"] .pill.normal {
+  background: #28403b;
+  color: #9ed3c6;
+  border-color: #3f5f57;
+}
+.dashboard-layout[data-theme="dark"] .insight {
+  border-color: var(--workspace-line);
+}
+.dashboard-layout[data-theme="dark"] .insight-icon {
+  border-color: #6a5330;
+  background: var(--warning-bg);
+}
+.dashboard-layout[data-theme="dark"] .model-tag,
+.dashboard-layout[data-theme="dark"] .bim-preview-note {
+  color: var(--workspace-muted);
+  border-color: var(--workspace-line);
+}
+.dashboard-layout[data-theme="dark"] .button.secondary,
+.dashboard-layout[data-theme="dark"] .button.ghost {
+  color: #e3b0cc;
+  border-color: #5b3f50;
+  background: transparent;
+}
+.dashboard-layout[data-theme="dark"] :is(table, thead, tbody, tr, th, td) {
+  border-color: var(--workspace-line);
+}
+.dashboard-layout[data-theme="dark"] :is(input, select, textarea) {
+  background: var(--workspace-bg);
+  color: var(--workspace-text);
+  border-color: #5a4d46;
+}
+/* Assistant dialog (rendered inside the dashboard layout) */
+.dashboard-layout[data-theme="dark"] .assistant-dialog {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+.dashboard-layout[data-theme="dark"] .assistant-surface > header {
+  background: #3d2b36;
+}
+.dashboard-layout[data-theme="dark"] :is(.eyebrow, .chat-turn h3) {
+  color: #e3b0cc;
+}
+.dashboard-layout[data-theme="dark"] .notice,
+.dashboard-layout[data-theme="dark"] .chat-turn > p:first-of-type {
+  background: #2c3b38;
+  color: var(--ink);
+}
+.dashboard-layout[data-theme="dark"] .assistant-dialog textarea {
+  background: var(--workspace-bg);
+  color: var(--ink);
+  border-color: #5a4d46;
+}
+.dashboard-layout[data-theme="dark"] .button.primary {
+  color: #1d1815;
+}
+.dashboard-layout .twin-grid {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+.dashboard-layout {
+  --grid-line: #e4dad2;
+}
+.dashboard-layout[data-theme="dark"] {
+  --grid-line: #2d2521;
+}
+.dashboard-layout .model-tag {
+  background: var(--surface);
+  color: var(--workspace-muted);
+}
+.dashboard-layout[data-theme="dark"] .model-tag {
+  background: var(--surface);
+}
+.dashboard-layout[data-theme="dark"]
+  :is(.text-button, .chart-table > summary, .demo-banner > a) {
+  color: var(--workspace-accent);
+}

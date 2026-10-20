@@ -77,7 +77,7 @@ Les variables de web/styles/platform.css sont la source d'exécution canonique (
 Familles système sur les pages publiques; Manrope variable auto-hébergée sur le dashboard (paquet @fontsource-variable/manrope 5.3.0, SIL OFL). La police est chargée avec la route et possède un repli système; aucune requête à Google Fonts. Titres marketing grands et légèrement resserrés, titres produit sobres, mesures en chiffres tabulaires et légendes techniques monospace. Français fr-FR; dates Europe/Paris. Aucune police décorative dans les tableaux.
 
 ## Layout
-Rythme 4 px, panneaux 24 px. Accueil asymétrique texte/axonométrie; dashboard rail blanc 224 px et grille asymétrique : BIM/historique dans la colonne principale, métriques/points à examiner dans une colonne de 304 px (340 px au-delà de 1600 px). Sous 1150 px les panneaux passent en colonne; sous 800 px la navigation est horizontale et les alertes précèdent les mesures puis graphique/BIM. Le document reste scrollable.
+Rythme 4 px, panneaux 24 px. Accueil asymétrique texte/axonométrie; dashboard : barre supérieure (marque, navigation, source, actions) puis, en vue d’ensemble sur écran large, un atelier plein cadre où le jumeau 3D occupe tout l’espace et des panneaux flottants (niveaux et cartes thermiques à gauche; capteurs et historique à droite) le recouvrent, avec une barre temporelle en bas. Sous 1151 px les éléments s’empilent : vue, outils, panneaux, barre temporelle. Les pages Capteurs et Insights restent des pages centrées. Le document reste scrollable sauf l’atelier plein écran.
 
 ## Elevation & Depth
 Surfaces blanches et bordures gris bleu; ombre légère pour la vue axonométrique et panneaux flottants seulement. La profondeur 3D encode l'orientation du bâtiment.
@@ -101,13 +101,13 @@ Le tri natif du catalogue expose `aria-sort` sur la colonne active, avec boutons
 
 Mouvement : transitions de couleur de 150 ms pour confirmer un état; tracé des courbes 650 ms pour matérialiser une sélection, ouverture du dialogue 180 ms; aucun mouvement permanent. Le défilement doux est désactivé avec `prefers-reduced-motion`. Les pages publiques conservent leurs polices système; le dashboard charge sa police locale avec la route.
 
-Méthode de référence : [les huit méthodes de conception](docs/design-workflow.md). Aucune nouvelle référence externe consultée pendant cette passe; l’inspiration métier Tandem n’implique aucune affiliation Autodesk.
+Méthode de référence : [les huit méthodes de conception](docs/design-workflow.md). L’inspiration métier Tandem n’implique aucune affiliation Autodesk. Références Godly de la passe du 2026-10-19 : voir la section « Références consultées » ci-dessous.
 
 ## Frontend React
 
 React possède les interfaces déclaratives, les contrôles, les états et les textes; Xeokit possède la géométrie et la sélection GPU. React Router conserve les filtres dans l’URL et la scène reste montée entre vues du dashboard. Les pages publiques partagent la palette demandée et conservent leurs familles système; le dashboard utilise les variantes documentées ci-dessous. La réduction des animations reste respectée. Le graphique propose une observation sélectionnée au pointeur ou avec un curseur natif au clavier; aucune information ne dépend uniquement du survol. Les boutons, messages et champs restent partagés, sans nouvelle bibliothèque de style concurrente.
 
-## Poste de surveillance — affinement du dashboard
+## Poste de surveillance — affinement du dashboard (partiellement remplacé par « Atelier 3D » ci-dessous)
 
 Le dashboard adopte un rail blanc, un espace ivoire chaud et une sélection verre marin. Il s’agit d’une création originale répondant à la demande d’une composition de dashboard de type kit UI; aucun fichier ni modèle Figma n’a été consulté (connecteur absent de la session). Aucun élément n’est présenté comme importé de Figma.
 
@@ -127,3 +127,31 @@ Palette explicitement fournie dans l’URL Figma Color Palette Generator : #AB6C
 Page de connexion : panneau verre marin et illustration schématique; formulaire lisible sur blanc. Business : offre avec prix Stripe réel et parcours de facturation en trois étapes, sans faux tarif ou témoignage. Compte : identité et une tâche de sécurité explicite. Assistant : bouton dans l’en-tête, dialogue natif avec consentement et provenance; aucun élément flottant ne masque les mesures. Chronologie : quatre dernières observations, synchronisées à la métrique, sans événements d’exploitation inventés.
 
 `services.css` possède ces compositions. Le tracé SVG n’est animé qu’au montage/changement de métrique ou taille de série; aucun redémarrage au survol. La préférence de réduction des mouvements supprime les animations. Les informations restent visibles indépendamment de l’animation.
+
+## Références consultées (2026-10-19)
+
+Pages Godly réellement récupérées : https://godly.design/ (accueil), https://godly.design/apps (liste, sans examen des fiches), https://godly.design/website/reevo, /website/superpower, /website/paradigmai et /website/cloaked. Les captures d’en-tête de Reevo, Superpower et Paradigm ont été regardées; celles de Cloaked n’ont pas été examinées (texte de la fiche seulement). Les sites eux-mêmes n’ont pas été visités et aucune animation n’a été observée en situation : seules des images fixes ont été vues. Aucune interface n’est copiée.
+
+Principes retenus : libellés techniques en capitales monospace et filets verticaux entre indicateurs (Superpower, Paradigm); étiquettes d’état en pastille avec point, y compris pour « sans mesure » (Paradigm); mise en évidence brève d’une valeur qui change (état « en cours de mise à jour » de Paradigm). Principes écartés : fond sombre, photographie plein cadre, titres capitales ultra-condensées (Reevo, Superpower) — contraires à l’identité et aux consignes ci-dessus.
+
+Mouvement ajouté, tous supprimés par `prefers-reduced-motion` : compteur 650 ms de la conformité à l’affichage, apparition échelonnée (380 ms, 40 ms par ligne) des métriques au montage, surbrillance de 900 ms d’une valeur modifiée par une actualisation. Aucun mouvement permanent.
+
+## Thèmes clair et sombre du dashboard (2026-10-19)
+
+L’espace connecté et la démonstration proposent un thème clair (identité ci-dessus) et un thème sombre. Le thème sombre est un brun chaud (`#1d1815` fond, `#27201c` surfaces, `#f1e9e2` texte), pas un noir; verre marin `#8ac1bd` pour les sélections et le focus, ambre `#e3b36a` pour la vigilance, prune éclaircie `#e3b0cc` pour les textes et contours d’actions secondaires. Les jetons vivent dans `web/src/theme.css` sous `.dashboard-layout[data-theme="dark"]`; les jetons clairs restent dans dashboard.css et platform.css. Les pages publiques, le compte et Business gardent leur thème clair.
+
+Le thème suit `prefers-color-scheme` tant que le visiteur n’a pas choisi; le bouton de l’en-tête alterne ensuite clair/sombre et mémorise le choix dans `localStorage` (convenance par visiteur, sans donnée sensible; indisponible = le choix vaut pour la visite).
+
+La composition de la vue d’ensemble est décrite dans « Atelier 3D » ci-dessous.
+
+## Atelier 3D (2026-10-19, remplace le rail latéral et la grille de la vue d’ensemble)
+
+Le rail latéral, le résumé en bandeau et la chronologie de quatre observations de la vue d’ensemble sont remplacés par la composition de la maquette validée (inspirée de Tandem et des exemples APS `aps-iot-extensions-demo` / `aps-digital-twin`, voir « Références consultées »). Les autres descriptions de ce fichier restent valables pour les pages Capteurs, Insights, Compte et Business.
+
+- **Barre supérieure** : marque, navigation (Vue d’ensemble, Capteurs & données, Insights), site et étiquette Démonstration/Source réelle, assistant, recherche (`/`), thème, actualisation, compte, Business, connexion ou déconnexion. Le titre h1 est présent pour les lecteurs d’écran; la page courante est signalée par `aria-current`.
+- **Niveaux** : lus dans le modèle XKT chargé (`IfcBuildingStorey`, noms IFC non traduits). Isoler un niveau met les autres en transparence; « Tous les niveaux » restaure. Avant chargement, le panneau l’indique.
+- **Cartes thermiques** : panneau présent mais inactif (« Aucun capteur relié ») tant que l’association objet-capteur n’existe pas. Aucune couleur illustrative n’est appliquée au vrai modèle.
+- **Capteurs** (onglet) : quatre indicateurs calculés, liste groupée par famille (`sensor.family`, « Environnement » par défaut tant que l’API ne la fournit pas), lignes sélectionnables avec jauge de seuil. **Points à examiner** (onglet) : règles explicables avec compteur. Les outils BIM, maintenance et actions restent dans l’ancien viewer, lié depuis le pied du panneau.
+- **Historique** : même composant que précédemment, compact; la sélection d’observation est partagée avec la **barre temporelle** (précédent, lecture, suivant; lecture 700 ms par observation, interrompue par un changement de métrique). Le curseur natif « Observation sélectionnée » reste le contrôle clavier; la piste de la barre est décorative.
+- **Outils 3D** : barre horizontale en bas du jumeau (ajuster, tourner, zoomer, transparence, télécharger le XKT).
+- Les tailles de cible des lignes de panneaux (36 à 40 px) sont inférieures aux 44 px des boutons principaux : écart assumé pour la densité, au-dessus du minimum WCAG 2.2 de 24 px.

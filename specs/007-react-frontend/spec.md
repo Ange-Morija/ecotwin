@@ -13,3 +13,5 @@ Demande : remplacer le frontend par une stack adaptée aux interfaces dynamiques
 - Livraison : même build statique servi par FastAPI ou Nginx, Docker reproductible depuis le lockfile, SDK et XKT locaux, IFC source hors distribution, tests navigateur et typage strict.
 
 Le scope n’ajoute ni SSO, ni multi-sites, ni IA, ni import IFC. Les outils historiques de mesure/maintenance/actions restent accessibles et testés; leur moteur n’est pas réécrit sans nécessité fonctionnelle.
+
+Mise à jour 2026-10-19 : la composition de la vue d’ensemble (barre supérieure, atelier 3D plein écran, thèmes clair/sombre, barre temporelle) est décrite dans [specs/009-workspace-themes](../009-workspace-themes/spec.md); les critères ci-dessus restent valables (navigation sans rechargement, canvas conservé, URL, catalogue, résilience). `view=bim` est ramené à `view=overview`.

@@ -16,4 +16,6 @@ Le changement de mot de passe vérifie le secret actuel, limite les erreurs et r
 
 Chat : quotas utilisateur et global persistés, contenu borné, aucun outil exécutant des opérations, textes rendus sans HTML, pas de persistance locale des conversations. Voir [politique de transmission et limites](ai-integration.md).
 
+Navigateur : aucune donnée sensible n’est stockée; seule la préférence de thème (`ecotwin-theme`: clair ou sombre) est conservée dans `localStorage`, avec accès protégé par try/catch.
+
 Stripe : prix et client possédés par le serveur, CSRF, Checkout/Portal hébergés, signature temporelle du corps brut, identifiants d’événements dédupliqués, statut relu chez Stripe. Pas de stockage de carte ni droit accordé par retour navigateur. Mode live nécessite une activation explicite. Les paiements ne fournissent pas l’isolation multi-client encore absente. Voir [activation et limites](billing.md).

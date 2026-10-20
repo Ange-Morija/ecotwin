@@ -43,13 +43,9 @@ test("assistant non configuré, modal clavier et timeline synchronisée", async 
   page,
 }) => {
   await page.goto("/dashboard?mode=demo");
-  await expect(
-    page.getByRole("heading", { name: /Dernières observations/ }),
-  ).toContainText("Température");
+  await expect(page.locator(".timeline-readout")).toContainText("°C");
   await page.getByLabel("Métrique", { exact: true }).selectOption("CAP_PM25");
-  await expect(
-    page.getByRole("heading", { name: /Dernières observations/ }),
-  ).toContainText("PM2.5");
+  await expect(page.locator(".timeline-readout")).toContainText("µg/m³");
   const button = page.getByRole("button", {
     name: "Assistant IA",
     exact: true,
@@ -193,9 +189,7 @@ for (const width of [320, 768, 1440])
       if (path.includes("dashboard")) {
         if (width <= 768) {
           await expect(
-            page
-              .getByRole("navigation", { name: "Compte et facturation" })
-              .getByRole("link", { name: "Business et facturation" }),
+            page.getByRole("link", { name: "Business", exact: true }),
           ).toBeVisible();
         }
         await page

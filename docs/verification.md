@@ -125,3 +125,71 @@ Vérifications réellement exécutées :
 Limites : Chromium uniquement. Aucun appel OpenAI réel, aucun Checkout/Portal/webhook externe Stripe et aucun paiement réel exécutés, faute de configuration du propriétaire. Le modèle, le prix, le secret brut de signature et les politiques de données/commercialisation restent à configurer/valider. Les écrans désactivés sont intentionnels dans cet état, pas des réponses IA ou paiements simulés présentés comme réels. Le test Influx réel n’a pas été exécuté ici. Les risques de dépendances Xeokit déjà suivis en R007 restent ouverts; aucun audit npm supplémentaire n’est revendiqué pour ce lot.
 
 Le brouillon cloud a enregistré les besoins non secrets et les bindings sortants `ECOTWIN_OPENAI_API_KEY`/`STRIPE_SECRET_KEY`, ajoutant `api.openai.com` et `api.stripe.com`. Cela ne configure pas le secret brut de webhook, n’applique pas les clés au processus en cours et ne publie pas l’environnement. Revoir/enregistrer les valeurs dans les paramètres, puis publier l’environnement avant une validation externe. Aucune mise en production applicative n’a été effectuée.
+
+## 2026-10-19 — Indicateur de conformité et jauges de métriques
+
+Changement : quatrième indicateur du résumé et jauges par métrique (`Dashboard.tsx`, `dashboard.css`); test e2e du nombre d’indicateurs passé de 3 à 4.
+
+Vérifications réellement exécutées : build React/TypeScript (`npm run build`) réussi; captures Chromium à 1440 et 390 px sur la distribution statique avec une API simulée (quatre capteurs dont un sans mesure et un au-dessus du seuil), inspectées.
+
+Non exécutés : le backend Python n’a pas pu être installé dans cet environnement (échec de compilation de pydantic-core), donc ni tests API ni scénarios Playwright, y compris le test modifié. Aucun contrôle axe sur la nouvelle zone. À rejouer : `npm run test:e2e`.
+
+Complément du 2026-10-19 (mouvement et références) : `npm run build`, `npm run check`, `npm run format:check` et `npm run test:unit` exécutés; captures ordinateur inspectées après ajout des pastilles d’état et du compteur. Les animations ne sont pas validées en mouvement réduit par un test automatisé, et la surbrillance d’une valeur modifiée n’a pas été observée en situation réelle (aucun rafraîchissement simulé). Mêmes limites que ci-dessus : ni API ni Playwright.
+
+## 2026-10-19 — Thèmes clair/sombre et atelier 3D plein écran
+
+Changement : thèmes clair/sombre; vue d’ensemble refondue en atelier 3D (barre supérieure, panneaux flottants, barre temporelle), suppression du rail latéral, de la chronologie de quatre observations et du CSS associé; niveaux lus dans le vrai modèle (2 niveaux IFC : `NIV_baja`, `NIV_cubierta`).
+
+Vérifications réellement exécutées : `npm run build`, `npm run check`, `npm run format:check`, `npm run test:unit`. Sur la distribution statique avec une API simulée (8 capteurs dont un sans mesure, 1 point de vigilance) et Chromium : suivi de `prefers-color-scheme`, bascule et mémorisation; **axe WCAG A/AA/2.1/2.2 sans violation** sur vue d’ensemble, capteurs et insights, en clair et sombre, à 1440 et 390 px, sans débordement horizontal et avec un seul h1; parcours scriptés réussis (sélection d’une métrique et URL, onglets, repli de famille, précédent/suivant/lecture/pause de la barre temporelle, scène 3D conservée entre vues, raccourci `/`, pause de l’actualisation); chargement du vrai modèle XKT (WebGL logiciel) avec trois boutons de niveau et isolation de NIV_baja; captures ordinateur et mobile inspectées dans les deux thèmes, dont le dialogue de l’assistant. Deux défauts trouvés puis corrigés : contraste du bouton « Charger le modèle 3D » en sombre, barre d’outils étirée après la refonte.
+
+Limites : le backend Python n’a pas pu être installé ici (compilation de pydantic-core). Aucun test d’API ni scénario Playwright **du dépôt** n’a été exécuté, y compris le nouveau test « atelier » et les tests adaptés à la refonte (liens, `.workspace-stage`, onglet Points à examiner); les parcours ci-dessus sont des scripts équivalents sur API simulée, pas la suite. À rejouer : `npm run test:e2e`. Non vérifiés : Compte et Business (non thématisés), mouvement réduit, rendu WebGL en thème sombre au-delà d’une capture, plusieurs familles de capteurs (l’API n’en fournit pas : tout est « Environnement »), identifiants de niveaux sur d’autres modèles, lecture sur 7 jours. Les cartes thermiques et l’association objet-capteur restent non livrées.
+
+## 2026-10-19 — Nettoyage du dépôt
+
+Supprimé : ~140 règles CSS sans aucune utilisation (rail latéral, ancienne grille de la vue d’ensemble, cartes de résumé historiques) dans platform.css, services.css, react.css, theme.css; l’icône `logout`; `ObservationTimeline`. Déplacé : `web/assets/data.csv` (2,7 Mo, échantillon du script de rejeu, jusque-là copié et servi publiquement dans la distribution) vers `data-model/samples/`.
+
+Vérifications réellement exécutées : `tsc --noUnusedLocals`, build, format, tests Node; comparaison pixel à pixel de 32 captures (8 routes × 1440/390 px × clair/sombre) entre l’état précédent et l’état nettoyé, avec mesure du bruit en comparant l’ancien build à lui-même : écarts de 0 à 7 pixels, identiques au bruit. Cette comparaison a révélé une régression (règle de couleur des liens en thème sombre supprimée à tort), corrigée avant le commit.
+
+Non fait / limites : captures de `docs/images/` non régénérées (elles montrent l’ancienne interface et exigent l’API de démonstration réelle, indisponible ici); `premium-ui.json` conservé (aucune référence dans le dépôt, probablement lu par un outil externe); tests API et Playwright du dépôt non exécutés; Ruff non exécuté (environnement Python non installable ici).
+
+## 2026-10-19 — Mise à jour des documents et de Spec Kit
+
+Ajouté `specs/009-workspace-themes/` (spec, plan, tâches W001–W014) pour l’atelier 3D et les thèmes; mis à jour specs 001 (FR-011, plan mobile), 007 (spec, plan, tâches : R011/R012 déplacées vers 009), 008 (chronologie remplacée), README, docs/README, product, architecture, security (préférence de thème en `localStorage`) et AGENTS.md.
+
+Vérifications réellement exécutées : `check-prerequisites.sh --require-spec --include-tasks` valide pour 001, 007, 008 et 009 (avec `SPECIFY_FEATURE_DIRECTORY`, la branche de travail n’étant pas numérotée Spec Kit); liens relatifs des fichiers modifiés contrôlés par script.
+
+Limites : tâches W010 à W014 ouvertes, en particulier la suite Playwright et les tests API du dépôt jamais rejoués depuis la refonte; captures de `docs/images/` toujours à régénérer; la constitution n’a pas été modifiée (aucun principe ne change).
+
+## 2026-10-19 — Rejeu des suites du dépôt après la refonte (W010)
+
+Débloqué : le backend ne s’installait pas sous Python 3.13 (pydantic-core 2.16.3 n’a pas de binaire); avec Python 3.12 (`uv venv .venv --python 3.12`) l’installation avec hashes réussit.
+
+Exécuté : `pytest api/tests` → **25 réussis, 1 ignoré** (test InfluxDB jetable); `ruff check` et `ruff format --check` OK; `npm run test:e2e` (Chromium, WebGL logiciel, serveur FastAPI isolé) → **26/26 réussis** après corrections. Premier passage : 18 réussis, 8 échecs, tous dus à la refonte :
+- titre h1 en double (barre supérieure et titre de page) → un seul h1 par page (sr-only sur l’atelier, visible sur les pages);
+- nom de l’utilisateur disparu avec le rail → affiché dans la barre supérieure en mode connecté;
+- Points à examiner monté en double dans le DOM (onglet masqué) → monté seulement quand l’onglet est actif;
+- contraste mesuré pendant l’apparition en fondu des lignes de capteurs → animation limitée au déplacement, sans opacité;
+- navigation de la barre supérieure débordant à 320 px → retour à la ligne;
+- tests adaptés à la nouvelle interface : chronologie → barre temporelle, navigation mobile compte/facturation → liens de la barre supérieure.
+Le nouveau test « atelier » (familles, onglets, lecture, niveaux du vrai modèle) et le test de thème passent.
+
+Captures `docs/images/` régénérées avec l’API de démonstration réelle (dashboard clair, sombre, mobile; assistant bureau et mobile). Tâches W010 et W013 closes; W014 reste ouverte (WebGL en sombre, 7 jours, autres modèles, thème sombre dans la suite).
+
+## 2026-10-19 — Revue automatisée de la PR (Codex)
+
+Deux remarques P2 jugées fondées et corrigées : (1) la conformité et la barre segmentée ignoraient les dépassements sur donnée ancienne (statut `stale`) — elles comparent désormais la valeur au seuil et la fraîcheur s’affiche à part; (2) l’animation d’apparition des lignes, la surbrillance, les transitions de jauge, de famille et de la tête de lecture ne respectaient pas le mouvement réduit (les raccourcis `animation`/`transition` des classes l’emportent sur la règle universelle de platform.css) — override ajouté. Deux tests e2e ajoutés; ils échouent sans le correctif et passent avec. Suite complète rejouée : 28/28 réussis.
+
+## 2026-10-19 — Échec de CI hérité de `main` : débordement de l’accueil à 320 px
+
+La CI échouait sur `platform.spec.js:406` (« petits écrans, textes longs ») **déjà sur `main`** depuis le 16 octobre (5 runs rouges consécutifs, même ligne 436) : le test passait en local mais pas sur le runner, dont les polices par défaut sont plus larges. Cause reproduite en forçant « DejaVu Sans » : sur la page d’accueil à 320 px, la colonne de la section « usages » s’élargissait au contenu minimal (titre) et le bouton « Ouvrir le site de démonstration » (`white-space: nowrap`) dépassait de 7 px.
+
+Correctif (`web/styles/platform.css`) : `min-width: 0` sur les enfants de `.use-section`, retour à la ligne du titre et du bouton. Le test impose désormais une police large (DejaVu Sans, Liberation Sans) avant la mesure : il échoue sans le correctif (0,8 s, comme en CI) et passe avec; aucun débordement non plus avec IPAGothic, WenQuanYi Zen Hei, FreeSans, Liberation Sans, Unifont et Loma à 320 et 768 px sur l’accueil, l’inscription et le catalogue.
+
+
+## 2026-10-20 — Thème sombre dans la suite Playwright
+
+Changement : trois tests `thème sombre 320/768/1440px` ajoutés à `tests/e2e/platform.spec.js` (vue d’ensemble, capteurs, insights en démonstration, `prefers-color-scheme: dark`): thème appliqué, pas de débordement horizontal, axe WCAG A/AA/2.1/2.2 sans violation.
+
+Vérifications réellement exécutées : `npx playwright test` en local, **31/31**. Non rejoué en CI au moment de l’écriture.
+
+Limites : le test ne couvre ni Compte/Business (non thématisés), ni le rendu WebGL du vrai modèle en sombre, ni la lecture sur 7 jours, ni les niveaux d’autres modèles. Ces points de W014 restent ouverts.

@@ -14,13 +14,16 @@ const paths = {
   alert: "m12 3 10 18H2Zm0 6v5m0 3v1",
   search: "M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14m5 12 6 6",
   close: "m6 6 12 12M6 18 18 6",
-  logout: "M9 4H4v16h5m5-13 5 5-5 5m-6-5h11",
   eye: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Zm10-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6",
   lock: "M5 10h14v11H5zm3 0V6a4 4 0 0 1 8 0v4",
   plus: "M12 5v14M5 12h14",
   minus: "M5 12h14",
   fit: "M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5",
   building: "M4 21V7l8-4v18m0-11h8v11M2 21h20M7 8v2m0 3v2m0 3v1m9-5v2m0 2v1",
+  play: "M7 4.5v15l12-7.5Z",
+  pause: "M8 5v14m8-14v14",
+  sun: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4",
+  moon: "M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10Z",
   help: "M9 8a3 3 0 0 1 6 1c0 2-3 2-3 5m0 3v1M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20",
 };
 export type IconName = keyof typeof paths;

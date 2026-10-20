@@ -5,18 +5,18 @@ React 19 + TypeScript strict + Vite 8 + React Router 7, versions exactes dans pa
 
 ## Propriétaires
 - `web/src/App.tsx` : routes, frontières d’erreur/chargement et navigation clavier.
-- `pages/Landing.tsx`, `pages/Auth.tsx`, `pages/Dashboard.tsx` : parcours.
+- `pages/Landing.tsx`, `pages/Auth.tsx`, `pages/Dashboard.tsx` : parcours; la coque et l’atelier du dashboard sont décrits dans le plan 009.
 - `components/ui.tsx` : boutons, navigation, icônes, messages et indicateurs.
 - `components/TrendPanel.tsx` : graphique SVG déclaratif, sélection d’observation, table et CSV; une série de 24 ou 168 points.
 - `components/SensorTable.tsx` : catalogue borné, recherche/filtre/tri et export cohérent.
-- `components/BimPanel.tsx` : cycle de vie React, textes et commandes; `lib/bim-engine.ts` : objets GPU et SDK chargé à la demande, callbacks, destruction. Une seule scène.
+- `components/BimPanel.tsx` : cycle de vie React, textes et commandes; `lib/bim-engine.ts` : objets GPU et SDK chargé à la demande, callbacks, destruction. Une seule scène. `BimPanel` lit aussi les niveaux du modèle chargé et les isole (`levels`, `isolate`).
 - `lib/useDashboard.ts` : appels groupés, annulation et délai de réponse, rafraîchissement toutes les 30 secondes si onglet visible, reprise réseau, état périmé et retour à la période de la dernière réponse exploitable après échec.
 - `lib/types.ts` et `lib/api.ts` : contrats TypeScript et client même origine; aucun secret stocké dans le navigateur.
-- `platform.css` : tokens; `react.css` : agencement des composants React. Le build Vite produit CSS et JS minifiés par route dans `web/dist/app-assets`.
+- `platform.css` : tokens; `react.css` : agencement des composants React; `dashboard.css`, `theme.css` et `workspace.css` : poste de surveillance, thèmes et atelier (voir 009). Le build Vite produit CSS et JS minifiés par route dans `web/dist/app-assets`.
 
-URL : mode, view, metric, period, q, state, sort, dir. Recherche en replaceState; navigation/choix validés en pushState. Le point de graphique sélectionné, le détail d’insight et l’ouverture de la table sont éphémères et conservés pendant les actualisations. Aucun stockage local de données ou session.
+URL : mode, view (overview, sensors, insights; `bim` retombe sur overview), metric, period, q, state, sort, dir. Recherche en replaceState; navigation/choix validés en pushState. Le point de graphique sélectionné, le détail d’insight et l’ouverture de la table sont éphémères et conservés pendant les actualisations. Aucun stockage local de données ou session.
 
-Mobile : résumé et vigilance avant graphique/BIM; filtres natifs, slider clavier/tactile, catalogue défilable dans une région focalisable, mêmes opérations qu’au bureau. Aucun blocage du défilement natif; préférence de réduction des animations conservée. Mode portrait et paysage reposent sur les mêmes breakpoints.
+Mobile : vue 3D, outils, puis panneaux (capteurs, alertes, historique) et barre temporelle empilés; filtres natifs, slider clavier/tactile, catalogue défilable dans une région focalisable, mêmes opérations qu’au bureau. Aucun blocage du défilement natif; préférence de réduction des animations conservée. Mode portrait et paysage reposent sur les mêmes breakpoints.
 
 ## Distribution
 `npm run build` vérifie le typage, construit le bundle, copie les assets utiles et le SDK précompressé, exclut l’IFC source. FastAPI monte `web/dist` et Nginx reçoit ce même dossier. `npm run dev` expose Vite avec proxy `/api` vers FastAPI local pour le rechargement à chaud. Playwright reconstruit avant de lancer son serveur isolé.
