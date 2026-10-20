@@ -668,6 +668,42 @@ test("thème clair/sombre : suit le système, bascule et se souvient du choix", 
   ).toBeVisible();
 });
 
+for (const width of [320, 768, 1440]) {
+  test(`thème sombre ${width}px : sans débordement ni violation axe`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of [
+      "/dashboard?mode=demo",
+      "/dashboard?mode=demo&view=sensors",
+      "/dashboard?mode=demo&view=insights",
+    ]) {
+      await page.goto(path);
+      await expect(page.locator(".dashboard-layout")).toHaveAttribute(
+        "data-theme",
+        "dark",
+      );
+      await expect(page.getByRole("heading", { level: 1 })).toBeAttached();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        ),
+      ).toBe(true);
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(
+        results.violations.map((v) => ({
+          id: v.id,
+          nodes: v.nodes.map((n) => n.target),
+        })),
+        path,
+      ).toEqual([]);
+    }
+  });
+}
+
 test("conformité : un dépassement sur donnée ancienne reste compté au-dessus du seuil", async ({
   page,
 }) => {

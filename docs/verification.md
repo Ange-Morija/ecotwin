@@ -185,3 +185,11 @@ La CI échouait sur `platform.spec.js:406` (« petits écrans, textes longs ») 
 
 Correctif (`web/styles/platform.css`) : `min-width: 0` sur les enfants de `.use-section`, retour à la ligne du titre et du bouton. Le test impose désormais une police large (DejaVu Sans, Liberation Sans) avant la mesure : il échoue sans le correctif (0,8 s, comme en CI) et passe avec; aucun débordement non plus avec IPAGothic, WenQuanYi Zen Hei, FreeSans, Liberation Sans, Unifont et Loma à 320 et 768 px sur l’accueil, l’inscription et le catalogue.
 
+
+## 2026-10-20 — Thème sombre dans la suite Playwright
+
+Changement : trois tests `thème sombre 320/768/1440px` ajoutés à `tests/e2e/platform.spec.js` (vue d’ensemble, capteurs, insights en démonstration, `prefers-color-scheme: dark`): thème appliqué, pas de débordement horizontal, axe WCAG A/AA/2.1/2.2 sans violation.
+
+Vérifications réellement exécutées : `npx playwright test` en local, **31/31**. Non rejoué en CI au moment de l’écriture.
+
+Limites : le test ne couvre ni Compte/Business (non thématisés), ni le rendu WebGL du vrai modèle en sombre, ni la lecture sur 7 jours, ni les niveaux d’autres modèles. Ces points de W014 restent ouverts.

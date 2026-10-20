@@ -14,3 +14,4 @@
 - [ ] W012 Activer les cartes thermiques une fois l’association objet-capteur livrée (dépend de T030 dans `specs/001-digital-twin-platform/tasks.md`).
 - [x] W013 Régénérer les captures de `docs/images/` avec l’API de démonstration réelle (dashboard clair, sombre, mobile, assistant).
 - [ ] W014 Compléter la vérification : rendu WebGL du vrai modèle en thème sombre, lecture sur 7 jours, autres modèles (niveaux), thème sombre dans la suite Playwright (axe 320/768/1440 px et mouvement réduit déjà couverts en clair sur le dashboard de démonstration).
+  - Fait : thème sombre dans la suite Playwright (axe + débordement à 320/768/1440 px, vues d’ensemble, capteurs, insights). Reste : WebGL en sombre, lecture sur 7 jours, autres modèles.
