@@ -4,11 +4,24 @@ Une plateforme de jumeaux numériques pour relier le contexte BIM aux observatio
 Le frontend React et TypeScript propose une présentation produit, une connexion réelle, un espace compte, un chatbot OpenAI configurable, une page Business reliée à Stripe et un dashboard responsive clair/sombre (atelier 3D avec niveaux du modèle XKT, huit métriques environnementales, historique avec lecture, export CSV et insights par règles). Il s'inspire des usages de plateformes comme Autodesk Tandem, avec une identité propre.
 
 ## Aperçu
-![Dashboard EcoTwin — démonstration BIM et données](docs/images/dashboard-desktop.png)
+Le dashboard est un atelier 3D plein écran, en thème clair ou sombre.
+
+![Atelier 3D EcoTwin, thème clair — démonstration BIM et données](docs/images/dashboard-desktop.png)
+![Atelier 3D EcoTwin, thème sombre](docs/images/dashboard-desktop-dark.png)
 
 [Présentation, connexion et captures mobiles](docs/product.md) · [Documentation complète](docs/README.md) · [Architecture](docs/architecture.md) · [Déploiement](docs/deployment.md)
 
 Le pilote et ses lots de maintenance livrent 36 tâches. La [migration React](specs/007-react-frontend/spec.md) modernise les interfaces et l’[atelier 3D avec thèmes clair/sombre](specs/009-workspace-themes/spec.md) recompose le dashboard; 7 lots métier restent planifiés. Les observations de démonstration sont illustratives, le modèle XKT est réel et le chatbot OpenAI est configurable mais non activé sans clé et modèle. Voir [les prochaines tâches](specs/001-digital-twin-platform/tasks.md).
+
+## Interface du dashboard
+- **Barre supérieure**: navigation Vue d’ensemble / Capteurs & données / Insights, recherche (`/`), assistant, bouton de thème clair/sombre, actualisation, compte.
+- **Atelier 3D** (≥ 1151 px, sans défilement de page): jumeau numérique plein cadre, panneau **Niveaux** (lus dans le modèle XKT chargé, avec isolation), **Cartes thermiques** inactives tant que l’association objet-capteur n’existe pas, outils de navigation 3D en bas.
+- **Capteurs** groupés par famille (aujourd’hui « Environnement » seulement), indicateurs de conformité aux seuils, jauges et états textuels; onglet **Points à examiner** pour les insights par règles.
+- **Historique** avec table de valeurs et export CSV; **barre temporelle** (précédent, lecture, pause, suivant) synchronisée avec la sélection du graphique.
+- **Thèmes**: suit `prefers-color-scheme`, bascule par bouton, choix mémorisé dans le navigateur; animations réduites si le système le demande. Sous 1151 px, les panneaux s’empilent.
+- Ce qui n’est pas livré: familles de capteurs multiples dans l’API, cartes thermiques et association objet-capteur, IA prédictive. Compte et Business ne sont pas thématisés.
+
+Spécification: [specs/009-workspace-themes](specs/009-workspace-themes/spec.md); comportements: [UX-CONTRACT.md](UX-CONTRACT.md).
 
 ## Démarrage
 Python 3.11+ (3.12 testé), Node.js 22.12+ et uv.
